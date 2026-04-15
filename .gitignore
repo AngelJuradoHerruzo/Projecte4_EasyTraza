@@ -1,0 +1,38 @@
+# --- IDEs (IntelliJ, Android Studio) ---
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.shelf/
+gen/
+
+# --- Android / Gradle ---
+.gradle/
+**/build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.aab
+*.apk
+output-metadata.json
+*.hprof
+
+# --- Spring Boot / Maven ---
+target/
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.rar
+
+# --- Sistema ---
+.DS_Store
+Thumbs.db
+*.log
+
+# --- Seguretat ---
+*.jks
+*.keystore
+# application-local.properties
