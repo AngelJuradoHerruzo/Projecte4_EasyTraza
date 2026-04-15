@@ -29,8 +29,8 @@ public class UsuariService {
 
     // OBTENIR USUARI PER ID
     public Usuari getUsuariById(Long id) {
-        Optional<Usuari> usuari = usuariRepository.findById(id);
-        return usuari.orElse(null);
+        Optional<Usuari> usuariOpt = usuariRepository.findById(id);
+        return usuariOpt.orElse(null);
     }
 
 

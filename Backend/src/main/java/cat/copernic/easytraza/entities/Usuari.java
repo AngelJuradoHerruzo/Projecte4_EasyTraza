@@ -36,7 +36,15 @@ public class Usuari {
     /*********************       .CONSTRUCTORS.       *********************/
     public Usuari() { }
 
+    public Usuari (Long id, String nomComplet, RolUsuari rolUsuari, String email, String password) {
+        this.id = id;
+        this.nomComplet = nomComplet;
+        this.rolUsuari = rolUsuari;
+        this.email = email;
+        this.password = password;
+    }
 
+    
     /*********************       .GETTERS & SETTERS.       *********************/
     // ─────────── ID ───────────
     public Long getId() { return id; }
