@@ -61,68 +61,56 @@ image::Board_Inicial_Spring1.jpeg[]
 
 image::Board_Final_Spring1.jpeg[]
 
-Sí.
-El problema es que esas tablas tienen un ancho automático poco equilibrado.
-La primera columna queda demasiado estrecha y la segunda demasiado ancha o se rompe según el visor.
-
-Prueba así:
-
 ==== Daily Stand Up
 
-[cols="20,80",options="header"]
-|===
-| Camp | Seguiment
-|===
+===== Divendres 10 d'abril
 
-===== Divendres 10 d’abril
-
-[cols="20,80",frame="all",grid="all"]
+[cols="1,3"]
 |===
 | Ahir | -
 | Avui | Defensa de la recuperació del projecte 2
-| Problemes | No s’ha pogut iniciar el projecte
-| Hores | 0 h
+| Problemes | No s'ha pogut iniciar el projecte
+| Hores | 0h
 |===
 
-===== Dilluns 13 d’abril
+===== Dilluns 13 d'abril
 
-[cols="20,80",frame="all",grid="all"]
+[cols="1,3"]
 |===
 | Ahir | -
-| Avui | Creació d’epics, labels i estructura del projecte.
-Configuració inicial de Spring Boot i definició de packages.
+| Avui | Creació d'epics, labels i estructura del projecte. Configuració inicial de Spring Boot i definició de packages
 | Problemes | Error en la creació del projecte Spring Boot
-| Hores | 6 h
+| Hores | 6h
 |===
 
-===== Dimarts 14 d’abril
+===== Dimarts 14 d'abril
 
-[cols="20,80",frame="all",grid="all"]
+[cols="1,3"]
 |===
 | Ahir | Configuració inicial del projecte
 | Avui | Finalització dels packages
 | Problemes | Poc temps disponible
-| Hores | 2 h
+| Hores | 2h
 |===
 
-===== Dimecres 15 d’abril
+===== Dimecres 15 d'abril
 
-[cols="20,80",frame="all",grid="all"]
+[cols="1,3"]
 |===
-| Ahir | Finalització de l’estructura de packages
-| Avui | Inici de la implementació dels requeriments funcionals
+| Ahir | Estructura de packages finalitzada
+| Avui | Inici implementació dels RF
 | Problemes | Temps limitat
-| Hores | 4 h
+| Hores | 4h
 |===
 
-===== Dijous 16 d’abril
+===== Dijous 16 d'abril
 
-[cols="20,80",frame="all",grid="all"]
+[cols="1,3"]
 |===
-| Ahir | Inici dels requeriments funcionals
-| Avui | Finalització dels requeriments funcionals i de la documentació
+| Ahir | Inici dels RF
+| Avui | Finalització dels RF i documentació
 | Problemes | Temps insuficient
-| Hores | 6 h
+| Hores | 6h
 |===
 
 ==== Retrospective Meeting
