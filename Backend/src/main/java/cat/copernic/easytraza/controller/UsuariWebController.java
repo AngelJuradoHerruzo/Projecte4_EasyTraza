@@ -29,20 +29,26 @@ public class UsuariWebController {
         return "usuaris/formUsuaris";
     }
 
-    @PostMapping
-    public String guardarUsuari(@ModelAttribute Usuari usuari) {
+    @PostMapping("/save")
+    public String guardarUsuari(@ModelAttribute("usuari") Usuari usuari) {
         usuariService.createUsuari(usuari);
         return "redirect:/usuaris/list";
     }
 
     @GetMapping("/edit/{id}")
     public String formEditarUsuari(@PathVariable Long id, Model model) {
-        model.addAttribute("usuari", usuariService.getUsuariById(id));
+        Usuari usuari = usuariService.getUsuariById(id);
+
+        if (usuari == null) {
+            return "redirect:/usuaris/list";
+        }
+
+        model.addAttribute("usuari", usuari);
         return "usuaris/formUsuaris";
     }
 
     @PostMapping("/update/{id}")
-    public String updateUsuari(@PathVariable Long id, @ModelAttribute Usuari usuari) {
+    public String updateUsuari(@PathVariable Long id, @ModelAttribute("usuari") Usuari usuari) {
         usuariService.updateUsuari(id, usuari);
         return "redirect:/usuaris/list";
     }

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuaris - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="layout/sidebar :: sidebar('usuaris')"></div>
+
+    <main class="main">
+
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Administració</p>
+                <h1 class="page-heading">Usuaris</h1>
+                <p class="page-description">
+                    Consulta i gestiona els usuaris registrats al sistema EasyTraza.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/usuaris/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nou usuari</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="content-card">
+
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Llistat general</h2>
+                    <p class="content-subtitle">
+                        Vista general dels usuaris amb accés directe a edició i eliminació.
+                    </p>
+                </div>
+
+                <div class="toolbar-actions">
+                    <div class="search-field">
+                        <i class="bi bi-search"></i>
+                        <input id="searchInput" type="text" placeholder="Cercar usuari...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom complet</th>
+                            <th>Rol</th>
+                            <th>Correu electrònic</th>
+                            <th class="th-actions">Accions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="usuari : ${usuaris}">
+                            <td class="td-id" th:text="${usuari.id}"></td>
+
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar"
+                                         th:text="${#strings.substring(usuari.nomComplet,0,1)}">U</div>
+                                    <div class="user-text">
+                                        <span class="user-name" th:text="${usuari.nomComplet}"></span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="badge-role" th:text="${usuari.rolUsuari}"></span>
+                            </td>
+
+                            <td>
+                                <span class="user-email" th:text="${usuari.email}"></span>
+                            </td>
+
+                            <td class="td-actions">
+                                <div class="table-actions">
+                                    <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}" class="btn-table btn-edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                        <span>Editar</span>
+                                    </a>
+
+                                    <a th:href="@{/usuaris/delete/{id}(id=${usuari.id})}"
+                                       class="btn-table btn-delete"
+                                       onclick="return confirm('Segur que vols eliminar aquest usuari?')">
+                                        <i class="bi bi-trash3"></i>
+                                        <span>Eliminar</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(usuaris)}">
+                            <td colspan="5" class="empty-state">
+                                <div class="empty-box">
+                                    <i class="bi bi-people"></i>
+                                    <p>No hi ha usuaris registrats.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('usersTable');
+    const rows = table.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            if (row.querySelector('.empty-state')) return;
+
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+</body>
+</html>
+
