@@ -49,7 +49,7 @@
                         <i class="bi bi-search"></i>
                         <input id="searchInput" type="text" placeholder="Cercar usuari...">
                     </div>
-                </div>
+                </div>  
             </div>
 
             <div class="table-container">
@@ -60,7 +60,7 @@
                             <th>Nom complet</th>
                             <th>Rol</th>
                             <th>Correu electrònic</th>
-                            <th class="th-actions">Accions</th>
+                            <th class="th-actions" style="text-align: center;">Accions</th>
                         </tr>
                     </thead>
 
@@ -86,9 +86,9 @@
                                 <span class="user-email" th:text="${usuari.email}"></span>
                             </td>
 
-                            <td class="td-actions">
-                                <div class="table-actions">
-                                    <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}" class="btn-table btn-edit">
+                            <td style="text-align: center;">
+                                <div class="table-actions" style="display:inline-flex; gap:8px;">
+                                    <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}" class="btn-table btn-soft">
                                         <i class="bi bi-pencil-square"></i>
                                         <span>Editar</span>
                                     </a>
@@ -140,4 +140,3 @@
 
 </body>
 </html>
-
