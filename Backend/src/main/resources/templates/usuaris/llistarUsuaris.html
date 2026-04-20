@@ -13,7 +13,7 @@
 
 <div class="app-layout">
 
-    <div th:replace="layout/sidebar :: sidebar('usuaris')"></div>
+    <div th:replace="~{layout/sidebar :: sidebar('usuaris')}"></div>
 
     <main class="main">
 
@@ -49,7 +49,7 @@
                         <i class="bi bi-search"></i>
                         <input id="searchInput" type="text" placeholder="Cercar usuari...">
                     </div>
-                </div>  
+                </div>
             </div>
 
             <div class="table-container">
@@ -60,7 +60,7 @@
                             <th>Nom complet</th>
                             <th>Rol</th>
                             <th>Correu electrònic</th>
-                            <th class="th-actions" style="text-align: center;">Accions</th>
+                            <th class="th-actions">Accions</th>
                         </tr>
                     </thead>
 
@@ -79,14 +79,17 @@
                             </td>
 
                             <td>
-                                <span class="badge-role" th:text="${usuari.rolUsuari}"></span>
+                                <span class="badge-role"
+                                      th:classappend="${usuari.rolUsuari.name() == 'OPERARI'} ? ' operari' : ' admin'"
+                                      th:text="${usuari.rolUsuari}">
+                                </span>
                             </td>
 
                             <td>
                                 <span class="user-email" th:text="${usuari.email}"></span>
                             </td>
 
-                            <td style="text-align: center;">
+                            <td class="td-actions">
                                 <div class="table-actions" style="display:inline-flex; gap:8px;">
                                     <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}" class="btn-table btn-soft">
                                         <i class="bi bi-pencil-square"></i>
@@ -127,13 +130,16 @@
     const rows = table.querySelectorAll('tbody tr');
 
     searchInput.addEventListener('keyup', function () {
+
         const filter = this.value.toLowerCase();
 
         rows.forEach(row => {
+
             if (row.querySelector('.empty-state')) return;
 
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
+            const name = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
+
+            row.style.display = name.includes(filter) ? '' : 'none';
         });
     });
 </script>

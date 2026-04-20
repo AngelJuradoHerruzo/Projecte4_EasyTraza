@@ -349,6 +349,7 @@ a {
     min-width: 760px;
     border-collapse: collapse;
     background-color: var(--white);
+    table-layout: fixed;
 }
 
 .data-table thead th {
@@ -360,9 +361,35 @@ a {
     font-weight: 700;
     text-align: left;
     padding: 14px 16px;
+    padding-left: 49px; 
     border-bottom: 1px solid var(--border);
 }
 
+/* Anchos de columnas */
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: left;
+}
+
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+    width: 30%;
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+    width: 17%;
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+    width: 28%;
+}
+
+/* Celdas */
 .data-table tbody td {
     padding: 16px;
     border-bottom: 1px solid #f1e7dc;
@@ -378,11 +405,11 @@ a {
     color: #7f6b5e;
 }
 
-.th-actions,
 .td-actions {
-    text-align: right;
+    text-align: center;
 }
 
+/* Usuari */
 .user-info {
     display: flex;
     align-items: center;
@@ -406,6 +433,15 @@ a {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
+}
+
+.user-name,
+.user-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
 }
 
 .user-name {
@@ -413,21 +449,36 @@ a {
     color: var(--text);
 }
 
-.badge-role {
-    display: inline-flex;
-    align-items: center;
-    padding: 7px 11px;
-    border-radius: 999px;
-    background-color: var(--green-soft);
-    color: var(--green-text);
-    font-size: 12px;
-    font-weight: 700;
-}
-
 .user-email {
     color: var(--muted);
 }
 
+/* Badge rol */
+.badge-role {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    min-width: 90px;
+}
+
+/* Operari verd */
+.badge-role.operari {
+    background-color: var(--green-soft);
+    color: var(--green-text);
+}
+
+/* Admin blau */
+.badge-role.admin {
+    background-color: #e7f0fb;
+    color: #4c78a8;
+}
+
+/* Botons accions */
 .btn-table {
     display: inline-flex;
     align-items: center;
@@ -436,8 +487,12 @@ a {
     border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
-    margin-left: 6px;
+    margin-left: 0;
     transition: background-color 0.2s ease;
+}
+
+.table-actions {
+    margin-left: -30px;
 }
 
 /* ACCIÓN SUAVE (EDITAR / GUARDAR) */
@@ -548,5 +603,9 @@ input[type="password"] {
 
     .toolbar-right {
         width: 100%;
+    }
+
+    .data-table {
+        table-layout: auto;
     }
 }

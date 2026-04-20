@@ -56,7 +56,7 @@
 
                 <form th:action="${usuari.id != null} ? 
                                 @{/usuaris/update/{id}(id=${usuari.id})} : 
-                                @{/usuaris}"
+                                @{/usuaris/save}"
                       th:object="${usuari}"
                       method="post">
 
