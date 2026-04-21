@@ -13,19 +13,28 @@
 
 <div class="app-layout">
 
+    <!-- SIDEBAR -->
     <div th:replace="~{layout/sidebar :: sidebar('usuaris')}"></div>
 
     <main class="main">
 
+        <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
+
+                <!-- Secció -->
                 <p class="page-eyebrow">Administració</p>
+
+                <!-- Títol principal -->
                 <h1 class="page-heading">Usuaris</h1>
+
+                <!-- Descripció -->
                 <p class="page-description">
                     Consulta i gestiona els usuaris registrats al sistema EasyTraza.
                 </p>
             </div>
 
+            <!-- Botó nou usuari -->
             <div class="page-top-actions">
                 <a th:href="@{/usuaris/new}" class="btn btn-primary">
                     <i class="bi bi-plus-lg"></i>
@@ -34,9 +43,13 @@
             </div>
         </section>
 
+        <!----------------------- CONTENIDOR DEL LLISTAT ----------------------->
         <section class="content-card">
 
+            <!----------------------- TOOLBAR SUPERIOR ----------------------->
             <div class="content-toolbar">
+
+                <!-- Títol del llistat -->
                 <div class="toolbar-block">
                     <h2 class="content-title">Llistat general</h2>
                     <p class="content-subtitle">
@@ -44,6 +57,7 @@
                     </p>
                 </div>
 
+                <!-- Cercador -->
                 <div class="toolbar-actions">
                     <div class="search-field">
                         <i class="bi bi-search"></i>
@@ -52,8 +66,11 @@
                 </div>
             </div>
 
+            <!----------------------- TAULA D'USUARIS ----------------------->
             <div class="table-container">
                 <table class="data-table" id="usersTable">
+
+                    <!-- Capçalera de la taula -->
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -64,20 +81,30 @@
                         </tr>
                     </thead>
 
+                    <!-- Cos de la taula -->
                     <tbody>
                         <tr th:each="usuari : ${usuaris}">
+
+                            <!-- ID de l'usuari -->
                             <td class="td-id" th:text="${usuari.id}"></td>
 
+                            <!-- Nom complet amb avatar -->
                             <td>
                                 <div class="user-info">
+
+                                    <!-- Inicial de l'usuari -->
                                     <div class="user-avatar"
                                          th:text="${#strings.substring(usuari.nomComplet,0,1)}">U</div>
+
+                                    <!-- Nom complet -->
                                     <div class="user-text">
                                         <span class="user-name" th:text="${usuari.nomComplet}"></span>
                                     </div>
+
                                 </div>
                             </td>
 
+                            <!-- Rol de l'usuari -->
                             <td>
                                 <span class="badge-role"
                                       th:classappend="${usuari.rolUsuari.name() == 'OPERARI'} ? ' operari' : ' admin'"
@@ -85,27 +112,35 @@
                                 </span>
                             </td>
 
+                            <!-- Correu electrònic -->
                             <td>
                                 <span class="user-email" th:text="${usuari.email}"></span>
                             </td>
 
+                            <!-- Accions (editar i eliminar) -->
                             <td class="td-actions">
                                 <div class="table-actions" style="display:inline-flex; gap:8px;">
+
+                                    <!-- Botó editar -->
                                     <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}" class="btn-table btn-soft">
                                         <i class="bi bi-pencil-square"></i>
                                         <span>Editar</span>
                                     </a>
 
+                                    <!-- Botó eliminar -->
                                     <a th:href="@{/usuaris/delete/{id}(id=${usuari.id})}"
                                        class="btn-table btn-delete"
                                        onclick="return confirm('Segur que vols eliminar aquest usuari?')">
                                         <i class="bi bi-trash3"></i>
                                         <span>Eliminar</span>
                                     </a>
+
                                 </div>
                             </td>
+
                         </tr>
 
+                        <!-- Missatge si no hi ha usuaris -->
                         <tr th:if="${#lists.isEmpty(usuaris)}">
                             <td colspan="5" class="empty-state">
                                 <div class="empty-box">
@@ -124,17 +159,20 @@
 
 </div>
 
+<!----------------------- SCRIPT DE CERCA ----------------------->
 <script>
     const searchInput = document.getElementById('searchInput');
     const table = document.getElementById('usersTable');
     const rows = table.querySelectorAll('tbody tr');
 
+    // Filtra la taula en temps real segons el nom complet
     searchInput.addEventListener('keyup', function () {
 
         const filter = this.value.toLowerCase();
 
         rows.forEach(row => {
 
+            // Ignorem la fila del missatge buit
             if (row.querySelector('.empty-state')) return;
 
             const name = row.querySelector('.user-name')?.textContent.toLowerCase() || '';

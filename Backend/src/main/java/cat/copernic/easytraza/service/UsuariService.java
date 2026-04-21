@@ -36,6 +36,11 @@ public class UsuariService {
 
     // CREAR USUARI
     public Usuari createUsuari(Usuari usuari) {
+        validarDadesUsuari(usuari, null);
+
+        usuari.setNomComplet(usuari.getNomComplet().trim());
+        usuari.setEmail(usuari.getEmail().trim());
+
         return usuariRepository.save(usuari);
     }
 
@@ -45,23 +50,66 @@ public class UsuariService {
 
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
 
-        if (usuariOpt.isPresent()) {
-            Usuari usuariActual = usuariOpt.get();
-
-            usuariActual.setNomComplet(usuari.getNomComplet());
-            usuariActual.setRolUsuari(usuari.getRolUsuari());
-            usuariActual.setEmail(usuari.getEmail());
-            usuariActual.setPassword(usuari.getPassword());
-
-            return usuariRepository.save(usuariActual);
+        if (usuariOpt.isEmpty()) {
+            throw new RuntimeException("Usuari no trobat");
         }
 
-        return null;
+        validarDadesUsuari(usuari, id);
+
+        Usuari usuariActual = usuariOpt.get();
+
+        usuariActual.setNomComplet(usuari.getNomComplet().trim());
+        usuariActual.setRolUsuari(usuari.getRolUsuari());
+        usuariActual.setEmail(usuari.getEmail().trim());
+
+        // Només actualitza la contrasenya si s'ha introduït
+        if (usuari.getPassword() != null && !usuari.getPassword().trim().isEmpty()) {
+            usuariActual.setPassword(usuari.getPassword());
+        }
+
+        return usuariRepository.save(usuariActual);
     }
 
 
     // ELIMINAR USUARI
     public void deleteUsuari(Long id) {
         usuariRepository.deleteById(id);
+    }
+
+
+    // VALIDAR DADES D'USUARI
+    private void validarDadesUsuari(Usuari usuari, Long id) {
+
+        if (usuari.getNomComplet() == null || usuari.getNomComplet().trim().isEmpty()) {
+            throw new RuntimeException("El nom complet és obligatori");
+        }
+
+        if (usuari.getEmail() == null || usuari.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("El correu electrònic és obligatori");
+        }
+
+        if (usuari.getRolUsuari() == null) {
+            throw new RuntimeException("El rol és obligatori");
+        }
+
+        // Si és creació, la contrasenya és obligatòria
+        if (id == null && (usuari.getPassword() == null || usuari.getPassword().trim().isEmpty())) {
+            throw new RuntimeException("La contrasenya és obligatòria");
+        }
+
+        // Validar email duplicat
+        Optional<Usuari> usuariAmbMateixEmail = usuariRepository.findByEmail(usuari.getEmail().trim());
+
+        if (usuariAmbMateixEmail.isPresent()) {
+            // Creació: si ja existeix, error
+            if (id == null) {
+                throw new RuntimeException("Aquest correu electrònic ja està en ús");
+            }
+
+            // Edició: si l'email és d'un altre usuari, error
+            if (!usuariAmbMateixEmail.get().getId().equals(id)) {
+                throw new RuntimeException("Aquest correu electrònic ja està en ús");
+            }
+        }
     }
 }
