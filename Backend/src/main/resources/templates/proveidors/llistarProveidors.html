@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Proveïdors - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('proveidors')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Administració</p>
+                <h1 class="page-heading">Proveïdors</h1>
+                <p class="page-description">
+                    Consulta i gestiona els proveïdors registrats al sistema EasyTraza.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/proveidors/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nou proveïdor</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- CONTENIDOR PRINCIPAL ----------------------->
+        <section class="content-card">
+
+            <!----------------------- TOOLBAR ----------------------->
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Directori de proveïdors</h2>
+                    <p class="content-subtitle">
+                        Vista general amb accés directe a les dades principals de cada proveïdor.
+                    </p>
+                </div>
+
+                <div class="toolbar-actions">
+                    <div class="search-field">
+                        <i class="bi bi-search"></i>
+                        <input id="searchInput" type="text" placeholder="Cercar proveïdor...">
+                    </div>
+                </div>
+            </div>
+
+            <!----------------------- TARGETES ----------------------->
+            <div class="cards-grid" id="proveidorsContainer">
+
+                <article th:each="proveidor : ${proveidors}" class="info-card proveidor-card">
+
+                    <!----------------------- CAPÇALERA TARGETA ----------------------->
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="bi bi-buildings"></i>
+                        </div>
+
+                        <div class="info-card-body">
+                            <h3 class="info-card-title" th:text="${proveidor.nomProveidor}">
+                                Nom proveïdor
+                            </h3>
+
+                            <p class="info-card-description"
+                               th:text="${proveidor.descripcio != null && !#strings.isEmpty(proveidor.descripcio) ? proveidor.descripcio : 'Sense descripció'}">
+                                Descripció
+                            </p>
+                        </div>
+                    </div>
+
+                    <!----------------------- DADES DEL PROVEÏDOR ----------------------->
+                    <div class="info-card-meta">
+
+                        <div class="info-card-meta-item">
+                            <i class="bi bi-upc-scan"></i>
+                            <div class="info-card-meta-text">
+                                <span class="info-card-meta-label">CIF</span>
+                                <span class="info-card-meta-value" th:text="${proveidor.cif}">CIF</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card-meta-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <div class="info-card-meta-text">
+                                <span class="info-card-meta-label">Adreça</span>
+                                <span class="info-card-meta-value"
+                                      th:text="${proveidor.adreca != null && !#strings.isEmpty(proveidor.adreca) ? proveidor.adreca : 'Sense adreça'}">
+                                    Adreça
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!----------------------- ACCIONS ----------------------->
+                    <div class="info-card-actions">
+                        <a th:href="@{/proveidors/edit/{id}(id=${proveidor.id})}" class="btn-table btn-soft">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Editar</span>
+                        </a>
+
+                        <a th:href="@{/proveidors/delete/{id}(id=${proveidor.id})}"
+                           class="btn-table btn-delete"
+                           onclick="return confirm('Segur que vols eliminar aquest proveïdor?')">
+                            <i class="bi bi-trash3"></i>
+                            <span>Eliminar</span>
+                        </a>
+                    </div>
+
+                </article>
+
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(proveidors)}" class="empty-state">
+                    <div class="empty-box">
+                        <i class="bi bi-buildings"></i>
+                        <p>No hi ha proveïdors registrats.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!----------------------- SCRIPT DE CERCA ----------------------->
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.proveidor-card');
+
+    searchInput.addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+</body>
+</html>
