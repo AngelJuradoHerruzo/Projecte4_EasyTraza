@@ -29,13 +29,14 @@ public class ProducteService {
 
     // OBTENIR PRODUCTE PER ID
     public Producte getProducteById(Long id) {
-        Optional<Producte> producteOpt = producteRepository.findById(id);
-        return producteOpt.orElse(null);
+        Optional<Producte> producte = producteRepository.findById(id);
+        return producte.orElse(null);
     }
 
 
     // CREAR PRODUCTE
     public Producte createProducte(Producte producte) {
+        validarDadesProducte(producte);
         return producteRepository.save(producte);
     }
 
@@ -46,9 +47,14 @@ public class ProducteService {
         Optional<Producte> producteOpt = producteRepository.findById(id);
 
         if (producteOpt.isPresent()) {
+            validarDadesProducte(producte);
+
             Producte producteActual = producteOpt.get();
 
-            producteActual.setDescripcio(producte.getDescripcio());
+            producteActual.setNomProducte(producte.getNomProducte().trim());
+            producteActual.setDescripcio(
+                producte.getDescripcio() != null ? producte.getDescripcio().trim() : null
+            );
 
             return producteRepository.save(producteActual);
         }
@@ -60,5 +66,26 @@ public class ProducteService {
     // ELIMINAR PRODUCTE
     public void deleteProducte(Long id) {
         producteRepository.deleteById(id);
+    }
+
+
+    // VALIDAR DADES DEL PRODUCTE
+    private void validarDadesProducte(Producte producte) {
+
+        if (producte.getNomProducte() != null) {
+            producte.setNomProducte(producte.getNomProducte().trim());
+        }
+
+        if (producte.getDescripcio() != null) {
+            producte.setDescripcio(producte.getDescripcio().trim());
+        }
+
+        if (producte.getNomProducte() == null || producte.getNomProducte().isBlank()) {
+            throw new RuntimeException("El nom del producte és obligatori.");
+        }
+
+        if (producte.getDescripcio() != null && producte.getDescripcio().length() > 50) {
+            throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
+        }
     }
 }
