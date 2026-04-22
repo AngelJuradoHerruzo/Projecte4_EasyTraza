@@ -21,7 +21,7 @@ public class MateriaPrima {
     @Column(nullable = false)
     private String nomMateria;
 
-    @Column(length = 150)
+    @Column(length = 50)
     private String descripcio;
 
 

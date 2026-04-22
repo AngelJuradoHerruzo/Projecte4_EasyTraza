@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside class="sidebar" th:fragment="sidebar(activePage)">
+
+    <div class="sidebar-brand">
+        <div class="sidebar-logo-box">
+            <img th:src="@{/img/Logo_EasyTraza.jpg}" alt="Logo EasyTraza" class="sidebar-logo">
+        </div>
+
+        <div class="sidebar-brand-text">
+            <h1>EasyTraza</h1>
+            <p>Panaderia · Gestió web</p>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <p class="sidebar-section">Administració</p>
+
+        <a th:href="@{/productes/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'productes'} ? ' active' : ''">
+            <i class="bi bi-box-seam sidebar-icon"></i>
+            <span>Productes</span>
+        </a>
+
+        <a th:href="@{/usuaris/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'usuaris'} ? ' active' : ''">
+            <i class="bi bi-people sidebar-icon"></i>
+            <span>Usuaris</span>
+        </a>
+
+        <a th:href="@{/proveidors/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'proveidors'} ? ' active' : ''">
+            <i class="bi bi-truck sidebar-icon"></i>
+            <span>Proveïdors</span>
+        </a>
+
+        <a th:href="@{/materies-primeres/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'materies'} ? ' active' : ''">
+            <i class="bi bi-flower1 sidebar-icon"></i>
+            <span>Matèries primeres</span>
+        </a>
+
+        <a th:href="@{/clients/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'clients'} ? ' active' : ''">
+            <i class="bi bi-person-vcard sidebar-icon"></i>
+            <span>Clients</span>
+        </a>
+
+        <p class="sidebar-section">Operacions</p>
+
+        <a th:href="@{/albaransproveidor/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'albaransProveidor'} ? ' active' : ''">
+            <i class="bi bi-receipt sidebar-icon"></i>
+            <span>Albarans proveïdor</span>
+        </a>
+
+        <a th:href="@{/albaransclient/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'albaransClient'} ? ' active' : ''">
+            <i class="bi bi-receipt-cutoff sidebar-icon"></i>
+            <span>Albarans client</span>
+        </a>
+
+        <a th:href="@{/lots/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'lots'} ? ' active' : ''">
+            <i class="bi bi-archive sidebar-icon"></i>
+            <span>Lots</span>
+        </a>
+
+        <a th:href="@{/tracabilitat/list}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'tracabilitat'} ? ' active' : ''">
+            <i class="bi bi-bar-chart-line sidebar-icon"></i>
+            <span>Explotació de dades</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+        <a th:href="@{/perfil}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'perfil'} ? ' active' : ''">
+            <i class="bi bi-person-gear sidebar-icon"></i>
+            <span>El meu perfil</span>
+        </a>
+
+        <a th:href="@{/logout}"
+           class="sidebar-link"
+           th:classappend="${activePage == 'logout'} ? ' active' : ''">
+            <i class="bi bi-box-arrow-left sidebar-icon"></i>
+            <span>Tancar sessió</span>
+        </a>
+    </div>
+
+</aside>
+
+</body>
+</html>

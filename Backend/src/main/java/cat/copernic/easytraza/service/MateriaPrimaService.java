@@ -36,6 +36,7 @@ public class MateriaPrimaService {
 
     // CREAR MATÈRIA PRIMERA
     public MateriaPrima createMateriaPrima(MateriaPrima materiaPrima) {
+        validarDadesMateriesPrimeres(materiaPrima);
         return materiaPrimaRepository.save(materiaPrima);
     }
 
@@ -46,10 +47,12 @@ public class MateriaPrimaService {
         Optional<MateriaPrima> materiaPrimaOpt = materiaPrimaRepository.findById(id);
 
         if (materiaPrimaOpt.isPresent()) {
+            validarDadesMateriesPrimeres(materiaPrima);
+
             MateriaPrima materiaPrimaActual = materiaPrimaOpt.get();
 
-            materiaPrimaActual.setNomMateria(materiaPrima.getNomMateria());
-            materiaPrimaActual.setDescripcio(materiaPrima.getDescripcio());
+            materiaPrimaActual.setNomMateria(materiaPrima.getNomMateria().trim());
+            materiaPrimaActual.setDescripcio(materiaPrima.getDescripcio() != null ? materiaPrima.getDescripcio().trim() : null);
 
             return materiaPrimaRepository.save(materiaPrimaActual);
         }
@@ -61,5 +64,26 @@ public class MateriaPrimaService {
     // ELIMINAR MATÈRIA PRIMERA
     public void deleteMateriaPrima(Long id) {
         materiaPrimaRepository.deleteById(id);
+    }
+
+
+    // VALIDAR DADES DE LA MATÈRIA PRIMERA
+    private void validarDadesMateriesPrimeres(MateriaPrima materiaPrima) {
+
+        if (materiaPrima.getNomMateria() != null) {
+            materiaPrima.setNomMateria(materiaPrima.getNomMateria().trim());
+        }
+
+        if (materiaPrima.getDescripcio() != null) {
+            materiaPrima.setDescripcio(materiaPrima.getDescripcio().trim());
+        }
+
+        if (materiaPrima.getNomMateria() == null || materiaPrima.getNomMateria().isBlank()) {
+            throw new RuntimeException("El nom de la matèria primera és obligatori.");
+        }
+
+        if (materiaPrima.getDescripcio() != null && materiaPrima.getDescripcio().length() > 50) {
+            throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
+        }
     }
 }
