@@ -1,0 +1,175 @@
+= Memòria del Projecte EasyTraza
+:toc:
+:toclevels: 3
+
+== 1. Planificació i Seguiment de Sprints
+
+=== 1.1 Configuració inicial a GitLab
+
+==== Permisos i accés
+
+El projecte ha estat desenvolupat per un únic integrant, que actua com a líder i desenvolupador.
+S'ha afegit l'usuari *dam2m@copernic.cat* amb rol *Maintainer* per a la supervisió del projecte.
+
+==== Creació d'Epics i Issues
+
+S'han creat Epics tant per als Requeriments Funcionals (RF) com per als Requeriments No Funcionals (RNF).
+Les Issues no s'han definit totes inicialment, sinó que s'han anat creant de manera progressiva segons les necessitats del desenvolupament.
+
+==== Divisió en Sprints (Milestones)
+
+S'ha creat el Milestone corresponent al *Sprint 2*.
+La seva planificació s'ha realitzat de manera progressiva segons les necessitats del desenvolupament.
+
+==== Estructura del repositori
+
+El repositori s'ha organitzat en tres carpetes principals:
+
+- backend
+- mobile
+- documentació
+
+=== 1.2 Estats de les tasques (Issue Board)
+
+El seguiment de tasques s'ha realitzat mitjançant un Issue Board personalitzat.
+Les columnes i el flux de treball s'han adaptat a les necessitats reals del projecte, sense seguir estrictament l'estructura proposada a l'enunciat.
+
+[cols="1,3"]
+|===
+| Estat | Descripció
+
+| To Do
+| Tasques creades i preparades per iniciar-se
+
+| Doing
+| Tasques actualment en desenvolupament
+
+| Teacher Review
+| Tasques finalitzades pendents de revisió
+
+| Closed
+| Tasques completades i tancades
+|===
+
+=== 1.3 Seguiment i Documentació de l'Sprint 2
+
+==== Planificació inicial
+
+image::Board_Inicial_Spring2.jpeg[]
+
+==== Planificació final
+
+image::Board_Final_Spring2.jpeg[]
+
+==== Daily Stand Up
+
+===== Divendres 17/04
+
+[cols="1,3"]
+|===
+| Ahir | Finalització dels RF i documentació
+| Avui | He creat la branca específica per arreglar tots els errors del sprint 1
+| Problemes | Res del que s'ha fet al sprint 1 ha estat correcte, per tant s'ha de refer pràcticament tot
+| Hores | 6h
+|===
+
+===== Dilluns 20/04
+
+[cols="1,3"]
+|===
+| Ahir | -
+| Avui | Començar a arreglar el CRUD d'usuaris i establir una base en el disseny de tota la part web
+| Problemes | És un procés lent
+| Hores | 6h
+|===
+
+===== Dimarts 21/04
+
+[cols="1,3"]
+|===
+| Ahir | Inici de la reparació del CRUD i del disseny web
+| Avui | Acabar el disseny i reparar tot el que faltava del sprint anterior
+| Problemes | Tot i completar-se, ha requerit més temps del previst
+| Hores | 8h
+|===
+
+===== Dimecres 22/04
+
+[cols="1,3"]
+|===
+| Ahir | Finalització de la reparació del sprint anterior
+| Avui | Inici del sprint 2 amb una base ja funcional
+| Problemes | Poc temps disponible després de dedicar molt temps al sprint anterior
+| Hores | 4h
+|===
+
+===== Dijous 23/04
+
+[cols="1,3"]
+|===
+| Ahir | Inici del desenvolupament del sprint 2
+| Avui | Finalitzar la documentació i deixar preparat el CRUD d'albarà proveïdor
+| Problemes | Poc temps disponible, es decideix posposar part de la feina al següent sprint
+| Hores | 1h
+|===
+
+==== Retrospective Meeting
+
+===== Aspectes positius
+
+- Sprint anterior reparat completament
+- L'estructura del projecte s'ha acabat de consolidar i les classes s'utilitzen correctament
+- El format visual de la part web està finalitzat i l'aplicació segueix una línia uniforme
+
+===== Aspectes a millorar
+
+- Planificació inicial del temps millorable
+- Excés de temps dedicat a corregir errors del sprint anterior
+- Distribució de la càrrega de treball poc equilibrada
+
+===== Accions de millora
+
+- Planificar millor les tasques per evitar acumulacions
+- Dedicar més temps progressivament durant el sprint
+
+== 2. Documentació Tècnica
+
+=== Decisions de disseny
+
+S'ha optat per una arquitectura client-servidor basada en API REST.
+El backend s'ha desenvolupat amb Spring Boot seguint una arquitectura en capes.
+La persistència de dades s'ha implementat amb JPA.
+La base de dades utilitzada és MySQL.
+El client mòbil s'ha desenvolupat amb Android Studio utilitzant Kotlin.
+La comunicació entre client i servidor es realitza mitjançant peticions REST.
+
+=== Requeriments implementats
+
+- RF03: CRUD d'usuaris
+- RF04: CRUD de matèries primeres
+- RF08: CRUD de proveïdors
+- RF15: Configuració de connexió
+- RF01: CRUD de productes
+
+=== Incidències
+
+- Errors importants arrossegats del sprint anterior
+- Problemes de temps disponibles durant el desenvolupament
+
+=== Desviacions
+
+- Gran part del sprint dedicada a corregir el sprint anterior
+- Retard en l'inici real del desenvolupament del sprint 2
+- Algunes funcionalitats posposades al següent sprint
+
+== 3. Propostes de Millora
+
+- Millorar la planificació inicial dels sprints
+- Evitar acumulació de tasques entre sprints
+
+== 4. Conclusió
+
+Durant aquest Sprint s'ha centrat gran part de l'esforç en la correcció dels errors de l'Sprint 1 i en la consolidació de l'estructura del projecte.
+Tot i que s'ha iniciat el desenvolupament de l'Sprint 2, no s'han pogut completar totes les tasques previstes.
+Els principals problemes han estat la manca de temps i la necessitat de refer part del treball anterior.
+De cara al següent Sprint, es planteja una millor planificació i una distribució més equilibrada del treball.
