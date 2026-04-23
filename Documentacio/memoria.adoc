@@ -55,11 +55,11 @@ Les columnes i el flux de treball s'han adaptat a les necessitats reals del proj
 
 ==== Planificació inicial
 
-image::Board_Inicial_Spring1.jpeg[]
+image::Board_Inicial_Sprint1.jpeg[]
 
 ==== Planificació final
 
-image::Board_Final_Spring1.jpeg[]
+image::Board_Final_Sprint1.jpeg[]
 
 ==== Daily Stand Up
 
