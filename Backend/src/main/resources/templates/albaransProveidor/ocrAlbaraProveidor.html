@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OCR Albarà Proveïdor - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
+
+    <main class="main">
+
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">OCR</p>
+                <h1 class="page-heading">Importar albarà amb OCR</h1>
+                <p class="page-description">
+                    Puja una imatge de l'albarà per preparar la lectura automàtica.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-proveidor/new}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>Entrada manual</span>
+                </a>
+
+                <a th:href="@{/albarans-proveidor/list}" class="btn btn-soft">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Tornar</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="content-card">
+
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Imatge de l'albarà</h2>
+                    <p class="content-subtitle">
+                        Selecciona una imatge o fotografia del document.
+                    </p>
+                </div>
+            </div>
+
+            <div style="padding: 20px 24px;">
+
+                <form method="post" enctype="multipart/form-data">
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
+
+                        <div class="form-group">
+                            <label class="form-label" for="file">Fitxer de l'albarà</label>
+                            <input id="file"
+                                   type="file"
+                                   name="file"
+                                   class="form-input"
+                                   accept="image/*">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Estat</label>
+                            <div class="form-input">
+                                OCR pendent de processar
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="margin-top:25px; display:flex; gap:10px;">
+                        <button type="button" class="btn btn-primary">
+                            <i class="bi bi-camera"></i>
+                            <span>Processar OCR</span>
+                        </button>
+
+                        <a th:href="@{/albarans-proveidor/new}" class="btn btn-soft">
+                            Cancel·lar
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        <section class="content-card">
+
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Dades detectades</h2>
+                    <p class="content-subtitle">
+                        Quan l'OCR estigui implementat, aquí es mostraran les dades detectades.
+                    </p>
+                </div>
+            </div>
+
+            <div style="padding: 20px 24px;">
+
+                <div class="empty-state">
+                    <div class="empty-box">
+                        <i class="bi bi-file-earmark-image"></i>
+                        <p>Encara no s'ha processat cap imatge.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

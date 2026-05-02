@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Albarà Proveïdor - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Recepció</p>
+
+                <h1 class="page-heading"
+                    th:text="${albaraProveidor != null and albaraProveidor.id != null} ? 'Editar albarà de proveïdor' : 'Nou albarà de proveïdor'">
+                    Formulari
+                </h1>
+
+                <p class="page-description">
+                    Registra la recepció i els lots associats.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-proveidor/ocr}" class="btn btn-primary">
+                    <i class="bi bi-camera"></i>
+                    <span>OCR</span>
+                </a>
+
+                <a th:href="@{/albarans-proveidor/list}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Tornar</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
+        <section class="content-card">
+
+            <!----------------------- TOOLBAR SUPERIOR ----------------------->
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Dades de l'albarà</h2>
+                    <p class="content-subtitle">
+                        Completa les dades de recepció.
+                    </p>
+                </div>
+
+                <div th:if="${error}" class="form-error">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span th:text="${error}"></span>
+                </div>
+            </div>
+
+            <!----------------------- COS DEL FORMULARI ----------------------->
+            <div style="padding: 20px 24px;">
+
+                <form id="albaraProveidorForm"
+                      th:action="${albaraProveidor != null and albaraProveidor.id != null} ? @{/albarans-proveidor/update/{id}(id=${albaraProveidor.id})} : @{/albarans-proveidor/save}"
+                      th:object="${albaraProveidor}"
+                      method="post">
+
+                    <!----------------------- DADES ALBARÀ ----------------------->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
+
+                        <div class="form-group">
+                            <label class="form-label" for="dataRecepcio">Data recepció</label>
+                            <input id="dataRecepcio"
+                                   type="datetime-local"
+                                   th:field="*{dataRecepcio}"
+                                   class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="proveidor">Proveïdor</label>
+                            <select id="proveidor"
+                                    th:field="*{proveidor.id}"
+                                    class="form-select">
+                                <option value="">-- Selecciona proveïdor --</option>
+                                <option th:each="proveidor : ${proveidors}"
+                                        th:value="${proveidor.id}"
+                                        th:text="${proveidor.nomProveidor}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="usuariReceptor">Usuari receptor</label>
+                            <select id="usuariReceptor"
+                                    th:field="*{usuariReceptor.id}"
+                                    class="form-select">
+                                <option value="">-- Selecciona usuari --</option>
+                                <option th:each="usuari : ${usuaris}"
+                                        th:value="${usuari.id}"
+                                        th:text="${usuari.nomComplet}">
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!----------------------- SEPARADOR LOT ----------------------->
+                    <div style="margin-top:28px; padding-top:22px; border-top:1px solid #f0e6dc;">
+                        <h2 class="content-title">Dades del lot</h2>
+                        <p class="content-subtitle">
+                            Aquest lot es crearà associat a l'albarà.
+                        </p>
+                    </div>
+
+                    <!----------------------- DADES LOT ----------------------->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; margin-top:20px;">
+
+                        <div class="form-group">
+                            <label class="form-label" for="identificadorLot">Identificador lot</label>
+                            <input id="identificadorLot"
+                                   type="text"
+                                   th:field="*{lots[0].identificadorLot}"
+                                   class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="materiaPrimera">Matèria primera</label>
+                            <select id="materiaPrimera"
+                                    th:field="*{lots[0].materiaPrimera.id}"
+                                    class="form-select">
+                                <option value="">-- Selecciona matèria primera --</option>
+                                <option th:each="materia : ${materiesPrimeres}"
+                                        th:value="${materia.id}"
+                                        th:text="${materia.nomMateria}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="quantitat">Quantitat</label>
+                            <input id="quantitat"
+                                   type="number"
+                                   th:field="*{lots[0].quantitat}"
+                                   class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="dataCaducitat">Data caducitat</label>
+                            <input id="dataCaducitat"
+                                   type="date"
+                                   th:field="*{lots[0].dataCaducitat}"
+                                   class="form-input">
+                        </div>
+
+                    </div>
+
+                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                    <div style="margin-top:25px; display:flex; gap:10px;">
+
+                        <button type="submit" class="btn btn-soft">
+                            <i class="bi bi-save"></i>
+                            <span>Guardar</span>
+                        </button>
+
+                        <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
+                            Cancel·lar
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script th:src="@{/js/albaransProveidor.js}"></script>
+
+</body>
+</html>

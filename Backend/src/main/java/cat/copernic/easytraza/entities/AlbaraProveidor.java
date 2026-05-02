@@ -1,17 +1,26 @@
 package cat.copernic.easytraza.entities;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+/**
+ * ENTITAT ALBARÀ DE PROVEÏDOR
+ *
+ * Representa una recepció de lots de matèria primera d'un proveïdor.
+ *
+ * @author Ángel Jurado
+ */
 @Entity
-@Table(name = "albara_proveidor")
+@Table(name = "albarans_proveidor")
 public class AlbaraProveidor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDateTime dataRecepcio;
 
     @ManyToOne
@@ -19,7 +28,7 @@ public class AlbaraProveidor {
     private Proveidor proveidor;
 
     @ManyToOne
-    @JoinColumn(name = "usuari_id", nullable = false)
+    @JoinColumn(name = "usuari_receptor_id", nullable = false)
     private Usuari usuariReceptor;
 
     @OneToMany(mappedBy = "albaraProveidor", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -27,7 +36,7 @@ public class AlbaraProveidor {
 
 
     /*********************       .CONSTRUCTORS.       *********************/
-    public AlbaraProveidor() {}
+    public AlbaraProveidor() { }
 
     public AlbaraProveidor(Long id, LocalDateTime dataRecepcio, Proveidor proveidor, Usuari usuariReceptor, List<LotProveidor> lots) {
         this.id = id;
@@ -37,25 +46,25 @@ public class AlbaraProveidor {
         this.lots = lots;
     }
 
-    
+
     /*********************       .GETTERS & SETTERS.       *********************/
     // ─────────── ID ───────────
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    
+
     // ────── DATA RECEPCIÓ ──────
     public LocalDateTime getDataRecepcio() { return dataRecepcio; }
     public void setDataRecepcio(LocalDateTime dataRecepcio) { this.dataRecepcio = dataRecepcio; }
 
-    // ──────── PROVEÏDOR ────────
+    // ───────── PROVEÏDOR ─────────
     public Proveidor getProveidor() { return proveidor; }
     public void setProveidor(Proveidor proveidor) { this.proveidor = proveidor; }
 
-    // ───────── RECEPTOR ─────────
+    // ─────── USUARI RECEPTOR ───────
     public Usuari getUsuariReceptor() { return usuariReceptor; }
     public void setUsuariReceptor(Usuari usuariReceptor) { this.usuariReceptor = usuariReceptor; }
 
-    // ──────── LLISTA LOTS ────────
+    // ─────────── LOTS ───────────
     public List<LotProveidor> getLots() { return lots; }
     public void setLots(List<LotProveidor> lots) { this.lots = lots; }
 }

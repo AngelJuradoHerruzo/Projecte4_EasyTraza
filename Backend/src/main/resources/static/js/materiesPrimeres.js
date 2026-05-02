@@ -1,4 +1,4 @@
-const form = document.getElementById('materiaPrimaForm');
+const form = document.getElementById('materiaPrimeraForm');
 const nomInput = document.getElementById('nomMateria');
 const descripcioInput = document.getElementById('descripcio');
 const descripcioCounter = document.getElementById('descripcioCounter');

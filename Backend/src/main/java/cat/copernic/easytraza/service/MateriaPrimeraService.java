@@ -1,0 +1,89 @@
+package cat.copernic.easytraza.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import cat.copernic.easytraza.entities.MateriaPrimera;
+import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
+
+@Service
+@Transactional
+public class MateriaPrimeraService {
+
+    // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
+    private final MateriaPrimeraRepository materiaPrimeraRepository;
+
+    public MateriaPrimeraService(MateriaPrimeraRepository materiaPrimeraRepository) {
+        this.materiaPrimeraRepository = materiaPrimeraRepository;
+    }
+
+
+    // OBTENIR TOTES LES MATÈRIES PRIMERES
+    public List<MateriaPrimera> getAllMateriesPrimeres() {
+        return materiaPrimeraRepository.findAll();
+    }
+
+
+    // OBTENIR MATÈRIA PRIMERA PER ID
+    public MateriaPrimera getMateriaPrimeraById(Long id) {
+        Optional<MateriaPrimera> materiaPrimera = materiaPrimeraRepository.findById(id);
+        return materiaPrimera.orElse(null);
+    }
+
+
+    // CREAR MATÈRIA PRIMERA
+    public MateriaPrimera createMateriaPrimera(MateriaPrimera materiaPrimera) {
+        validarDadesMateriesPrimeres(materiaPrimera);
+        return materiaPrimeraRepository.save(materiaPrimera);
+    }
+
+
+    // ACTUALITZAR MATÈRIA PRIMERA
+    public MateriaPrimera updateMateriaPrimera(Long id, MateriaPrimera materiaPrimera) {
+
+        Optional<MateriaPrimera> materiaPrimeraOpt = materiaPrimeraRepository.findById(id);
+
+        if (materiaPrimeraOpt.isPresent()) {
+            validarDadesMateriesPrimeres(materiaPrimera);
+
+            MateriaPrimera materiaPrimeraActual = materiaPrimeraOpt.get();
+
+            materiaPrimeraActual.setNomMateria(materiaPrimera.getNomMateria().trim());
+            materiaPrimeraActual.setDescripcio(materiaPrimera.getDescripcio() != null ? materiaPrimera.getDescripcio().trim() : null);
+
+            return materiaPrimeraRepository.save(materiaPrimeraActual);
+        }
+
+        return null;
+    }
+
+
+    // ELIMINAR MATÈRIA PRIMERA
+    public void deleteMateriaPrimera(Long id) {
+        materiaPrimeraRepository.deleteById(id);
+    }
+
+
+    // VALIDAR DADES DE LA MATÈRIA PRIMERA
+    private void validarDadesMateriesPrimeres(MateriaPrimera materiaPrimera) {
+
+        if (materiaPrimera.getNomMateria() != null) {
+            materiaPrimera.setNomMateria(materiaPrimera.getNomMateria().trim());
+        }
+
+        if (materiaPrimera.getDescripcio() != null) {
+            materiaPrimera.setDescripcio(materiaPrimera.getDescripcio().trim());
+        }
+
+        if (materiaPrimera.getNomMateria() == null || materiaPrimera.getNomMateria().isBlank()) {
+            throw new RuntimeException("El nom de la matèria primera és obligatori.");
+        }
+
+        if (materiaPrimera.getDescripcio() != null && materiaPrimera.getDescripcio().length() > 50) {
+            throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
+        }
+    }
+}

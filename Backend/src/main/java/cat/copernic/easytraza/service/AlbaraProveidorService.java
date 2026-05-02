@@ -21,7 +21,7 @@ public class AlbaraProveidorService {
     public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository) {
         this.albaraProveidorRepository = albaraProveidorRepository;
     }
-    
+
 
     // OBTENIR TOTS ELS ALBARANS DE PROVEÏDOR
     public List<AlbaraProveidor> getAllAlbaransProveidor() {
@@ -31,8 +31,8 @@ public class AlbaraProveidorService {
 
     // OBTENIR ALBARÀ DE PROVEÏDOR PER ID
     public AlbaraProveidor getAlbaraProveidorById(Long id) {
-        Optional<AlbaraProveidor> albaraOpt = albaraProveidorRepository.findById(id);
-        return albaraOpt.orElse(null);
+        Optional<AlbaraProveidor> albaraProveidor = albaraProveidorRepository.findById(id);
+        return albaraProveidor.orElse(null);
     }
 
 
@@ -46,6 +46,7 @@ public class AlbaraProveidorService {
 
         if (albaraProveidor.getLots() != null) {
             for (LotProveidor lot : albaraProveidor.getLots()) {
+                validarDadesLotProveidor(lot);
                 lot.setAlbaraProveidor(albaraProveidor);
             }
         }
@@ -57,18 +58,28 @@ public class AlbaraProveidorService {
     // ACTUALITZAR ALBARÀ DE PROVEÏDOR
     public AlbaraProveidor updateAlbaraProveidor(Long id, AlbaraProveidor albaraProveidor) {
 
-        Optional<AlbaraProveidor> albaraOpt = albaraProveidorRepository.findById(id);
+        Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
 
-        if (albaraOpt.isPresent()) {
+        if (albaraProveidorOpt.isPresent()) {
             validarDadesAlbaraProveidor(albaraProveidor);
 
-            AlbaraProveidor albaraActual = albaraOpt.get();
+            AlbaraProveidor albaraProveidorActual = albaraProveidorOpt.get();
 
-            albaraActual.setDataRecepcio(albaraProveidor.getDataRecepcio());
-            albaraActual.setProveidor(albaraProveidor.getProveidor());
-            albaraActual.setUsuariReceptor(albaraProveidor.getUsuariReceptor());
+            albaraProveidorActual.setDataRecepcio(albaraProveidor.getDataRecepcio());
+            albaraProveidorActual.setProveidor(albaraProveidor.getProveidor());
+            albaraProveidorActual.setUsuariReceptor(albaraProveidor.getUsuariReceptor());
 
-            return albaraProveidorRepository.save(albaraActual);
+            if (albaraProveidor.getLots() != null) {
+                albaraProveidorActual.getLots().clear();
+
+                for (LotProveidor lot : albaraProveidor.getLots()) {
+                    validarDadesLotProveidor(lot);
+                    lot.setAlbaraProveidor(albaraProveidorActual);
+                    albaraProveidorActual.getLots().add(lot);
+                }
+            }
+
+            return albaraProveidorRepository.save(albaraProveidorActual);
         }
 
         return null;
@@ -94,6 +105,35 @@ public class AlbaraProveidorService {
 
         if (albaraProveidor.getUsuariReceptor() == null) {
             throw new RuntimeException("L'usuari receptor és obligatori.");
+        }
+    }
+
+
+    // VALIDAR DADES DEL LOT DE PROVEÏDOR
+    private void validarDadesLotProveidor(LotProveidor lotProveidor) {
+
+        if (lotProveidor.getIdentificadorLot() != null) {
+            lotProveidor.setIdentificadorLot(lotProveidor.getIdentificadorLot().trim().toUpperCase());
+        }
+
+        if (lotProveidor.getIdentificadorLot() == null || lotProveidor.getIdentificadorLot().isBlank()) {
+            throw new RuntimeException("L'identificador del lot és obligatori.");
+        }
+
+        if (lotProveidor.getMateriaPrimera() == null) {
+            throw new RuntimeException("La matèria primera és obligatòria.");
+        }
+
+        if (lotProveidor.getQuantitat() == null) {
+            throw new RuntimeException("La quantitat és obligatòria.");
+        }
+
+        if (lotProveidor.getQuantitat() <= 0) {
+            throw new RuntimeException("La quantitat ha de ser superior a zero.");
+        }
+
+        if (lotProveidor.getEstat() == null) {
+            throw new RuntimeException("L'estat del lot és obligatori.");
         }
     }
 }

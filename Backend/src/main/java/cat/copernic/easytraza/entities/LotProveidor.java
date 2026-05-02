@@ -1,24 +1,34 @@
 package cat.copernic.easytraza.entities;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
 import cat.copernic.easytraza.enums.EstatLot;
+import jakarta.persistence.*;
 
+/**
+ * ENTITAT LOT DE PROVEÏDOR
+ *
+ * Representa un lot de matèria primera recepcionat mitjançant un albarà de proveïdor.
+ *
+ * @author Ángel Jurado
+ */
 @Entity
-@Table(name = "lot_proveidor")
+@Table(name = "lots_proveidor")
 public class LotProveidor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String identificadorLot;
 
+    @Column(nullable = false)
     private Integer quantitat;
 
     @Enumerated(EnumType.STRING)
-    private EstatLot estatLot;
+    @Column(nullable = false)
+    private EstatLot estat = EstatLot.EN_ESTOC;
 
     private LocalDate dataCaducitat;
 
@@ -28,7 +38,7 @@ public class LotProveidor {
 
     @ManyToOne
     @JoinColumn(name = "materia_prima_id", nullable = false)
-    private MateriaPrima materiaPrima;
+    private MateriaPrimera materiaPrimera;
 
     @ManyToOne
     @JoinColumn(name = "albara_proveidor_id", nullable = false)
@@ -36,19 +46,18 @@ public class LotProveidor {
 
 
     /*********************       .CONSTRUCTORS.       *********************/
-    public LotProveidor() {}
+    public LotProveidor() { }
 
-    public LotProveidor(Long id, String identificadorLot, Integer quantitat, EstatLot estatLot,
-                        LocalDate dataCaducitat, LocalDate dataObertura, LocalDate dataAcabament,
-                        MateriaPrima materiaPrima, AlbaraProveidor albaraProveidor) {
+    public LotProveidor(Long id, String identificadorLot, Integer quantitat, EstatLot estat, LocalDate dataCaducitat,
+                        LocalDate dataObertura, LocalDate dataAcabament, MateriaPrimera materiaPrimera, AlbaraProveidor albaraProveidor) {
         this.id = id;
         this.identificadorLot = identificadorLot;
         this.quantitat = quantitat;
-        this.estatLot = estatLot;
+        this.estat = estat;
         this.dataCaducitat = dataCaducitat;
         this.dataObertura = dataObertura;
         this.dataAcabament = dataAcabament;
-        this.materiaPrima = materiaPrima;
+        this.materiaPrimera = materiaPrimera;
         this.albaraProveidor = albaraProveidor;
     }
 
@@ -58,23 +67,23 @@ public class LotProveidor {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    // ──── IDENTIFICADOR LOT ────
+    // ───── IDENTIFICADOR LOT ─────
     public String getIdentificadorLot() { return identificadorLot; }
     public void setIdentificadorLot(String identificadorLot) { this.identificadorLot = identificadorLot; }
 
-    // ──────── QUANTITAT ────────
+    // ───────── QUANTITAT ─────────
     public Integer getQuantitat() { return quantitat; }
     public void setQuantitat(Integer quantitat) { this.quantitat = quantitat; }
 
-    // ────────── ESTAT ──────────
-    public EstatLot getEstat() { return estatLot; }
-    public void setEstat(EstatLot estatLot) { this.estatLot = estatLot; }
+    // ─────────── ESTAT ───────────
+    public EstatLot getEstat() { return estat; }
+    public void setEstat(EstatLot estat) { this.estat = estat; }
 
-    // ───── DATA CADUCITAT ─────
+    // ────── DATA CADUCITAT ──────
     public LocalDate getDataCaducitat() { return dataCaducitat; }
     public void setDataCaducitat(LocalDate dataCaducitat) { this.dataCaducitat = dataCaducitat; }
 
-    // ─────     DATA OBERTURA ─────
+    // ────── DATA OBERTURA ──────
     public LocalDate getDataObertura() { return dataObertura; }
     public void setDataObertura(LocalDate dataObertura) { this.dataObertura = dataObertura; }
 
@@ -82,11 +91,11 @@ public class LotProveidor {
     public LocalDate getDataAcabament() { return dataAcabament; }
     public void setDataAcabament(LocalDate dataAcabament) { this.dataAcabament = dataAcabament; }
 
-    // ───── MATERIA PRIMA ─────
-    public MateriaPrima getMateriaPrima() { return materiaPrima; }
-    public void setMateriaPrima(MateriaPrima materiaPrima) { this.materiaPrima = materiaPrima; }
+    // ───── MATÈRIA PRIMERA ─────
+    public MateriaPrimera getMateriaPrimera() { return materiaPrimera; }
+    public void setMateriaPrimera(MateriaPrimera materiaPrimera) { this.materiaPrimera = materiaPrimera; }
 
-    // ───── ALBARÀ PROVEÏDOR ─────
+    // ──── ALBARÀ DE PROVEÏDOR ────
     public AlbaraProveidor getAlbaraProveidor() { return albaraProveidor; }
     public void setAlbaraProveidor(AlbaraProveidor albaraProveidor) { this.albaraProveidor = albaraProveidor; }
 }

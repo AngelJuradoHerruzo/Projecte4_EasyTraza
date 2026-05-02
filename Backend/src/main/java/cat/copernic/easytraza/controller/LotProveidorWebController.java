@@ -1,17 +1,17 @@
 package cat.copernic.easytraza.controller;
 
-
-import cat.copernic.easytraza.enums.EstatLot;
-import cat.copernic.easytraza.service.LotProveidorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import cat.copernic.easytraza.enums.EstatLot;
+import cat.copernic.easytraza.service.LotProveidorService;
 
 @Controller
 @RequestMapping("/lots")
 public class LotProveidorWebController {
 
-    // ---------------------------- SERVICE ----------------------------
+    // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final LotProveidorService lotProveidorService;
 
     public LotProveidorWebController(LotProveidorService lotProveidorService) {
@@ -19,20 +19,26 @@ public class LotProveidorWebController {
     }
 
 
-    // ---------------------------- LLISTAR ----------------------------
-    @GetMapping
-    public String list(Model model) {
+    // LLISTAR LOTS DE PROVEÏDOR
+    @GetMapping("/list")
+    public String llistarLots(Model model) {
         model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
         return "lots/llistarLots";
     }
 
 
-    // ---------------------------- CANVIAR ESTAT ----------------------------
+    // CANVIAR ESTAT DEL LOT
     @PostMapping("/estat/{id}")
-    public String canviarEstat(@PathVariable Long id,
-                               @RequestParam EstatLot estat) {
-
-        lotProveidorService.canviarEstatLot(id, estat);
-        return "redirect:/lots";
+    public String canviarEstatLot(@PathVariable Long id, @RequestParam EstatLot estat, Model model) {
+        try {
+            lotProveidorService.canviarEstatLot(id, estat);
+            return "redirect:/lots/list";
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("lotsProveidor", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("estats", EstatLot.values());
+            return "lots/llistarLots";
+        }
     }
 }

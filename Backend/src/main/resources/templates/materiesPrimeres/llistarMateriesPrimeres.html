@@ -82,13 +82,13 @@
 
                     <!-- Cos de la taula -->
                     <tbody>
-                        <tr th:each="materiaPrima : ${materiesPrimeres}">
+                        <tr th:each="materiaPrimera : ${materiesPrimeres}">
 
                             <!-- Nom de la matèria primera -->
                             <td style="vertical-align: top;">
                                 <div class="user-text" style="min-width: 0;">
                                     <span class="materia-name"
-                                        th:text="${materiaPrima.nomMateria}"
+                                        th:text="${materiaPrimera.nomMateria}"
                                         style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
                                         Nom matèria
                                     </span>
@@ -98,7 +98,7 @@
                             <!-- Descripció -->
                             <td style="vertical-align: top;">
                                 <span class="user-email"
-                                    th:text="${materiaPrima.descripcio != null && !#strings.isEmpty(materiaPrima.descripcio) ? materiaPrima.descripcio : 'Sense descripció'}"
+                                    th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio) ? materiaPrimera.descripcio : 'Sense descripció'}"
                                     style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
                                     Descripció
                                 </span>
@@ -109,14 +109,14 @@
                                 <div class="table-actions" style="display:inline-flex; gap:8px; flex-wrap:wrap;">
 
                                     <!-- Botó editar -->
-                                    <a th:href="@{/materies-primeres/edit/{id}(id=${materiaPrima.id})}"
+                                    <a th:href="@{/materies-primeres/edit/{id}(id=${materiaPrimera.id})}"
                                     class="btn-table btn-soft">
                                         <i class="bi bi-pencil-square"></i>
                                         <span>Editar</span>
                                     </a>
 
                                     <!-- Botó eliminar -->
-                                        <a th:href="@{/materies-primeres/delete/{id}(id=${materiaPrima.id})}"
+                                        <a th:href="@{/materies-primeres/delete/{id}(id=${materiaPrimera.id})}"
                                     class="btn-table btn-delete"
                                     onclick="return confirm('Segur que vols eliminar aquesta matèria primera?')">
                                         <i class="bi bi-trash3"></i>

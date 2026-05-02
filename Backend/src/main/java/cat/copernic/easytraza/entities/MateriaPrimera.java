@@ -12,7 +12,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "materies_primeres")
-public class MateriaPrima {
+public class MateriaPrimera {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +26,9 @@ public class MateriaPrima {
 
 
     /*********************       .CONSTRUCTORS.       *********************/
-    public MateriaPrima() { }
+    public MateriaPrimera() { }
 
-    public MateriaPrima(Long id, String nomMateria, String descripcio) {
+    public MateriaPrimera(Long id, String nomMateria, String descripcio) {
         this.id = id;
         this.nomMateria = nomMateria;
         this.descripcio = descripcio;

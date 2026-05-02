@@ -31,35 +31,35 @@ public class LotProveidorService {
 
     // OBTENIR LOT DE PROVEÏDOR PER ID
     public LotProveidor getLotProveidorById(Long id) {
-        Optional<LotProveidor> lotOpt = lotProveidorRepository.findById(id);
-        return lotOpt.orElse(null);
+        Optional<LotProveidor> lotProveidor = lotProveidorRepository.findById(id);
+        return lotProveidor.orElse(null);
     }
 
 
     // CANVIAR ESTAT DEL LOT
     public LotProveidor canviarEstatLot(Long id, EstatLot estat) {
 
-        Optional<LotProveidor> lotOpt = lotProveidorRepository.findById(id);
+        Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
 
-        if (lotOpt.isEmpty()) {
+        if (lotProveidorOpt.isEmpty()) {
             throw new RuntimeException("Lot no trobat.");
         }
 
-        LotProveidor lotActual = lotOpt.get();
+        LotProveidor lotProveidorActual = lotProveidorOpt.get();
 
-        validarCanviEstatLot(lotActual, estat);
+        validarCanviEstatLot(lotProveidorActual, estat);
 
-        lotActual.setEstat(estat);
+        lotProveidorActual.setEstat(estat);
 
         if (estat == EstatLot.OBERT) {
-            lotActual.setDataObertura(LocalDate.now());
+            lotProveidorActual.setDataObertura(LocalDate.now());
         }
 
         if (estat == EstatLot.ACABAT) {
-            lotActual.setDataAcabament(LocalDate.now());
+            lotProveidorActual.setDataAcabament(LocalDate.now());
         }
 
-        return lotProveidorRepository.save(lotActual);
+        return lotProveidorRepository.save(lotProveidorActual);
     }
 
 
