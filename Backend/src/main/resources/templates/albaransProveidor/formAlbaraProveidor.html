@@ -24,7 +24,6 @@
 
                 <h1 class="page-heading"
                     th:text="${albaraProveidor != null and albaraProveidor.id != null} ? 'Editar albarà de proveïdor' : 'Nou albarà de proveïdor'">
-                    Formulari
                 </h1>
 
                 <p class="page-description">
@@ -35,26 +34,23 @@
             <div class="page-top-actions">
                 <a th:href="@{/albarans-proveidor/ocr}" class="btn btn-primary">
                     <i class="bi bi-camera"></i>
-                    <span>OCR</span>
+                    OCR
                 </a>
 
                 <a th:href="@{/albarans-proveidor/list}" class="btn btn-primary">
                     <i class="bi bi-arrow-left"></i>
-                    <span>Tornar</span>
+                    Tornar
                 </a>
             </div>
         </section>
 
-        <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
+        <!----------------------- CONTINGUT ----------------------->
         <section class="content-card">
 
-            <!----------------------- TOOLBAR SUPERIOR ----------------------->
             <div class="content-toolbar">
                 <div class="toolbar-block">
                     <h2 class="content-title">Dades de l'albarà</h2>
-                    <p class="content-subtitle">
-                        Completa les dades de recepció.
-                    </p>
+                    <p class="content-subtitle">Informació general de recepció</p>
                 </div>
 
                 <div th:if="${error}" class="form-error">
@@ -63,115 +59,140 @@
                 </div>
             </div>
 
-            <!----------------------- COS DEL FORMULARI ----------------------->
-            <div style="padding: 20px 24px;">
+            <div style="padding:20px 24px;">
 
                 <form id="albaraProveidorForm"
-                      th:action="${albaraProveidor != null and albaraProveidor.id != null} ? @{/albarans-proveidor/update/{id}(id=${albaraProveidor.id})} : @{/albarans-proveidor/save}"
+                      th:action="${albaraProveidor.id != null} ? @{/albarans-proveidor/update/{id}(id=${albaraProveidor.id})} : @{/albarans-proveidor/save}"
                       th:object="${albaraProveidor}"
                       method="post">
 
                     <!----------------------- DADES ALBARÀ ----------------------->
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
 
                         <div class="form-group">
-                            <label class="form-label" for="dataRecepcio">Data recepció</label>
+                            <label class="form-label">Data recepció</label>
                             <input id="dataRecepcio"
                                    type="datetime-local"
-                                   th:field="*{dataRecepcio}"
-                                   class="form-input">
+                                   name="dataRecepcio"
+                                   th:value="${albaraProveidor.dataRecepcio != null} ? ${#temporals.format(albaraProveidor.dataRecepcio, 'yyyy-MM-dd''T''HH:mm')} : ''"
+                                   class="form-input"
+                                   required>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="proveidor">Proveïdor</label>
+                            <label class="form-label">Proveïdor</label>
                             <select id="proveidor"
                                     th:field="*{proveidor.id}"
-                                    class="form-select">
-                                <option value="">-- Selecciona proveïdor --</option>
-                                <option th:each="proveidor : ${proveidors}"
-                                        th:value="${proveidor.id}"
-                                        th:text="${proveidor.nomProveidor}">
+                                    class="form-select"
+                                    required>
+                                <option value="">-- Selecciona --</option>
+                                <option th:each="p : ${proveidors}"
+                                        th:value="${p.id}"
+                                        th:text="${p.nomProveidor}">
                                 </option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="usuariReceptor">Usuari receptor</label>
+                            <label class="form-label">Usuari receptor</label>
                             <select id="usuariReceptor"
                                     th:field="*{usuariReceptor.id}"
-                                    class="form-select">
-                                <option value="">-- Selecciona usuari --</option>
-                                <option th:each="usuari : ${usuaris}"
-                                        th:value="${usuari.id}"
-                                        th:text="${usuari.nomComplet}">
+                                    class="form-select"
+                                    required>
+                                <option value="">-- Selecciona --</option>
+                                <option th:each="u : ${usuaris}"
+                                        th:value="${u.id}"
+                                        th:text="${u.nomComplet}">
                                 </option>
                             </select>
                         </div>
 
                     </div>
 
-                    <!----------------------- SEPARADOR LOT ----------------------->
-                    <div style="margin-top:28px; padding-top:22px; border-top:1px solid #f0e6dc;">
-                        <h2 class="content-title">Dades del lot</h2>
-                        <p class="content-subtitle">
-                            Aquest lot es crearà associat a l'albarà.
-                        </p>
+                    <!----------------------- LOTS ----------------------->
+                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h2 class="content-title">Lots</h2>
+                            <p class="content-subtitle">Lots inclosos en aquest albarà</p>
+                        </div>
+
+                        <button type="button" id="addLotBtn" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i>
+                            Afegir lot
+                        </button>
                     </div>
 
-                    <!----------------------- DADES LOT ----------------------->
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; margin-top:20px;">
+                    <div id="lotsContainer" style="margin-top:15px; display:flex; flex-direction:column; gap:15px;">
 
-                        <div class="form-group">
-                            <label class="form-label" for="identificadorLot">Identificador lot</label>
-                            <input id="identificadorLot"
-                                   type="text"
-                                   th:field="*{lots[0].identificadorLot}"
-                                   class="form-input">
-                        </div>
+                        <div th:each="lot, stat : *{lots}"
+                             class="lot-row"
+                             style="padding:16px; border:1px solid #f0e6dc; border-radius:18px;">
 
-                        <div class="form-group">
-                            <label class="form-label" for="materiaPrimera">Matèria primera</label>
-                            <select id="materiaPrimera"
-                                    th:field="*{lots[0].materiaPrimera.id}"
-                                    class="form-select">
-                                <option value="">-- Selecciona matèria primera --</option>
-                                <option th:each="materia : ${materiesPrimeres}"
-                                        th:value="${materia.id}"
-                                        th:text="${materia.nomMateria}">
-                                </option>
-                            </select>
-                        </div>
+                            <input type="hidden" th:field="*{lots[__${stat.index}__].id}">
 
-                        <div class="form-group">
-                            <label class="form-label" for="quantitat">Quantitat</label>
-                            <input id="quantitat"
-                                   type="number"
-                                   th:field="*{lots[0].quantitat}"
-                                   class="form-input">
-                        </div>
+                            <div style="display:grid; grid-template-columns:1.2fr 1fr 0.7fr 0.7fr auto; gap:15px; align-items:end;">
 
-                        <div class="form-group">
-                            <label class="form-label" for="dataCaducitat">Data caducitat</label>
-                            <input id="dataCaducitat"
-                                   type="date"
-                                   th:field="*{lots[0].dataCaducitat}"
-                                   class="form-input">
+                                <!------ IDENTIFICADOR (READONLY) ------>
+                                <div class="form-group">
+                                    <label class="form-label">Identificador lot</label>
+                                    <input type="text"
+                                           class="form-input identificadorLotPreview"
+                                           readonly>
+                                </div>
+
+                                <!------ MATÈRIA PRIMERA ------>
+                                <div class="form-group">
+                                    <label class="form-label">Matèria primera</label>
+                                    <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
+                                            class="form-select materiaPrimeraInput"
+                                            required>
+                                        <option value="">-- Selecciona --</option>
+                                        <option th:each="m : ${materiesPrimeres}"
+                                                th:value="${m.id}"
+                                                th:text="${m.nomMateria}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!------ QUANTITAT ------>
+                                <div class="form-group">
+                                    <label class="form-label">Quantitat</label>
+                                    <input type="number"
+                                           th:field="*{lots[__${stat.index}__].quantitat}"
+                                           class="form-input quantitatInput"
+                                           min="1"
+                                           required>
+                                </div>
+
+                                <!------ UNITATS ------>
+                                <div class="form-group">
+                                    <label class="form-label">Unitats</label>
+                                    <input type="text"
+                                           th:field="*{lots[__${stat.index}__].unitats}"
+                                           class="form-input unitatsInput"
+                                           required>
+                                </div>
+
+                                <!------ ELIMINAR ------>
+                                <button type="button" class="btn btn-secondary remove-lot-btn">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+
+                            </div>
+
                         </div>
 
                     </div>
 
-                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                    <!----------------------- BOTONS ----------------------->
                     <div style="margin-top:25px; display:flex; gap:10px;">
-
                         <button type="submit" class="btn btn-soft">
-                            <i class="bi bi-save"></i>
-                            <span>Guardar</span>
+                            <i class="bi bi-save"></i> Guardar
                         </button>
 
                         <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
                             Cancel·lar
                         </a>
-
                     </div>
 
                 </form>

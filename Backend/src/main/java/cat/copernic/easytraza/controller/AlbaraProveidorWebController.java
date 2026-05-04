@@ -34,10 +34,13 @@ public class AlbaraProveidorWebController {
         this.materiaPrimeraService = materiaPrimeraService;
     }
 
+
     // LLISTAR ALBARANS DE PROVEÏDOR
     @GetMapping("/list")
     public String llistarAlbaransProveidor(Model model) {
         model.addAttribute("albarans", albaraProveidorService.getAllAlbaransProveidor());
+        model.addAttribute("albaraProveidorService", albaraProveidorService);
+
         return "albaransProveidor/llistarAlbaransProveidor";
     }
 
@@ -71,6 +74,10 @@ public class AlbaraProveidorWebController {
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
+            model.addAttribute("proveidors", proveidorService.getAllProveidors());
+            model.addAttribute("usuaris", usuariService.getAllUsuaris());
+            model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+
             return "albaransProveidor/formAlbaraProveidor";
         }
     }
@@ -85,8 +92,25 @@ public class AlbaraProveidorWebController {
             return "redirect:/albarans-proveidor/list";
         }
 
-        model.addAttribute("albaraProveidor", albaraProveidor);
-        return "albaransProveidor/formAlbaraProveidor";
+        try {
+            if (!albaraProveidorService.esModificable(albaraProveidor)) {
+                throw new RuntimeException("No es pot modificar un albarà amb lots iniciats o finalitzats.");
+            }
+
+            model.addAttribute("albaraProveidor", albaraProveidor);
+            model.addAttribute("proveidors", proveidorService.getAllProveidors());
+            model.addAttribute("usuaris", usuariService.getAllUsuaris());
+            model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+
+            return "albaransProveidor/formAlbaraProveidor";
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("albarans", albaraProveidorService.getAllAlbaransProveidor());
+            model.addAttribute("albaraProveidorService", albaraProveidorService);
+
+            return "albaransProveidor/llistarAlbaransProveidor";
+        }
     }
 
 
@@ -102,6 +126,10 @@ public class AlbaraProveidorWebController {
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
+            model.addAttribute("proveidors", proveidorService.getAllProveidors());
+            model.addAttribute("usuaris", usuariService.getAllUsuaris());
+            model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+
             return "albaransProveidor/formAlbaraProveidor";
         }
     }
@@ -109,12 +137,23 @@ public class AlbaraProveidorWebController {
 
     // ELIMINAR ALBARÀ DE PROVEÏDOR
     @GetMapping("/delete/{id}")
-    public String deleteAlbaraProveidor(@PathVariable Long id) {
-        albaraProveidorService.deleteAlbaraProveidor(id);
+    public String deleteAlbaraProveidor(@PathVariable Long id, Model model) {
+        try {
+            albaraProveidorService.deleteAlbaraProveidor(id);
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("albarans", albaraProveidorService.getAllAlbaransProveidor());
+            model.addAttribute("albaraProveidorService", albaraProveidorService);
+
+            return "albaransProveidor/llistarAlbaransProveidor";
+        }
+
         return "redirect:/albarans-proveidor/list";
     }
 
-    //OCR
+
+    // OCR
     @GetMapping("/ocr")
     public String ocrView() {
         return "albaransProveidor/ocrAlbaraProveidor";

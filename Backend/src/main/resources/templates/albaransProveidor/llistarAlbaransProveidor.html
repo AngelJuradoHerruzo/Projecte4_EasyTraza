@@ -47,7 +47,13 @@
             <!----------------------- TOOLBAR ----------------------->
             <div class="content-toolbar">
                 <div class="toolbar-block">
+                    <div th:if="${error}" class="form-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
                     <h2 class="content-title">Llistat d'albarans</h2>
+                    
                     <p class="content-subtitle">
                         Vista general dels albarans registrats i els lots recepcionats.
                     </p>
@@ -125,15 +131,17 @@
 
                     <!----------------------- ACCIONS ----------------------->
                     <div class="info-card-actions">
-                        <a th:href="@{/albarans-proveidor/edit/{id}(id=${albara.id})}"
-                           class="btn-table btn-soft">
+                        <a th:if="${albaraProveidorService.esModificable(albara)}"
+                            th:href="@{/albarans-proveidor/edit/{id}(id=${albara.id})}"
+                            class="btn-table btn-soft">
                             <i class="bi bi-pencil-square"></i>
                             <span>Editar</span>
                         </a>
 
-                        <a th:href="@{/albarans-proveidor/delete/{id}(id=${albara.id})}"
-                           class="btn-table btn-delete"
-                           onclick="return confirm('Segur que vols eliminar aquest albarà?')">
+                        <a th:if="${albaraProveidorService.esModificable(albara)}"
+                            th:href="@{/albarans-proveidor/delete/{id}(id=${albara.id})}"
+                            class="btn-table btn-delete"
+                            onclick="return confirm('Segur que vols eliminar aquest albarà?')">
                             <i class="bi bi-trash3"></i>
                             <span>Eliminar</span>
                         </a>

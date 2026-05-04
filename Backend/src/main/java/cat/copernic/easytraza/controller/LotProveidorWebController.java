@@ -23,6 +23,8 @@ public class LotProveidorWebController {
     @GetMapping("/list")
     public String llistarLots(Model model) {
         model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+        model.addAttribute("estats", EstatLot.values());
+
         return "lots/llistarLots";
     }
 
@@ -36,8 +38,9 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lotsProveidor", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
             model.addAttribute("estats", EstatLot.values());
+
             return "lots/llistarLots";
         }
     }

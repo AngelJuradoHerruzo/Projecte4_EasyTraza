@@ -3,6 +3,8 @@ const form = document.getElementById('albaraProveidorForm');
 const dataInput = document.getElementById('dataRecepcio');
 const proveidorInput = document.getElementById('proveidor');
 const usuariInput = document.getElementById('usuariReceptor');
+const lotsContainer = document.getElementById('lotsContainer');
+const addLotBtn = document.getElementById('addLotBtn');
 
 
 /*----------------------- FUNCIONS ESTAT -----------------------*/
@@ -40,11 +42,111 @@ function validateField(field) {
 }
 
 
+/*----------------------- IDENTIFICADOR LOT -----------------------*/
+function formatDateForLot(value) {
+    if (!value) return '';
+
+    const datePart = value.split('T')[0];
+
+    if (!datePart) return '';
+
+    const parts = datePart.split('-');
+
+    if (parts.length !== 3) return '';
+
+    return parts[2] + '_' + parts[1] + '_' + parts[0];
+}
+
+function updateIdentificadorsLot() {
+    const dataFormatada = formatDateForLot(dataInput.value);
+    const identificadors = document.querySelectorAll('.identificadorLotPreview');
+
+    identificadors.forEach((input, index) => {
+        if (dataFormatada === '') {
+            input.value = '';
+        }
+        else {
+            input.value = dataFormatada + '_lote' + (index + 1);
+        }
+    });
+}
+
+
 /*----------------------- EVENTS VALIDACIÓ -----------------------*/
-[dataInput, proveidorInput, usuariInput].forEach(field => {
+function getAllFields() {
+    return [
+        dataInput,
+        proveidorInput,
+        usuariInput,
+        ...document.querySelectorAll('.materiaPrimeraInput'),
+        ...document.querySelectorAll('.quantitatInput'),
+        ...document.querySelectorAll('.unitatsInput')
+    ];
+}
+
+getAllFields().forEach(field => {
     field.addEventListener('input', () => validateField(field));
     field.addEventListener('change', () => validateField(field));
 });
+
+dataInput.addEventListener('input', updateIdentificadorsLot);
+dataInput.addEventListener('change', updateIdentificadorsLot);
+
+
+/*----------------------- LOTS -----------------------*/
+function reindexLots() {
+    const rows = document.querySelectorAll('.lot-row');
+
+    rows.forEach((row, index) => {
+        row.querySelectorAll('input, select').forEach(field => {
+            const name = field.getAttribute('name');
+
+            if (name) {
+                field.setAttribute('name', name.replace(/lots\[\d+]/, 'lots[' + index + ']'));
+            }
+
+            const id = field.getAttribute('id');
+
+            if (id) {
+                field.setAttribute('id', id.replace(/lots\d+/, 'lots' + index));
+            }
+        });
+    });
+}
+
+function bindRemoveButtons() {
+    document.querySelectorAll('.remove-lot-btn').forEach(button => {
+        button.onclick = function () {
+            const rows = document.querySelectorAll('.lot-row');
+
+            if (rows.length > 1) {
+                this.closest('.lot-row').remove();
+                reindexLots();
+                updateIdentificadorsLot();
+            }
+        };
+    });
+}
+
+if (addLotBtn) {
+    addLotBtn.addEventListener('click', function () {
+        const rows = document.querySelectorAll('.lot-row');
+        const newRow = rows[rows.length - 1].cloneNode(true);
+
+        newRow.querySelectorAll('input, select').forEach(field => {
+            field.value = '';
+            clearState(field);
+        });
+
+        lotsContainer.appendChild(newRow);
+        reindexLots();
+        bindRemoveButtons();
+        updateIdentificadorsLot();
+    });
+}
+
+bindRemoveButtons();
+updateIdentificadorsLot();
 
 
 /*----------------------- SUBMIT -----------------------*/
@@ -52,7 +154,7 @@ form.addEventListener('submit', function (event) {
 
     let valid = true;
 
-    const fields = [dataInput, proveidorInput, usuariInput];
+    const fields = getAllFields();
 
     fields.forEach(field => {
         const ok = validateField(field);

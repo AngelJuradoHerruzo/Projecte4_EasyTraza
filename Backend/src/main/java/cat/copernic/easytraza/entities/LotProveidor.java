@@ -44,6 +44,9 @@ public class LotProveidor {
     @JoinColumn(name = "albara_proveidor_id", nullable = false)
     private AlbaraProveidor albaraProveidor;
 
+    @Column(nullable = false, length = 50)
+    private String unitats;
+
 
     /*********************       .CONSTRUCTORS.       *********************/
     public LotProveidor() { }
@@ -79,23 +82,27 @@ public class LotProveidor {
     public EstatLot getEstat() { return estat; }
     public void setEstat(EstatLot estat) { this.estat = estat; }
 
-    // ────── DATA CADUCITAT ──────
+    // ─────── DATA CADUCITAT ───────
     public LocalDate getDataCaducitat() { return dataCaducitat; }
     public void setDataCaducitat(LocalDate dataCaducitat) { this.dataCaducitat = dataCaducitat; }
 
-    // ────── DATA OBERTURA ──────
+    // ─────── DATA OBERTURA ───────
     public LocalDate getDataObertura() { return dataObertura; }
     public void setDataObertura(LocalDate dataObertura) { this.dataObertura = dataObertura; }
 
-    // ───── DATA ACABAMENT ─────
+    // ─────── DATA ACABAMENT ───────
     public LocalDate getDataAcabament() { return dataAcabament; }
     public void setDataAcabament(LocalDate dataAcabament) { this.dataAcabament = dataAcabament; }
 
-    // ───── MATÈRIA PRIMERA ─────
+    // ────── MATÈRIA PRIMERA ──────
     public MateriaPrimera getMateriaPrimera() { return materiaPrimera; }
     public void setMateriaPrimera(MateriaPrimera materiaPrimera) { this.materiaPrimera = materiaPrimera; }
 
     // ──── ALBARÀ DE PROVEÏDOR ────
     public AlbaraProveidor getAlbaraProveidor() { return albaraProveidor; }
     public void setAlbaraProveidor(AlbaraProveidor albaraProveidor) { this.albaraProveidor = albaraProveidor; }
+
+    // ────────── UNITATS ──────────
+    public String getUnitats() { return unitats; }
+    public void setUnitats(String unitats) { this.unitats = unitats; }
 }

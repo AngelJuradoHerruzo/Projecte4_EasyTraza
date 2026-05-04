@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cat.copernic.easytraza.entities.AlbaraProveidor;
 import cat.copernic.easytraza.entities.LotProveidor;
+import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.AlbaraProveidorRepository;
 
 @Service
@@ -38,17 +39,22 @@ public class AlbaraProveidorService {
 
     // CREAR ALBARÀ DE PROVEÏDOR
     public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor) {
-        validarDadesAlbaraProveidor(albaraProveidor);
 
-        if (albaraProveidor.getDataRecepcio() == null) {
-            albaraProveidor.setDataRecepcio(LocalDateTime.now());
-        }
+        prepararIValidarAlbaraProveidor(albaraProveidor);
 
-        if (albaraProveidor.getLots() != null) {
-            for (LotProveidor lot : albaraProveidor.getLots()) {
-                validarDadesLotProveidor(lot);
-                lot.setAlbaraProveidor(albaraProveidor);
-            }
+        int index = 1;
+
+        for (LotProveidor lot : albaraProveidor.getLots()) {
+
+            prepararIValidarLotProveidor(lot);
+
+            String identificador = generarIdentificadorLot(albaraProveidor, index);
+            lot.setIdentificadorLot(identificador);
+
+            lot.setEstat(EstatLot.EN_ESTOC);
+            lot.setAlbaraProveidor(albaraProveidor);
+
+            index++;
         }
 
         return albaraProveidorRepository.save(albaraProveidor);
@@ -61,22 +67,29 @@ public class AlbaraProveidorService {
         Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
 
         if (albaraProveidorOpt.isPresent()) {
-            validarDadesAlbaraProveidor(albaraProveidor);
-
             AlbaraProveidor albaraProveidorActual = albaraProveidorOpt.get();
+
+            validarAlbaraModificable(albaraProveidorActual);
+            prepararIValidarAlbaraProveidor(albaraProveidor);
 
             albaraProveidorActual.setDataRecepcio(albaraProveidor.getDataRecepcio());
             albaraProveidorActual.setProveidor(albaraProveidor.getProveidor());
             albaraProveidorActual.setUsuariReceptor(albaraProveidor.getUsuariReceptor());
 
-            if (albaraProveidor.getLots() != null) {
-                albaraProveidorActual.getLots().clear();
+            albaraProveidorActual.getLots().clear();
 
-                for (LotProveidor lot : albaraProveidor.getLots()) {
-                    validarDadesLotProveidor(lot);
-                    lot.setAlbaraProveidor(albaraProveidorActual);
-                    albaraProveidorActual.getLots().add(lot);
-                }
+            int index = 1;
+
+            for (LotProveidor lot : albaraProveidor.getLots()) {
+                prepararIValidarLotProveidor(lot);
+
+                lot.setIdentificadorLot(generarIdentificadorLot(albaraProveidorActual, index));
+                lot.setEstat(EstatLot.EN_ESTOC);
+                lot.setAlbaraProveidor(albaraProveidorActual);
+
+                albaraProveidorActual.getLots().add(lot);
+
+                index++;
             }
 
             return albaraProveidorRepository.save(albaraProveidorActual);
@@ -88,12 +101,35 @@ public class AlbaraProveidorService {
 
     // ELIMINAR ALBARÀ DE PROVEÏDOR
     public void deleteAlbaraProveidor(Long id) {
-        albaraProveidorRepository.deleteById(id);
+
+        Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
+
+        if (albaraProveidorOpt.isPresent()) {
+            validarAlbaraModificable(albaraProveidorOpt.get());
+            albaraProveidorRepository.deleteById(id);
+        }
     }
 
 
-    // VALIDAR DADES DE L'ALBARÀ DE PROVEÏDOR
-    private void validarDadesAlbaraProveidor(AlbaraProveidor albaraProveidor) {
+    // COMPROVAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
+    public boolean esModificable(AlbaraProveidor albaraProveidor) {
+
+        if (albaraProveidor == null || albaraProveidor.getLots() == null) {
+            return true;
+        }
+
+        for (LotProveidor lot : albaraProveidor.getLots()) {
+            if (lot.getEstat() != EstatLot.EN_ESTOC) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    // PREPARAR I VALIDAR DADES DE L'ALBARÀ DE PROVEÏDOR
+    private void prepararIValidarAlbaraProveidor(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor.getDataRecepcio() == null) {
             throw new RuntimeException("La data de recepció és obligatòria.");
@@ -106,18 +142,18 @@ public class AlbaraProveidorService {
         if (albaraProveidor.getUsuariReceptor() == null) {
             throw new RuntimeException("L'usuari receptor és obligatori.");
         }
+
+        if (albaraProveidor.getLots() == null || albaraProveidor.getLots().isEmpty()) {
+            throw new RuntimeException("L'albarà ha de tenir com a mínim un lot.");
+        }
     }
 
 
-    // VALIDAR DADES DEL LOT DE PROVEÏDOR
-    private void validarDadesLotProveidor(LotProveidor lotProveidor) {
+    // PREPARAR I VALIDAR DADES DEL LOT DE PROVEÏDOR
+    private void prepararIValidarLotProveidor(LotProveidor lotProveidor) {
 
         if (lotProveidor.getIdentificadorLot() != null) {
             lotProveidor.setIdentificadorLot(lotProveidor.getIdentificadorLot().trim().toUpperCase());
-        }
-
-        if (lotProveidor.getIdentificadorLot() == null || lotProveidor.getIdentificadorLot().isBlank()) {
-            throw new RuntimeException("L'identificador del lot és obligatori.");
         }
 
         if (lotProveidor.getMateriaPrimera() == null) {
@@ -132,8 +168,34 @@ public class AlbaraProveidorService {
             throw new RuntimeException("La quantitat ha de ser superior a zero.");
         }
 
-        if (lotProveidor.getEstat() == null) {
-            throw new RuntimeException("L'estat del lot és obligatori.");
+        if (lotProveidor.getUnitats() != null) {
+            lotProveidor.setUnitats(lotProveidor.getUnitats().trim());
         }
+
+        if (lotProveidor.getUnitats() == null || lotProveidor.getUnitats().isBlank()) {
+            throw new RuntimeException("Les unitats són obligatòries.");
+        }
+    }
+
+
+    // VALIDAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
+    private void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
+
+        if (!esModificable(albaraProveidor)) {
+            throw new RuntimeException("No es pot modificar o eliminar un albarà amb lots iniciats o finalitzats.");
+        }
+    }
+
+
+    // FORMAT AUTOMÀTIC DE L'IDENTIFICADOR DE LOT
+    private String generarIdentificadorLot(AlbaraProveidor albaraProveidor, int index) {
+
+        LocalDateTime data = albaraProveidor.getDataRecepcio();
+
+        String dia = String.format("%02d", data.getDayOfMonth());
+        String mes = String.format("%02d", data.getMonthValue());
+        String any = String.valueOf(data.getYear());
+
+        return dia + "_" + mes + "_" + any + "_lote" + index;
     }
 }

@@ -1,6 +1,7 @@
 package cat.copernic.easytraza.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -34,6 +35,11 @@ public class AlbaraProveidor {
     @OneToMany(mappedBy = "albaraProveidor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LotProveidor> lots;
 
+    @ElementCollection
+    @CollectionTable(name = "albara_proveidor_fitxers", joinColumns = @JoinColumn(name = "albara_id"))
+    @Column(name = "fitxer_path")
+    private List<String> fitxers = new ArrayList<>();
+
 
     /*********************       .CONSTRUCTORS.       *********************/
     public AlbaraProveidor() { }
@@ -48,11 +54,11 @@ public class AlbaraProveidor {
 
 
     /*********************       .GETTERS & SETTERS.       *********************/
-    // ─────────── ID ───────────
+    // ──────────── ID ────────────
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    // ────── DATA RECEPCIÓ ──────
+    // ─────── DATA RECEPCIÓ ───────
     public LocalDateTime getDataRecepcio() { return dataRecepcio; }
     public void setDataRecepcio(LocalDateTime dataRecepcio) { this.dataRecepcio = dataRecepcio; }
 
@@ -60,11 +66,15 @@ public class AlbaraProveidor {
     public Proveidor getProveidor() { return proveidor; }
     public void setProveidor(Proveidor proveidor) { this.proveidor = proveidor; }
 
-    // ─────── USUARI RECEPTOR ───────
+    // ────── USUARI RECEPTOR ──────
     public Usuari getUsuariReceptor() { return usuariReceptor; }
     public void setUsuariReceptor(Usuari usuariReceptor) { this.usuariReceptor = usuariReceptor; }
 
     // ─────────── LOTS ───────────
     public List<LotProveidor> getLots() { return lots; }
     public void setLots(List<LotProveidor> lots) { this.lots = lots; }
+
+    // ─────── RUTA FITXERS ───────
+    public List<String> getFitxers() { return fitxers; }
+    public void setFitxers(List<String> fitxers) { this.fitxers = fitxers; }
 }
