@@ -165,3 +165,35 @@ form.addEventListener('submit', function (event) {
         event.preventDefault();
     }
 });
+
+
+const ocrFile = document.getElementById('ocrFile');
+const ocrPreview = document.getElementById('ocrPreview');
+const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
+const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
+const ocrFileName = document.getElementById('ocrFileName');
+
+if (ocrFile) {
+    ocrFile.addEventListener('change', function () {
+        const file = this.files[0];
+
+        if (!file) {
+            ocrPreviewContainer.style.display = 'none';
+            ocrPreviewEmpty.style.display = 'block';
+            ocrPreview.src = '';
+            ocrFileName.textContent = '';
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            ocrPreview.src = event.target.result;
+            ocrFileName.textContent = file.name;
+            ocrPreviewContainer.style.display = 'block';
+            ocrPreviewEmpty.style.display = 'none';
+        };
+
+        reader.readAsDataURL(file);
+    });
+}

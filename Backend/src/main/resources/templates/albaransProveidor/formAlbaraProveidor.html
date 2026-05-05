@@ -27,16 +27,11 @@
                 </h1>
 
                 <p class="page-description">
-                    Registra la recepció i els lots associats.
+                    Registra la recepció, processa la imatge de l'albarà i afegeix els lots associats.
                 </p>
             </div>
 
             <div class="page-top-actions">
-                <a th:href="@{/albarans-proveidor/ocr}" class="btn btn-primary">
-                    <i class="bi bi-camera"></i>
-                    OCR
-                </a>
-
                 <a th:href="@{/albarans-proveidor/list}" class="btn btn-primary">
                     <i class="bi bi-arrow-left"></i>
                     Tornar
@@ -49,134 +44,242 @@
 
             <div class="content-toolbar">
                 <div class="toolbar-block">
-                    <h2 class="content-title">Dades de l'albarà</h2>
-                    <p class="content-subtitle">Informació general de recepció</p>
+                    <h2 class="content-title">Albarà de proveïdor</h2>
+                    <p class="content-subtitle">
+                        Introdueix les dades manualment o utilitza OCR per omplir-les a partir d'una imatge.
+                    </p>
                 </div>
 
                 <div th:if="${error}" class="form-error">
                     <i class="bi bi-exclamation-circle"></i>
                     <span th:text="${error}"></span>
                 </div>
+
+                <div th:if="${ocrInfo}" class="form-success">
+                    <i class="bi bi-check-circle"></i>
+                    <span th:text="${ocrInfo}"></span>
+                </div>
             </div>
 
             <div style="padding:20px 24px;">
 
+                <!----------------------- OCR ----------------------->
+                <div th:if="${albaraProveidor == null or albaraProveidor.id == null}"
+                     style="margin-bottom:24px; padding:18px; border:1px solid #f0e6dc; border-radius:18px; background:#fffaf5;">
+
+                    <h2 class="content-title">Entrada OCR</h2>
+                    <p class="content-subtitle">
+                        Selecciona una imatge de l'albarà. La imatge només es guardarà quan premis el botó Guardar.
+                    </p>
+
+                    <form th:action="@{/albarans-proveidor/ocr/process}"
+                          method="post"
+                          enctype="multipart/form-data"
+                          style="margin-top:18px;">
+
+                        <div style="display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end;">
+
+                            <div class="form-group" style="margin:0;">
+                                <label class="form-label">Imatge de l'albarà</label>
+                                <input id="ocrFile"
+                                       type="file"
+                                       name="file"
+                                       class="form-input"
+                                       accept="image/*"
+                                       required>
+                            </div>
+
+                            <button type="submit" class="btn btn-soft">
+                                <i class="bi bi-camera"></i>
+                                Processar OCR
+                            </button>
+
+                        </div>
+
+                        <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:220px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:white;">
+
+                            <div id="ocrPreviewEmpty"
+                                 th:style="${ocrImageBase64 != null and !#strings.isEmpty(ocrImageBase64)} ? 'display:none;' : 'text-align:center; padding:30px;'">
+                                <i class="bi bi-file-earmark-image" style="font-size:44px; color:#c9b8a6;"></i>
+                                <h2 class="content-title" style="margin-top:12px;">Cap imatge seleccionada</h2>
+                                <p class="content-subtitle">
+                                    La imatge seleccionada es mostrarà aquí abans de processar-la.
+                                </p>
+                            </div>
+
+                            <div id="ocrPreviewContainer"
+                                 th:style="${ocrImageBase64 != null and !#strings.isEmpty(ocrImageBase64)} ? 'display:block; width:100%; padding:16px; text-align:center;' : 'display:none; width:100%; padding:16px; text-align:center;'">
+
+                                <p id="ocrFileName"
+                                   class="content-subtitle"
+                                   style="margin-bottom:12px; font-weight:600;"
+                                   th:text="${ocrImageOriginalName}">
+                                </p>
+
+                                <img id="ocrPreview"
+                                     th:src="${ocrImageBase64}"
+                                     src=""
+                                     alt="Vista prèvia de l'albarà"
+                                     style="width:100%; max-height:420px; object-fit:contain; border-radius:14px;">
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <!----------------------- FORMULARI PRINCIPAL ----------------------->
                 <form id="albaraProveidorForm"
                       th:action="${albaraProveidor.id != null} ? @{/albarans-proveidor/update/{id}(id=${albaraProveidor.id})} : @{/albarans-proveidor/save}"
                       th:object="${albaraProveidor}"
                       method="post">
 
-                    <!----------------------- DADES ALBARÀ ----------------------->
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+                    <input type="hidden" name="ocrImageBase64" th:value="${ocrImageBase64}">
+                    <input type="hidden" name="ocrImageOriginalName" th:value="${ocrImageOriginalName}">
 
-                        <div class="form-group">
-                            <label class="form-label">Data recepció</label>
-                            <input id="dataRecepcio"
-                                   type="datetime-local"
-                                   name="dataRecepcio"
-                                   th:value="${albaraProveidor.dataRecepcio != null} ? ${#temporals.format(albaraProveidor.dataRecepcio, 'yyyy-MM-dd''T''HH:mm')} : ''"
-                                   class="form-input"
-                                   required>
+                    <div th:each="fitxer, stat : *{fitxers}">
+                        <input type="hidden" th:field="*{fitxers[__${stat.index}__]}">
+                    </div>
+
+                    <!----------------------- DADES GENERALS ----------------------->
+                    <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                        <h2 class="content-title">Dades generals</h2>
+                        <p class="content-subtitle">
+                            Informació principal de la recepció.
+                        </p>
+
+                        <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px;">
+
+                            <div class="form-group">
+                                <label class="form-label">Data recepció</label>
+                                <input id="dataRecepcio"
+                                       type="datetime-local"
+                                       name="dataRecepcio"
+                                       th:value="${albaraProveidor.dataRecepcio != null} ? ${#temporals.format(albaraProveidor.dataRecepcio, 'yyyy-MM-dd''T''HH:mm')} : ''"
+                                       class="form-input"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Proveïdor</label>
+                                <select id="proveidor"
+                                        th:field="*{proveidor.id}"
+                                        class="form-select"
+                                        required>
+                                    <option value="">-- Selecciona --</option>
+                                    <option th:each="p : ${proveidors}"
+                                            th:value="${p.id}"
+                                            th:text="${p.nomProveidor}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Usuari receptor</label>
+                                <select id="usuariReceptor"
+                                        th:field="*{usuariReceptor.id}"
+                                        class="form-select"
+                                        required>
+                                    <option value="">-- Selecciona --</option>
+                                    <option th:each="u : ${usuaris}"
+                                            th:value="${u.id}"
+                                            th:text="${u.nomComplet}">
+                                    </option>
+                                </select>
+                            </div>
+
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Proveïdor</label>
-                            <select id="proveidor"
-                                    th:field="*{proveidor.id}"
-                                    class="form-select"
-                                    required>
-                                <option value="">-- Selecciona --</option>
-                                <option th:each="p : ${proveidors}"
-                                        th:value="${p.id}"
-                                        th:text="${p.nomProveidor}">
-                                </option>
-                            </select>
-                        </div>
+                        <div th:if="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()}"
+                             style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; padding:16px; background:white; text-align:center;">
 
-                        <div class="form-group">
-                            <label class="form-label">Usuari receptor</label>
-                            <select id="usuariReceptor"
-                                    th:field="*{usuariReceptor.id}"
-                                    class="form-select"
-                                    required>
-                                <option value="">-- Selecciona --</option>
-                                <option th:each="u : ${usuaris}"
-                                        th:value="${u.id}"
-                                        th:text="${u.nomComplet}">
-                                </option>
-                            </select>
+                            <p class="content-subtitle" style="font-weight:600; margin-bottom:12px;">
+                                Imatge guardada
+                            </p>
+
+                            <p class="content-subtitle"
+                               th:text="${#strings.substringAfterLast(albaraProveidor.fitxers[0], '/')}"
+                               style="margin-bottom:12px;">
+                            </p>
+
+                            <img th:src="@{${albaraProveidor.fitxers[0]}}"
+                                 alt="Imatge guardada"
+                                 style="width:100%; max-height:420px; object-fit:contain; border-radius:14px;">
                         </div>
 
                     </div>
 
                     <!----------------------- LOTS ----------------------->
-                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h2 class="content-title">Lots</h2>
-                            <p class="content-subtitle">Lots inclosos en aquest albarà</p>
+                    <div style="margin-top:26px; padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+                            <div>
+                                <h2 class="content-title">Lots recepcionats</h2>
+                                <p class="content-subtitle">
+                                    Cada fila correspon a un lot inclòs en aquest albarà.
+                                </p>
+                            </div>
+
+                            <button type="button" id="addLotBtn" class="btn btn-primary">
+                                <i class="bi bi-plus-lg"></i>
+                                Afegir lot
+                            </button>
                         </div>
 
-                        <button type="button" id="addLotBtn" class="btn btn-primary">
-                            <i class="bi bi-plus-lg"></i>
-                            Afegir lot
-                        </button>
-                    </div>
+                        <div id="lotsContainer" style="margin-top:18px; display:flex; flex-direction:column; gap:14px;">
 
-                    <div id="lotsContainer" style="margin-top:15px; display:flex; flex-direction:column; gap:15px;">
+                            <div th:each="lot, stat : *{lots}"
+                                 class="lot-row"
+                                 style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
 
-                        <div th:each="lot, stat : *{lots}"
-                             class="lot-row"
-                             style="padding:16px; border:1px solid #f0e6dc; border-radius:18px;">
+                                <input type="hidden" th:field="*{lots[__${stat.index}__].id}">
 
-                            <input type="hidden" th:field="*{lots[__${stat.index}__].id}">
+                                <div style="display:grid; grid-template-columns:1.2fr 1.2fr 0.7fr 0.7fr auto; gap:14px; align-items:end;">
 
-                            <div style="display:grid; grid-template-columns:1.2fr 1fr 0.7fr 0.7fr auto; gap:15px; align-items:end;">
+                                    <div class="form-group" style="margin:0;">
+                                        <label class="form-label">Identificador lot</label>
+                                        <input type="text"
+                                               class="form-input identificadorLotPreview"
+                                               readonly>
+                                    </div>
 
-                                <!------ IDENTIFICADOR (READONLY) ------>
-                                <div class="form-group">
-                                    <label class="form-label">Identificador lot</label>
-                                    <input type="text"
-                                           class="form-input identificadorLotPreview"
-                                           readonly>
+                                    <div class="form-group" style="margin:0;">
+                                        <label class="form-label">Matèria primera</label>
+                                        <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
+                                                class="form-select materiaPrimeraInput"
+                                                required>
+                                            <option value="">-- Selecciona --</option>
+                                            <option th:each="m : ${materiesPrimeres}"
+                                                    th:value="${m.id}"
+                                                    th:text="${m.nomMateria}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group" style="margin:0;">
+                                        <label class="form-label">Quantitat</label>
+                                        <input type="number"
+                                               th:field="*{lots[__${stat.index}__].quantitat}"
+                                               class="form-input quantitatInput"
+                                               min="1"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group" style="margin:0;">
+                                        <label class="form-label">Unitats</label>
+                                        <input type="text"
+                                               th:field="*{lots[__${stat.index}__].unitats}"
+                                               class="form-input unitatsInput"
+                                               required>
+                                    </div>
+
+                                    <button type="button" class="btn btn-secondary remove-lot-btn">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+
                                 </div>
-
-                                <!------ MATÈRIA PRIMERA ------>
-                                <div class="form-group">
-                                    <label class="form-label">Matèria primera</label>
-                                    <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
-                                            class="form-select materiaPrimeraInput"
-                                            required>
-                                        <option value="">-- Selecciona --</option>
-                                        <option th:each="m : ${materiesPrimeres}"
-                                                th:value="${m.id}"
-                                                th:text="${m.nomMateria}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!------ QUANTITAT ------>
-                                <div class="form-group">
-                                    <label class="form-label">Quantitat</label>
-                                    <input type="number"
-                                           th:field="*{lots[__${stat.index}__].quantitat}"
-                                           class="form-input quantitatInput"
-                                           min="1"
-                                           required>
-                                </div>
-
-                                <!------ UNITATS ------>
-                                <div class="form-group">
-                                    <label class="form-label">Unitats</label>
-                                    <input type="text"
-                                           th:field="*{lots[__${stat.index}__].unitats}"
-                                           class="form-input unitatsInput"
-                                           required>
-                                </div>
-
-                                <!------ ELIMINAR ------>
-                                <button type="button" class="btn btn-secondary remove-lot-btn">
-                                    <i class="bi bi-trash3"></i>
-                                </button>
 
                             </div>
 
@@ -187,7 +290,8 @@
                     <!----------------------- BOTONS ----------------------->
                     <div style="margin-top:25px; display:flex; gap:10px;">
                         <button type="submit" class="btn btn-soft">
-                            <i class="bi bi-save"></i> Guardar
+                            <i class="bi bi-save"></i>
+                            Guardar
                         </button>
 
                         <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">

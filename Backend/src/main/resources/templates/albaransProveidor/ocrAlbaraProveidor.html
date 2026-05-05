@@ -17,72 +17,135 @@
 
     <main class="main">
 
+        <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
                 <p class="page-eyebrow">OCR</p>
+
                 <h1 class="page-heading">Importar albarà amb OCR</h1>
+
                 <p class="page-description">
-                    Puja una imatge de l'albarà per preparar la lectura automàtica.
+                    Puja una imatge de l'albarà per revisar el document i les dades extretes.
                 </p>
             </div>
 
             <div class="page-top-actions">
                 <a th:href="@{/albarans-proveidor/new}" class="btn btn-primary">
                     <i class="bi bi-pencil-square"></i>
-                    <span>Entrada manual</span>
+                    Entrada manual
                 </a>
 
-                <a th:href="@{/albarans-proveidor/list}" class="btn btn-soft">
+                <a th:href="@{/albarans-proveidor/list}" class="btn btn-primary">
                     <i class="bi bi-arrow-left"></i>
-                    <span>Tornar</span>
+                    Tornar
                 </a>
             </div>
         </section>
 
+        <!----------------------- CONTINGUT ----------------------->
         <section class="content-card">
 
             <div class="content-toolbar">
                 <div class="toolbar-block">
-                    <h2 class="content-title">Imatge de l'albarà</h2>
+                    <h2 class="content-title">Lectura OCR</h2>
                     <p class="content-subtitle">
-                        Selecciona una imatge o fotografia del document.
+                        A l'esquerra es mostra la imatge adjuntada i a la dreta les dades detectades.
                     </p>
+                </div>
+
+                <div th:if="${error}" class="form-error">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span th:text="${error}"></span>
                 </div>
             </div>
 
-            <div style="padding: 20px 24px;">
+            <div style="padding:20px 24px;">
 
-                <form method="post" enctype="multipart/form-data">
+                <form th:action="@{/albarans-proveidor/ocr/process}"
+                      method="post"
+                      enctype="multipart/form-data">
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
+                    <div style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:22px; align-items:start;">
 
-                        <div class="form-group">
-                            <label class="form-label" for="file">Fitxer de l'albarà</label>
-                            <input id="file"
-                                   type="file"
-                                   name="file"
-                                   class="form-input"
-                                   accept="image/*">
-                        </div>
+                        <!----------------------- IMATGE ----------------------->
+                        <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
 
-                        <div class="form-group">
-                            <label class="form-label">Estat</label>
-                            <div class="form-input">
-                                OCR pendent de processar
+                            <h2 class="content-title">Imatge adjuntada</h2>
+                            <p class="content-subtitle">
+                                Selecciona la imatge de l'albarà abans de processar-la.
+                            </p>
+
+                            <div class="form-group" style="margin-top:18px;">
+                                <label class="form-label">Imatge de l'albarà</label>
+                                <input id="ocrFile"
+                                       type="file"
+                                       name="file"
+                                       class="form-input"
+                                       accept="image/*"
+                                       required>
                             </div>
+
+                            <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:360px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fffaf5;">
+
+                                <img id="ocrPreview"
+                                     src=""
+                                     alt="Vista prèvia de l'albarà"
+                                     style="display:none; width:100%; height:100%; object-fit:contain; max-height:520px;">
+
+                                <div id="ocrPreviewEmpty" style="text-align:center; padding:30px;">
+                                    <i class="bi bi-file-earmark-image" style="font-size:52px; color:#c9b8a6;"></i>
+                                    <h2 class="content-title" style="margin-top:12px;">Cap imatge seleccionada</h2>
+                                    <p class="content-subtitle">
+                                        Quan seleccionis una imatge, es mostrarà aquí.
+                                    </p>
+                                </div>
+
+                            </div>
+
                         </div>
 
-                    </div>
+                        <!----------------------- DADES EXTRETES ----------------------->
+                        <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
 
-                    <div style="margin-top:25px; display:flex; gap:10px;">
-                        <button type="button" class="btn btn-primary">
-                            <i class="bi bi-camera"></i>
-                            <span>Processar OCR</span>
-                        </button>
+                            <h2 class="content-title">Dades extretes</h2>
+                            <p class="content-subtitle">
+                                Després de processar, aquestes dades es mostraran al formulari normal per validar-les.
+                            </p>
 
-                        <a th:href="@{/albarans-proveidor/new}" class="btn btn-soft">
-                            Cancel·lar
-                        </a>
+                            <div style="margin-top:18px; display:flex; flex-direction:column; gap:12px;">
+
+                                <div style="padding:14px; border:1px solid #f0e6dc; border-radius:14px; background:#fffaf5;">
+                                    <p class="form-label" style="margin:0;">Data recepció</p>
+                                    <p class="content-subtitle" style="margin:6px 0 0 0;">Pendent de processar</p>
+                                </div>
+
+                                <div style="padding:14px; border:1px solid #f0e6dc; border-radius:14px; background:#fffaf5;">
+                                    <p class="form-label" style="margin:0;">Proveïdor</p>
+                                    <p class="content-subtitle" style="margin:6px 0 0 0;">Pendent de processar</p>
+                                </div>
+
+                                <div style="padding:14px; border:1px solid #f0e6dc; border-radius:14px; background:#fffaf5;">
+                                    <p class="form-label" style="margin:0;">Lots detectats</p>
+                                    <p class="content-subtitle" style="margin:6px 0 0 0;">Pendent de processar</p>
+                                </div>
+
+                            </div>
+
+                            <div style="margin-top:24px; display:flex; gap:10px;">
+
+                                <button type="submit" class="btn btn-soft">
+                                    <i class="bi bi-camera"></i>
+                                    Processar OCR
+                                </button>
+
+                                <a th:href="@{/albarans-proveidor/new}" class="btn btn-secondary">
+                                    Cancel·lar
+                                </a>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </form>
@@ -91,33 +154,35 @@
 
         </section>
 
-        <section class="content-card">
-
-            <div class="content-toolbar">
-                <div class="toolbar-block">
-                    <h2 class="content-title">Dades detectades</h2>
-                    <p class="content-subtitle">
-                        Quan l'OCR estigui implementat, aquí es mostraran les dades detectades.
-                    </p>
-                </div>
-            </div>
-
-            <div style="padding: 20px 24px;">
-
-                <div class="empty-state">
-                    <div class="empty-box">
-                        <i class="bi bi-file-earmark-image"></i>
-                        <p>Encara no s'ha processat cap imatge.</p>
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
     </main>
 
 </div>
+
+<script>
+    const ocrFile = document.getElementById('ocrFile');
+    const ocrPreview = document.getElementById('ocrPreview');
+    const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
+
+    ocrFile.addEventListener('change', function () {
+        const file = this.files[0];
+
+        if (!file) {
+            ocrPreview.style.display = 'none';
+            ocrPreviewEmpty.style.display = 'block';
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            ocrPreview.src = event.target.result;
+            ocrPreview.style.display = 'block';
+            ocrPreviewEmpty.style.display = 'none';
+        };
+
+        reader.readAsDataURL(file);
+    });
+</script>
 
 </body>
 </html>

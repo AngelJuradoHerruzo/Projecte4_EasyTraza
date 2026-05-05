@@ -1,6 +1,12 @@
 package cat.copernic.easytraza.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +22,10 @@ import cat.copernic.easytraza.repository.AlbaraProveidorRepository;
 @Transactional
 public class AlbaraProveidorService {
 
-    // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
+    // ---------------------------- REPOSITORI I CONFIGURACIÓ ----------------------------
     private final AlbaraProveidorRepository albaraProveidorRepository;
+
+    private static final String DIRECTORI_FITXERS = "C:/Users/crono/Desktop/DAM/Projecte4_EasyTraza/Backend/uploads/albarans-proveidor";
 
     public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository) {
         this.albaraProveidorRepository = albaraProveidorRepository;
@@ -38,31 +46,36 @@ public class AlbaraProveidorService {
 
 
     // CREAR ALBARÀ DE PROVEÏDOR
-    public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor) {
-
-        prepararIValidarAlbaraProveidor(albaraProveidor);
+    public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor,
+                                                 String ocrImageBase64,
+                                                 String ocrImageOriginalName) {
+        validarDadesAlbaraProveidor(albaraProveidor);
 
         int index = 1;
 
         for (LotProveidor lot : albaraProveidor.getLots()) {
+            validarDadesLotProveidor(lot);
 
-            prepararIValidarLotProveidor(lot);
-
-            String identificador = generarIdentificadorLot(albaraProveidor, index);
-            lot.setIdentificadorLot(identificador);
-
+            lot.setIdentificadorLot(generarIdentificadorLot(albaraProveidor, index));
             lot.setEstat(EstatLot.EN_ESTOC);
             lot.setAlbaraProveidor(albaraProveidor);
 
             index++;
         }
 
-        return albaraProveidorRepository.save(albaraProveidor);
+        AlbaraProveidor albaraGuardat = albaraProveidorRepository.save(albaraProveidor);
+
+        guardarImatgeOcrDefinitiva(albaraGuardat, ocrImageBase64, ocrImageOriginalName);
+
+        return albaraProveidorRepository.save(albaraGuardat);
     }
 
 
     // ACTUALITZAR ALBARÀ DE PROVEÏDOR
-    public AlbaraProveidor updateAlbaraProveidor(Long id, AlbaraProveidor albaraProveidor) {
+    public AlbaraProveidor updateAlbaraProveidor(Long id,
+                                                 AlbaraProveidor albaraProveidor,
+                                                 String ocrImageBase64,
+                                                 String ocrImageOriginalName) {
 
         Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
 
@@ -70,7 +83,7 @@ public class AlbaraProveidorService {
             AlbaraProveidor albaraProveidorActual = albaraProveidorOpt.get();
 
             validarAlbaraModificable(albaraProveidorActual);
-            prepararIValidarAlbaraProveidor(albaraProveidor);
+            validarDadesAlbaraProveidor(albaraProveidor);
 
             albaraProveidorActual.setDataRecepcio(albaraProveidor.getDataRecepcio());
             albaraProveidorActual.setProveidor(albaraProveidor.getProveidor());
@@ -81,7 +94,7 @@ public class AlbaraProveidorService {
             int index = 1;
 
             for (LotProveidor lot : albaraProveidor.getLots()) {
-                prepararIValidarLotProveidor(lot);
+                validarDadesLotProveidor(lot);
 
                 lot.setIdentificadorLot(generarIdentificadorLot(albaraProveidorActual, index));
                 lot.setEstat(EstatLot.EN_ESTOC);
@@ -91,6 +104,8 @@ public class AlbaraProveidorService {
 
                 index++;
             }
+
+            guardarImatgeOcrDefinitiva(albaraProveidorActual, ocrImageBase64, ocrImageOriginalName);
 
             return albaraProveidorRepository.save(albaraProveidorActual);
         }
@@ -128,8 +143,8 @@ public class AlbaraProveidorService {
     }
 
 
-    // PREPARAR I VALIDAR DADES DE L'ALBARÀ DE PROVEÏDOR
-    private void prepararIValidarAlbaraProveidor(AlbaraProveidor albaraProveidor) {
+    // VALIDAR DADES DE L'ALBARÀ DE PROVEÏDOR
+    private void validarDadesAlbaraProveidor(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor.getDataRecepcio() == null) {
             throw new RuntimeException("La data de recepció és obligatòria.");
@@ -149,12 +164,8 @@ public class AlbaraProveidorService {
     }
 
 
-    // PREPARAR I VALIDAR DADES DEL LOT DE PROVEÏDOR
-    private void prepararIValidarLotProveidor(LotProveidor lotProveidor) {
-
-        if (lotProveidor.getIdentificadorLot() != null) {
-            lotProveidor.setIdentificadorLot(lotProveidor.getIdentificadorLot().trim().toUpperCase());
-        }
+    // VALIDAR DADES DEL LOT DE PROVEÏDOR
+    private void validarDadesLotProveidor(LotProveidor lotProveidor) {
 
         if (lotProveidor.getMateriaPrimera() == null) {
             throw new RuntimeException("La matèria primera és obligatòria.");
@@ -178,16 +189,7 @@ public class AlbaraProveidorService {
     }
 
 
-    // VALIDAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
-    private void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
-
-        if (!esModificable(albaraProveidor)) {
-            throw new RuntimeException("No es pot modificar o eliminar un albarà amb lots iniciats o finalitzats.");
-        }
-    }
-
-
-    // FORMAT AUTOMÀTIC DE L'IDENTIFICADOR DE LOT
+    // GENERAR IDENTIFICADOR DEL LOT SEGONS LA DATA DE RECEPCIÓ I LA POSICIÓ DEL LOT
     private String generarIdentificadorLot(AlbaraProveidor albaraProveidor, int index) {
 
         LocalDateTime data = albaraProveidor.getDataRecepcio();
@@ -197,5 +199,61 @@ public class AlbaraProveidorService {
         String any = String.valueOf(data.getYear());
 
         return dia + "_" + mes + "_" + any + "_lote" + index;
+    }
+
+
+    // GUARDAR DEFINITIVAMENT LA IMATGE OCR NOMÉS QUAN ES GUARDA L'ALBARÀ
+    private void guardarImatgeOcrDefinitiva(AlbaraProveidor albaraProveidor,
+                                            String ocrImageBase64,
+                                            String ocrImageOriginalName) {
+
+        if (ocrImageBase64 == null || ocrImageBase64.isBlank()) {
+            return;
+        }
+
+        try {
+            Files.createDirectories(Paths.get(DIRECTORI_FITXERS));
+
+            String extensio = obtenirExtensioFitxer(ocrImageOriginalName);
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String nomFitxer = "albara_" + albaraProveidor.getId() + "_" + timestamp + extensio;
+
+            String base64Net = ocrImageBase64;
+
+            if (base64Net.contains(",")) {
+                base64Net = base64Net.substring(base64Net.indexOf(",") + 1);
+            }
+
+            byte[] bytes = Base64.getDecoder().decode(base64Net);
+
+            Path rutaFitxer = Paths.get(DIRECTORI_FITXERS, nomFitxer);
+            Files.write(rutaFitxer, bytes);
+
+            albaraProveidor.getFitxers().clear();
+            albaraProveidor.getFitxers().add("/uploads/albarans-proveidor/" + nomFitxer);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("No s'ha pogut guardar la imatge de l'albarà.");
+        }
+    }
+
+
+    // OBTENIR L'EXTENSIÓ DEL FITXER ORIGINAL
+    private String obtenirExtensioFitxer(String nomOriginal) {
+
+        if (nomOriginal == null || !nomOriginal.contains(".")) {
+            return ".png";
+        }
+
+        return nomOriginal.substring(nomOriginal.lastIndexOf("."));
+    }
+
+
+    // VALIDAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
+    private void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
+
+        if (!esModificable(albaraProveidor)) {
+            throw new RuntimeException("No es pot modificar o eliminar un albarà amb lots iniciats o finalitzats.");
+        }
     }
 }
