@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Albarans de proveïdor - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Recepcions</p>
+                <h1 class="page-heading">Albarans de proveïdor</h1>
+                <p class="page-description">
+                    Consulta i gestiona les recepcions de matèria primera dels proveïdors.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-proveidor/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nou albarà</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- CONTENIDOR ----------------------->
+        <section class="content-card">
+
+            <!----------------------- TOOLBAR ----------------------->
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <div th:if="${error}" class="form-error">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <h2 class="content-title">Llistat d'albarans</h2>
+                    
+                    <p class="content-subtitle">
+                        Vista general dels albarans registrats i els lots recepcionats.
+                    </p>
+                </div>
+
+                <div class="toolbar-actions">
+                    <div class="search-field">
+                        <i class="bi bi-search"></i>
+                        <input id="searchInput" type="text" placeholder="Cercar albarà...">
+                    </div>
+                </div>
+            </div>
+
+            <!----------------------- TARGETES ----------------------->
+            <div class="cards-grid" id="albaransContainer">
+
+                <article th:each="albara : ${albarans}" class="info-card albara-card">
+
+                    <!----------------------- CAPÇALERA TARGETA ----------------------->
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+
+                        <div class="info-card-body">
+                            <h3 class="info-card-title">
+                                <span>Albarà #</span>
+                                <span th:text="${albara.id}">1</span>
+                            </h3>
+
+                            <p class="info-card-description"
+                               th:text="${#temporals.format(albara.dataRecepcio, 'dd/MM/yyyy HH:mm')}">
+                                01/01/2026 10:00
+                            </p>
+                        </div>
+                    </div>
+
+                    <!----------------------- DADES ALBARÀ ----------------------->
+                    <div class="info-card-meta">
+
+                        <div class="info-card-meta-item">
+                            <i class="bi bi-buildings"></i>
+                            <div class="info-card-meta-text">
+                                <span class="info-card-meta-label">Proveïdor</span>
+                                <span class="info-card-meta-value"
+                                      th:text="${albara.proveidor.nomProveidor}">
+                                    Proveïdor
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="info-card-meta-item">
+                            <i class="bi bi-person-check"></i>
+                            <div class="info-card-meta-text">
+                                <span class="info-card-meta-label">Usuari receptor</span>
+                                <span class="info-card-meta-value"
+                                      th:text="${albara.usuariReceptor.nomComplet}">
+                                    Usuari
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="info-card-meta-item">
+                            <i class="bi bi-box-seam"></i>
+                            <div class="info-card-meta-text">
+                                <span class="info-card-meta-label">Lots recepcionats</span>
+                                <span class="info-card-meta-value"
+                                      th:text="${albara.lots != null ? #lists.size(albara.lots) : 0}">
+                                    0
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!----------------------- ACCIONS ----------------------->
+                    <div class="info-card-actions">
+                        <a th:if="${albaraProveidorService.esModificable(albara)}"
+                            th:href="@{/albarans-proveidor/edit/{id}(id=${albara.id})}"
+                            class="btn-table btn-soft">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Editar</span>
+                        </a>
+
+                        <a th:if="${albaraProveidorService.esModificable(albara)}"
+                            th:href="@{/albarans-proveidor/delete/{id}(id=${albara.id})}"
+                            class="btn-table btn-delete"
+                            onclick="return confirm('Segur que vols eliminar aquest albarà?')">
+                            <i class="bi bi-trash3"></i>
+                            <span>Eliminar</span>
+                        </a>
+                    </div>
+
+                </article>
+
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(albarans)}" class="empty-state">
+                    <div class="empty-box">
+                        <i class="bi bi-receipt"></i>
+                        <p>No hi ha albarans de proveïdor registrats.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!----------------------- SCRIPT DE CERCA ----------------------->
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.albara-card');
+
+    searchInput.addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+</body>
+</html>

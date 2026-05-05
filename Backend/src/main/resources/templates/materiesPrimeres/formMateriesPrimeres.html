@@ -27,7 +27,7 @@
 
                 <!-- Títol dinàmic -->
                 <h1 class="page-heading"
-                    th:text="${materiaPrima.id != null} ? 'Editar matèria primera' : 'Nova matèria primera'">
+                    th:text="${materiaPrimera.id != null} ? 'Editar matèria primera' : 'Nova matèria primera'">
                     Formulari
                 </h1>
 
@@ -70,9 +70,9 @@
             <!----------------------- COS DEL FORMULARI ----------------------->
             <div style="padding: 20px 24px;">
 
-                <form id="materiaPrimaForm"
-                      th:action="${materiaPrima.id != null} ? @{/materies-primeres/update/{id}(id=${materiaPrima.id})} : @{/materies-primeres/save}"
-                      th:object="${materiaPrima}"
+                <form id="materiaPrimeraForm"
+                      th:action="${materiaPrimera.id != null} ? @{/materies-primeres/update/{id}(id=${materiaPrimera.id})} : @{/materies-primeres/save}"
+                      th:object="${materiaPrimera}"
                       method="post">
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
