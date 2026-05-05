@@ -47,6 +47,7 @@ public class MateriaPrimeraService {
         Optional<MateriaPrimera> materiaPrimeraOpt = materiaPrimeraRepository.findById(id);
 
         if (materiaPrimeraOpt.isPresent()) {
+            materiaPrimera.setId(id);
             validarDadesMateriesPrimeres(materiaPrimera);
 
             MateriaPrimera materiaPrimeraActual = materiaPrimeraOpt.get();
@@ -80,6 +81,13 @@ public class MateriaPrimeraService {
 
         if (materiaPrimera.getNomMateria() == null || materiaPrimera.getNomMateria().isBlank()) {
             throw new RuntimeException("El nom de la matèria primera és obligatori.");
+        }
+
+        Optional<MateriaPrimera> materiaPrimeraExistent = materiaPrimeraRepository.findByNomMateria(materiaPrimera.getNomMateria());
+
+        if (materiaPrimeraExistent.isPresent()
+                && !materiaPrimeraExistent.get().getId().equals(materiaPrimera.getId())) {
+            throw new RuntimeException("Ja existeix una matèria primera amb aquest nom.");
         }
 
         if (materiaPrimera.getDescripcio() != null && materiaPrimera.getDescripcio().length() > 50) {

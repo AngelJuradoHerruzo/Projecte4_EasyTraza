@@ -47,6 +47,7 @@ public class ProducteService {
         Optional<Producte> producteOpt = producteRepository.findById(id);
 
         if (producteOpt.isPresent()) {
+            producte.setId(id);
             validarDadesProducte(producte);
 
             Producte producteActual = producteOpt.get();
@@ -82,6 +83,13 @@ public class ProducteService {
 
         if (producte.getNomProducte() == null || producte.getNomProducte().isBlank()) {
             throw new RuntimeException("El nom del producte és obligatori.");
+        }
+
+        Optional<Producte> producteExistent = producteRepository.findByNomProducte(producte.getNomProducte());
+
+        if (producteExistent.isPresent()
+                && !producteExistent.get().getId().equals(producte.getId())) {
+            throw new RuntimeException("Ja existeix un producte amb aquest nom.");
         }
 
         if (producte.getDescripcio() != null && producte.getDescripcio().length() > 50) {
