@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.repository.UsuariRepository;
@@ -15,9 +16,11 @@ public class UsuariService {
 
     // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
     private final UsuariRepository usuariRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuariService(UsuariRepository usuariRepository) {
+    public UsuariService(UsuariRepository usuariRepository, PasswordEncoder passwordEncoder) {
         this.usuariRepository = usuariRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -40,6 +43,7 @@ public class UsuariService {
 
         usuari.setNomComplet(usuari.getNomComplet().trim());
         usuari.setEmail(usuari.getEmail().trim());
+        usuari.setPassword(passwordEncoder.encode(usuari.getPassword().trim()));
 
         return usuariRepository.save(usuari);
     }
@@ -64,7 +68,7 @@ public class UsuariService {
 
         // Només actualitza la contrasenya si s'ha introduït
         if (usuari.getPassword() != null && !usuari.getPassword().trim().isEmpty()) {
-            usuariActual.setPassword(usuari.getPassword());
+            usuariActual.setPassword(passwordEncoder.encode(usuari.getPassword().trim()));
         }
 
         return usuariRepository.save(usuariActual);
