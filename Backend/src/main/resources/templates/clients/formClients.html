@@ -73,16 +73,16 @@
 
                         <!----------------------- CIF / DNI ----------------------->
                         <div class="form-group">
-                        <label class="form-label" for="cif">CIF / DNI</label>
-                        <input id="cif"
-                               type="text"
-                               th:field="*{cif}"
-                               class="form-input"
-                               required
-                               maxlength="9"
-                               pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"
-                               title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid">
-                    </div>
+                            <label class="form-label" for="cif">CIF / DNI</label>
+                            <input id="cif"
+                                   type="text"
+                                   th:field="*{cif}"
+                                   class="form-input"
+                                   required
+                                   maxlength="9"
+                                   pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"
+                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid">
+                        </div>
 
                         <!----------------------- NOM COMPLET ----------------------->
                         <div class="form-group">
