@@ -4,40 +4,123 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cat.copernic.easytraza.entities.LotProveidor;
+import cat.copernic.easytraza.entities.MateriaPrimera;
 import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
+import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 
 @Service
 @Transactional
 public class LotProveidorService {
 
-    // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
-    private final LotProveidorRepository lotProveidorRepository;
+    // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
 
-    public LotProveidorService(LotProveidorRepository lotProveidorRepository) {
+    private final LotProveidorRepository lotProveidorRepository;
+    private final MateriaPrimeraRepository materiaPrimeraRepository;
+
+    public LotProveidorService(LotProveidorRepository lotProveidorRepository,
+                               MateriaPrimeraRepository materiaPrimeraRepository) {
         this.lotProveidorRepository = lotProveidorRepository;
+        this.materiaPrimeraRepository = materiaPrimeraRepository;
     }
 
 
     // OBTENIR TOTS ELS LOTS DE PROVEÏDOR
+
     public List<LotProveidor> getAllLotsProveidor() {
         return lotProveidorRepository.findAll();
     }
 
 
-    // OBTENIR LOT DE PROVEÏDOR PER ID
-    public LotProveidor getLotProveidorById(Long id) {
-        Optional<LotProveidor> lotProveidor = lotProveidorRepository.findById(id);
-        return lotProveidor.orElse(null);
+    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
+
+    public List<MateriaPrimera> getAllMateriesPrimeresOrdenades() {
+        return materiaPrimeraRepository.findAll(Sort.by("nomMateria").ascending());
     }
 
 
-    // CANVIAR ESTAT DEL LOT
-    public LotProveidor canviarEstatLot(Long id, EstatLot estat) {
+    // OBTENIR LOT DE PROVEÏDOR PER ID
+
+    public LotProveidor getLotProveidorById(Long id) {
+        return obtenirLotValidat(id);
+    }
+
+
+    // COMPROVAR SI EXISTEIX UN LOT OBERT DE LA MATEIXA MATÈRIA PRIMERA
+
+    public boolean existeixLotObertMateixaMateria(Long id) {
+
+        LotProveidor lotProveidor = obtenirLotValidat(id);
+
+        validarLotPerIniciar(lotProveidor);
+
+        Optional<LotProveidor> lotObertOpt = lotProveidorRepository
+                .findFirstByMateriaPrimeraIdAndEstatAndIdNot(
+                        lotProveidor.getMateriaPrimera().getId(),
+                        EstatLot.OBERT,
+                        lotProveidor.getId()
+                );
+
+        return lotObertOpt.isPresent();
+    }
+
+
+    // INICIAR LOT
+
+    public LotProveidor iniciarLot(Long id, boolean confirmarFinalitzacioAnterior) {
+
+        LotProveidor lotProveidorActual = obtenirLotValidat(id);
+
+        validarLotPerIniciar(lotProveidorActual);
+
+        Optional<LotProveidor> lotObertOpt = lotProveidorRepository
+                .findFirstByMateriaPrimeraIdAndEstatAndIdNot(
+                        lotProveidorActual.getMateriaPrimera().getId(),
+                        EstatLot.OBERT,
+                        lotProveidorActual.getId()
+                );
+
+        if (lotObertOpt.isPresent()) {
+            if (!confirmarFinalitzacioAnterior) {
+                throw new RuntimeException("Ja hi ha un lot obert per aquesta matèria primera.");
+            }
+
+            LotProveidor lotObertAnterior = lotObertOpt.get();
+            lotObertAnterior.setEstat(EstatLot.ACABAT);
+            lotObertAnterior.setDataAcabament(LocalDate.now());
+            lotProveidorRepository.save(lotObertAnterior);
+        }
+
+        lotProveidorActual.setEstat(EstatLot.OBERT);
+        lotProveidorActual.setDataObertura(LocalDate.now());
+
+        return lotProveidorRepository.save(lotProveidorActual);
+    }
+
+
+    // FINALITZAR LOT
+
+    public LotProveidor finalitzarLot(Long id) {
+
+        LotProveidor lotProveidor = obtenirLotValidat(id);
+
+        validarLotPerFinalitzar(lotProveidor);
+
+        lotProveidor.setEstat(EstatLot.ACABAT);
+        lotProveidor.setDataAcabament(LocalDate.now());
+
+        return lotProveidorRepository.save(lotProveidor);
+    }
+
+
+    // OBTENIR LOT VALIDAT
+
+    private LotProveidor obtenirLotValidat(Long id) {
 
         Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
 
@@ -45,33 +128,38 @@ public class LotProveidorService {
             throw new RuntimeException("Lot no trobat.");
         }
 
-        LotProveidor lotProveidorActual = lotProveidorOpt.get();
-
-        validarCanviEstatLot(lotProveidorActual, estat);
-
-        lotProveidorActual.setEstat(estat);
-
-        if (estat == EstatLot.OBERT) {
-            lotProveidorActual.setDataObertura(LocalDate.now());
-        }
-
-        if (estat == EstatLot.ACABAT) {
-            lotProveidorActual.setDataAcabament(LocalDate.now());
-        }
-
-        return lotProveidorRepository.save(lotProveidorActual);
+        return lotProveidorOpt.get();
     }
 
 
-    // VALIDAR CANVI D'ESTAT DEL LOT
-    private void validarCanviEstatLot(LotProveidor lotProveidor, EstatLot estat) {
+    // VALIDAR LOT PER INICIAR
 
-        if (estat == null) {
-            throw new RuntimeException("L'estat és obligatori.");
+    private void validarLotPerIniciar(LotProveidor lotProveidor) {
+
+        if (lotProveidor.getMateriaPrimera() == null) {
+            throw new RuntimeException("La matèria primera del lot és obligatòria.");
         }
 
-        if (lotProveidor.getEstat() == EstatLot.ACABAT) {
-            throw new RuntimeException("No es pot modificar un lot acabat.");
+        if (lotProveidor.getEstat() == null) {
+            throw new RuntimeException("L'estat del lot és obligatori.");
+        }
+
+        if (lotProveidor.getEstat() != EstatLot.EN_ESTOC) {
+            throw new RuntimeException("Només es poden iniciar lots en estoc.");
+        }
+    }
+
+
+    // VALIDAR LOT PER FINALITZAR
+
+    private void validarLotPerFinalitzar(LotProveidor lotProveidor) {
+
+        if (lotProveidor.getEstat() == null) {
+            throw new RuntimeException("L'estat del lot és obligatori.");
+        }
+
+        if (lotProveidor.getEstat() != EstatLot.OBERT) {
+            throw new RuntimeException("Només es poden finalitzar lots oberts.");
         }
     }
 }

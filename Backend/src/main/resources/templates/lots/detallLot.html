@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detall lot - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{layout/sidebar :: sidebar('lots')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top lot-detail-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Traçabilitat</p>
+                <h1 class="page-heading">Detall del lot</h1>
+                <p class="page-description">
+                    Consulta la informació associada al lot seleccionat.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/lots/list}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Tornar</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- RESUM LOT ----------------------->
+        <section class="content-card lot-detail-summary">
+
+            <div class="lot-detail-summary-main">
+                <div>
+                    <h2 th:text="${lot.identificadorLot}">LOT-001</h2>
+                    <p>
+                        Quantitat:
+                        <strong th:text="${lot.quantitat != null ? lot.quantitat : '-'}">10</strong>
+                    </p>
+                </div>
+
+                <span class="badge-role operari"
+                      th:if="${lot.estat.name() == 'EN_ESTOC'}">
+                    EN ESTOC
+                </span>
+
+                <span class="badge-role admin"
+                      th:if="${lot.estat.name() == 'OBERT'}">
+                    OBERT
+                </span>
+
+                <span class="badge-role lot-badge-acabat"
+                      th:if="${lot.estat.name() == 'ACABAT'}">
+                    ACABAT
+                </span>
+            </div>
+
+            <div class="lot-detail-mini-grid">
+
+                <div class="lot-mini-data">
+                    <span>Caducitat</span>
+                    <strong th:text="${lot.dataCaducitat != null ? #temporals.format(lot.dataCaducitat, 'dd/MM/yyyy') : '-'}">
+                        -
+                    </strong>
+                </div>
+
+                <div class="lot-mini-data">
+                    <span>Obertura</span>
+                    <strong th:text="${lot.dataObertura != null ? #temporals.format(lot.dataObertura, 'dd/MM/yyyy') : '-'}">
+                        -
+                    </strong>
+                </div>
+
+                <div class="lot-mini-data">
+                    <span>Acabament</span>
+                    <strong th:text="${lot.dataAcabament != null ? #temporals.format(lot.dataAcabament, 'dd/MM/yyyy') : '-'}">
+                        -
+                    </strong>
+                </div>
+
+                <div class="lot-mini-data">
+                    <span>Albarà</span>
+                    <strong th:text="${lot.albaraProveidor != null ? '#' + lot.albaraProveidor.id : '-'}">
+                        #1
+                    </strong>
+                </div>
+
+<td>
+                    <span class="lot-main-text" th:text="${lot.identificadorLot}">LOT-001</span>
+                    <span class="lot-sub-text">
+                        Albarà #
+                        <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">1</span>
+                    </span>
+                </td>
+
+            </div>
+
+        </section>
+
+        <!----------------------- DADES ASSOCIADES ----------------------->
+        <section class="lot-detail-grid lot-detail-grid-compact">
+
+            <!----------------------- MATÈRIA PRIMERA ----------------------->
+            <article class="content-card lot-slim-card">
+
+                <div class="lot-slim-header">
+                    <div class="lot-slim-left">
+                        <div class="lot-slim-icon">
+                            <i class="bi bi-flower1"></i>
+                        </div>
+
+                        <div class="lot-slim-title">
+                            <span>Matèria primera</span>
+                            <h2 th:text="${lot.materiaPrimera != null ? lot.materiaPrimera.nomMateria : '-'}">
+                                Harina blanca de Albacete
+                            </h2>
+
+                            <p th:text="${lot.materiaPrimera != null && lot.materiaPrimera.descripcio != null && !#strings.isEmpty(lot.materiaPrimera.descripcio) ? lot.materiaPrimera.descripcio : 'Sense descripció'}">
+                                Harina blanca
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+
+            <!----------------------- ALBARÀ ----------------------->
+            <article class="content-card lot-slim-card">
+
+                <div class="lot-slim-header">
+                    <div class="lot-slim-left">
+                        <div class="lot-slim-icon">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+
+                        <div class="lot-slim-title">
+                            <span>Albarà de proveïdor</span>
+                            <h2>
+                                Albarà #
+                                <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">1</span>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lot-slim-data-grid">
+                    <div class="lot-slim-data">
+                        <span>Data recepció</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.dataRecepcio != null ? #temporals.format(lot.albaraProveidor.dataRecepcio, 'dd/MM/yyyy HH:mm') : '-'}">
+                            -
+                        </strong>
+                    </div>
+
+                    <div class="lot-slim-data">
+                        <span>Lots recepcionats</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.lots != null ? #lists.size(lot.albaraProveidor.lots) : 0}">
+                            0
+                        </strong>
+                    </div>
+                </div>
+
+            </article>
+
+            <!----------------------- PROVEÏDOR ----------------------->
+            <article class="content-card lot-slim-card">
+
+                <div class="lot-slim-header">
+                    <div class="lot-slim-left">
+                        <div class="lot-slim-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+
+                        <div class="lot-slim-title">
+                            <span>Proveïdor</span>
+                            <h2 th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null ? lot.albaraProveidor.proveidor.nomProveidor : '-'}">
+                                Proveïdor
+                            </h2>
+
+                            <p th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null && lot.albaraProveidor.proveidor.descripcio != null && !#strings.isEmpty(lot.albaraProveidor.proveidor.descripcio) ? lot.albaraProveidor.proveidor.descripcio : 'Sense descripció'}">
+                                Sense descripció
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lot-slim-data-grid">
+                    <div class="lot-slim-data">
+                        <span>CIF</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null ? lot.albaraProveidor.proveidor.cif : '-'}">
+                            B00000000
+                        </strong>
+                    </div>
+
+                    <div class="lot-slim-data">
+                        <span>Adreça</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null && lot.albaraProveidor.proveidor.adreca != null && !#strings.isEmpty(lot.albaraProveidor.proveidor.adreca) ? lot.albaraProveidor.proveidor.adreca : '-'}">
+                            -
+                        </strong>
+                    </div>
+                </div>
+
+            </article>
+
+            <!----------------------- USUARI RECEPTOR ----------------------->
+            <article class="content-card lot-slim-card">
+
+                <div class="lot-slim-header">
+                    <div class="lot-slim-left">
+                        <div class="lot-slim-icon">
+                            <i class="bi bi-person-check"></i>
+                        </div>
+
+                        <div class="lot-slim-title">
+                            <span>Usuari receptor</span>
+                            <h2 th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null ? lot.albaraProveidor.usuariReceptor.nomComplet : '-'}">
+                                Usuari
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lot-slim-data-grid">
+                    <div class="lot-slim-data">
+                        <span>Rol</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null ? lot.albaraProveidor.usuariReceptor.rolUsuari : '-'}">
+                            OPERARI
+                        </strong>
+                    </div>
+
+                    <div class="lot-slim-data">
+                        <span>Email</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null && lot.albaraProveidor.usuariReceptor.email != null && !#strings.isEmpty(lot.albaraProveidor.usuariReceptor.email) ? lot.albaraProveidor.usuariReceptor.email : '-'}">
+                            -
+                        </strong>
+                    </div>
+                </div>
+
+            </article>
+
+        </section>
+
+        <!----------------------- LOTS DEL MATEIX ALBARÀ ----------------------->
+        <section class="content-card lot-related-card"
+                 th:if="${lot.albaraProveidor != null && lot.albaraProveidor.lots != null}">
+
+            <div class="lot-related-header">
+                <div>
+                    <h2>Lots del mateix albarà</h2>
+                    <p>Altres lots recepcionats conjuntament.</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table lots-table lots-related-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Lot</th>
+                        <th>Matèria primera</th>
+                        <th class="text-center">Quantitat</th>
+                        <th class="text-center">Estat</th>
+                        <th class="text-center">Acció</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="lotAlbara : ${lot.albaraProveidor.lots}">
+                        <td class="td-id" th:text="${lotAlbara.id}">1</td>
+
+                        <td th:text="${lotAlbara.identificadorLot}">LOT-001</td>
+
+                        <td th:text="${lotAlbara.materiaPrimera != null ? lotAlbara.materiaPrimera.nomMateria : '-'}">
+                            Farina
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${lotAlbara.quantitat != null ? lotAlbara.quantitat : '-'}">
+                            10
+                        </td>
+
+                        <td class="text-center" th:text="${lotAlbara.estat}">
+                            EN_ESTOC
+                        </td>
+
+                        <td class="text-center">
+                            <a th:href="@{/lots/detail/{id}(id=${lotAlbara.id})}"
+                               class="lot-action-btn lot-action-view">
+                                <i class="bi bi-eye"></i>
+                                <span>Consultar</span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

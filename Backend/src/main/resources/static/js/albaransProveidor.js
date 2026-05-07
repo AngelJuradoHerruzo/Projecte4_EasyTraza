@@ -66,7 +66,7 @@ function updateIdentificadorsLot() {
             input.value = '';
         }
         else {
-            input.value = dataFormatada + '_lote' + (index + 1);
+            input.value = dataFormatada + '_lot' + (index + 1);
         }
     });
 }
