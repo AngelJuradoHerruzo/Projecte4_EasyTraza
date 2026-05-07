@@ -9,7 +9,6 @@ const descripcioCounter = document.getElementById('descripcioCounter');
 const tipusDocument = document.getElementById('tipusDocument');
 
 
-/*----------------------- NOM -----------------------*/
 // FORMAT CORRECTE (MAJÚSCULA INICIAL I ESPAIS CONTROLATS)
 nomInput.addEventListener('input', function () {
     let value = this.value;
@@ -25,7 +24,6 @@ nomInput.addEventListener('input', function () {
 });
 
 
-/*----------------------- CIF / DNI -----------------------*/
 // MAJÚSCULES I SENSE CARÀCTERS INVÀLIDS
 cifInput.addEventListener('input', function () {
     let value = this.value.toUpperCase();
@@ -39,7 +37,6 @@ cifInput.addEventListener('input', function () {
 });
 
 
-/*----------------------- DESCRIPCIÓ -----------------------*/
 // LIMIT D'ENTRADA: 100 CARÀCTERS
 descripcioInput.addEventListener('input', function () {
 
@@ -51,7 +48,7 @@ descripcioInput.addEventListener('input', function () {
 });
 
 
-/*----------------------- FUNCIONS ESTAT -----------------------*/
+// FUNCIONS ESTAT
 function clearState(field) {
     field.classList.remove('field-valid', 'field-invalid');
 }
@@ -67,7 +64,6 @@ function markInvalid(field) {
 }
 
 
-/*----------------------- TIPUS DOCUMENT -----------------------*/
 // DETECTA DNI O CIF SEGONS EL PRIMER CARÀCTER
 function updateTipusDocument() {
     const value = cifInput.value.trim();
@@ -89,7 +85,7 @@ function updateTipusDocument() {
 }
 
 
-/*----------------------- COMPTADOR DESCRIPCIÓ -----------------------*/
+// COMPTADOR DESCRIPCIÓ
 function updateDescripcioCounter() {
     const length = descripcioInput.value.length;
 
@@ -106,7 +102,6 @@ function updateDescripcioCounter() {
 }
 
 
-/*----------------------- VALIDACIÓ -----------------------*/
 // VALIDA SEGONS HTML + CASOS ESPECIALS
 function validateField(field) {
     const value = field.value.trim();
@@ -141,14 +136,14 @@ function validateField(field) {
 }
 
 
-/*----------------------- EVENTS VALIDACIÓ -----------------------*/
+// EVENTS VALIDACIÓ
 [cifInput, nomInput, adrecaInput, descripcioInput].forEach(field => {
     field.addEventListener('input', () => validateField(field));
     field.addEventListener('change', () => validateField(field));
 });
 
 
-/*----------------------- SUBMIT -----------------------*/
+// SUBMIT
 form.addEventListener('submit', function (event) {
 
     let valid = true;
@@ -166,6 +161,6 @@ form.addEventListener('submit', function (event) {
 });
 
 
-/*----------------------- INIT -----------------------*/
+// INIT
 updateTipusDocument();
 updateDescripcioCounter();

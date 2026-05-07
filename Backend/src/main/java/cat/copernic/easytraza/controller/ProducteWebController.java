@@ -19,7 +19,7 @@ public class ProducteWebController {
     }
 
 
-    // ---------------------------- LLISTAR PRODUCTES ----------------------------
+    // LLISTAR PRODUCTES
     @GetMapping("/list")
     public String llistarProductes(Model model) {
         model.addAttribute("productes", producteService.getAllProductes());
@@ -27,7 +27,7 @@ public class ProducteWebController {
     }
 
 
-    // ---------------------------- FORM CREAR ----------------------------
+    // CREAR
     @GetMapping("/new")
     public String formCrearProducte(Model model) {
         model.addAttribute("producte", new Producte());
@@ -35,7 +35,7 @@ public class ProducteWebController {
     }
 
 
-    // ---------------------------- GUARDAR ----------------------------
+    // GUARDAR
     @PostMapping("/save")
     public String guardarProducte(@ModelAttribute("producte") Producte producte,
                                  Model model) {
@@ -51,7 +51,7 @@ public class ProducteWebController {
     }
 
 
-    // ---------------------------- FORM EDITAR ----------------------------
+    // EDITAR
     @GetMapping("/edit/{id}")
     public String formEditarProducte(@PathVariable Long id, Model model) {
 
@@ -66,7 +66,7 @@ public class ProducteWebController {
     }
 
 
-    // ---------------------------- ACTUALITZAR ----------------------------
+    // ACTUALITZAR
     @PostMapping("/update/{id}")
     public String updateProducte(@PathVariable Long id,
                                 @ModelAttribute("producte") Producte producte,
@@ -83,7 +83,7 @@ public class ProducteWebController {
     }
 
 
-    // ---------------------------- ELIMINAR ----------------------------
+    // ELIMINAR
     @GetMapping("/delete/{id}")
     public String deleteProducte(@PathVariable Long id) {
         producteService.deleteProducte(id);
