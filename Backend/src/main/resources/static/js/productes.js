@@ -4,7 +4,6 @@ const descripcioInput = document.getElementById('descripcio');
 const descripcioCounter = document.getElementById('descripcioCounter');
 
 
-/*----------------------- NOM -----------------------*/
 // FORMAT CORRECTE (MAJÚSCULA INICIAL I ESPAIS CONTROLATS)
 nomInput.addEventListener('input', function () {
     let value = this.value;
@@ -20,7 +19,6 @@ nomInput.addEventListener('input', function () {
 });
 
 
-/*----------------------- DESCRIPCIÓ -----------------------*/
 // LIMIT D'ENTRADA: 100 CARÀCTERS
 descripcioInput.addEventListener('input', function () {
 
@@ -32,7 +30,7 @@ descripcioInput.addEventListener('input', function () {
 });
 
 
-/*----------------------- FUNCIONS ESTAT -----------------------*/
+// FUNCIONS ESTAT
 function clearState(field) {
     field.classList.remove('field-valid', 'field-invalid');
 }
@@ -48,7 +46,7 @@ function markInvalid(field) {
 }
 
 
-/*----------------------- COMPTADOR DESCRIPCIÓ -----------------------*/
+// COMPTADOR DESCRIPCIÓ
 function updateDescripcioCounter() {
     const length = descripcioInput.value.length;
 
@@ -62,7 +60,7 @@ function updateDescripcioCounter() {
 }
 
 
-/*----------------------- VALIDACIÓ -----------------------*/
+// VALIDACIÓ
 function validateField(field) {
     const value = field.value.trim();
 
@@ -94,14 +92,14 @@ function validateField(field) {
 }
 
 
-/*----------------------- EVENTS VALIDACIÓ -----------------------*/
+// EVENTS VALIDACIÓ
 [nomInput, descripcioInput].forEach(field => {
     field.addEventListener('input', () => validateField(field));
     field.addEventListener('change', () => validateField(field));
 });
 
 
-/*----------------------- SUBMIT -----------------------*/
+// SUBMIT
 form.addEventListener('submit', function (event) {
 
     let valid = true;
@@ -120,5 +118,5 @@ form.addEventListener('submit', function (event) {
 });
 
 
-/*----------------------- INIT -----------------------*/
+// INIT
 updateDescripcioCounter();
