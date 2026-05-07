@@ -81,7 +81,6 @@ a {
 }
 
 /* SIDEBAR */
-
 .sidebar {
     position: fixed;
     top: 0;
@@ -186,7 +185,6 @@ a {
 }
 
 /* MAIN */
-
 .main {
     margin-left: 272px;
     width: calc(100% - 272px);
@@ -194,7 +192,6 @@ a {
 }
 
 /* PAGE TOP */
-
 .page-top {
     display: flex;
     justify-content: space-between;
@@ -233,7 +230,6 @@ a {
 }
 
 /* BUTTONS */
-
 .btn {
     display: inline-flex;
     align-items: center;
@@ -269,7 +265,6 @@ a {
 }
 
 /* CARD */
-
 .content-card {
     background-color: var(--panel);
     border: 1px solid var(--border);
@@ -339,7 +334,6 @@ a {
 }
 
 /* TABLE */
-
 .table-container {
     overflow-x: auto;
 }
@@ -643,7 +637,6 @@ input[type="password"] {
 }
 
 /* TARJETES */
-
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -807,5 +800,459 @@ input[type="password"] {
 
     .data-table {
         table-layout: auto;
+    }
+}
+
+
+/* ==========================================================================
+   LOTS - RF10 INICIAR LOT / RF11 FINALITZAR LOT
+   ========================================================================== */
+
+/* ---------------------------- UTILITATS LOTS ---------------------------- */
+.text-center {
+    text-align: center !important;
+}
+
+.lot-error {
+    margin-bottom: 18px;
+}
+
+/* ---------------------------- LLISTAT DE LOTS ---------------------------- */
+.lots-table {
+    min-width: 1180px;
+    table-layout: fixed;
+}
+
+/* Corregeix el padding global de .data-table thead th per aquest llistat */
+.lots-table thead th {
+    padding: 13px 14px !important;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.lots-table thead th.text-center {
+    text-align: center !important;
+}
+
+.lots-table tbody td {
+    padding: 13px 14px;
+    vertical-align: middle;
+}
+
+.lots-table .col-id {
+    width: 70px;
+}
+
+.lots-table .col-lot {
+    width: 180px;
+}
+
+.lots-table .col-materia {
+    width: 210px;
+}
+
+.lots-table .col-quantitat {
+    width: 110px;
+}
+
+.lots-table .col-estat {
+    width: 130px;
+}
+
+.lots-table .col-data {
+    width: 125px;
+}
+
+.lots-table .col-accions {
+    width: 260px;
+}
+
+.lot-main-text {
+    display: block;
+    max-width: 100%;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lot-sub-text {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lot-badge-acabat {
+    background-color: var(--edit-soft);
+    color: var(--edit-text);
+}
+
+/* ---------------------------- ACCIONS LLISTAT LOTS ---------------------------- */
+.lot-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.lot-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 108px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.lot-action-view {
+    background-color: var(--panel-soft);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.lot-action-start {
+    background-color: var(--green-soft);
+    color: var(--green-text);
+}
+
+.lot-action-finish {
+    background-color: var(--danger-soft);
+    color: var(--danger-text);
+}
+
+/* ---------------------------- MODAL LOTS ---------------------------- */
+.lot-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background-color: rgba(63, 50, 41, 0.45);
+}
+
+.lot-modal-box {
+    width: 100%;
+    max-width: 430px;
+    padding: 22px;
+    background-color: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+}
+
+.lot-modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.lot-modal-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background-color: var(--accent-soft);
+    color: #8d6338;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.lot-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.lot-modal-header p {
+    margin: 7px 0 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--muted);
+}
+
+.lot-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---------------------------- DETALL LOT ---------------------------- */
+.lot-detail-top {
+    margin-bottom: 18px;
+}
+
+.lot-detail-summary {
+    padding: 18px 20px;
+    margin-bottom: 18px;
+}
+
+.lot-detail-summary-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f0e6dc;
+}
+
+.lot-detail-summary-main h2 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.lot-detail-summary-main p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.lot-detail-summary-main strong {
+    color: var(--text);
+}
+
+.lot-detail-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    padding-top: 14px;
+}
+
+.lot-mini-data {
+    background-color: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.lot-mini-data span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.lot-mini-data strong {
+    display: block;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.lot-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.lot-detail-grid-compact {
+    align-items: stretch;
+}
+
+/* ---------------------------- CARDS FINES DETALL LOT ---------------------------- */
+.lot-slim-card {
+    padding: 16px 20px;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.lot-slim-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.lot-slim-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    min-width: 0;
+}
+
+.lot-slim-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+    background-color: var(--accent-soft);
+    color: #8d6338;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+}
+
+.lot-slim-title {
+    min-width: 0;
+    padding-top: 1px;
+}
+
+.lot-slim-title span {
+    display: block;
+    margin-bottom: 3px;
+    color: #766255;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.lot-slim-title h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.08;
+    word-break: break-word;
+}
+
+.lot-slim-title p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.lot-slim-data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.lot-slim-data {
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 10px 13px;
+    background-color: var(--panel-soft);
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 14px;
+}
+
+.lot-slim-data span {
+    display: block;
+    color: #766255;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.lot-slim-data strong {
+    display: block;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: right;
+    word-break: break-word;
+}
+
+.lot-slim-card:hover,
+.lot-slim-data:hover {
+    background-color: var(--panel);
+}
+
+@media (max-width: 900px) {
+    .lot-slim-data-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .lot-slim-data {
+        grid-template-columns: 1fr;
+    }
+
+    .lot-slim-data strong {
+        text-align: left;
+    }
+}
+
+/* ---------------------------- LOTS DEL MATEIX ALBARÀ ---------------------------- */
+.lot-related-card {
+    margin-bottom: 18px;
+}
+
+.lot-related-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid #f0e6dc;
+}
+
+.lot-related-header h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.lot-related-header p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.lots-related-table {
+    min-width: 850px;
+}
+
+/* Evita el canvi de color en passar el cursor per sobre en el detall */
+.lot-detail-summary:hover,
+.lot-related-card .data-table tbody tr:hover {
+    background-color: var(--panel);
+}
+
+/* ---------------------------- RESPONSIVE LOTS ---------------------------- */
+
+@media (max-width: 1150px) {
+    .lot-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lot-actions {
+        flex-wrap: wrap;
+    }
+
+    .lot-detail-mini-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .lot-detail-mini-grid,
+    .lot-slim-data-grid {
+        grid-template-columns: 1fr;
     }
 }

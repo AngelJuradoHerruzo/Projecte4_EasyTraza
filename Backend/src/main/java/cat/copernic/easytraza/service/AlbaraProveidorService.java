@@ -198,7 +198,7 @@ public class AlbaraProveidorService {
         String mes = String.format("%02d", data.getMonthValue());
         String any = String.valueOf(data.getYear());
 
-        return dia + "_" + mes + "_" + any + "_lote" + index;
+        return dia + "_" + mes + "_" + any + "_lot" + index;
     }
 
 

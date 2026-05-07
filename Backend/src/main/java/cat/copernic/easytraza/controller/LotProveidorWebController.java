@@ -4,7 +4,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.service.LotProveidorService;
 
 @Controller
@@ -23,24 +22,72 @@ public class LotProveidorWebController {
     @GetMapping("/list")
     public String llistarLots(Model model) {
         model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
-        model.addAttribute("estats", EstatLot.values());
-
         return "lots/llistarLots";
     }
 
 
-    // CANVIAR ESTAT DEL LOT
-    @PostMapping("/estat/{id}")
-    public String canviarEstatLot(@PathVariable Long id, @RequestParam EstatLot estat, Model model) {
+    // CONSULTAR DETALL DEL LOT
+    @GetMapping("/detail/{id}")
+    public String consultarLot(@PathVariable Long id, Model model) {
         try {
-            lotProveidorService.canviarEstatLot(id, estat);
+            model.addAttribute("lot", lotProveidorService.getLotProveidorById(id));
+            return "lots/detallLot";
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            return "lots/llistarLots";
+        }
+    }
+
+
+    // INICIAR LOT
+    @PostMapping("/iniciar/{id}")
+    public String iniciarLot(@PathVariable Long id, Model model) {
+        try {
+            if (lotProveidorService.existeixLotObertMateixaMateria(id)) {
+                model.addAttribute("confirmarIniciLot", true);
+                model.addAttribute("lotAIniciar", lotProveidorService.getLotProveidorById(id));
+                model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+                return "lots/llistarLots";
+            }
+
+            lotProveidorService.iniciarLot(id, false);
             return "redirect:/lots/list";
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
-            model.addAttribute("estats", EstatLot.values());
+            return "lots/llistarLots";
+        }
+    }
 
+
+    // CONFIRMAR INICI DE LOT
+    @PostMapping("/iniciar-confirmat/{id}")
+    public String confirmarIniciLot(@PathVariable Long id, Model model) {
+        try {
+            lotProveidorService.iniciarLot(id, true);
+            return "redirect:/lots/list";
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            return "lots/llistarLots";
+        }
+    }
+
+
+    // FINALITZAR LOT
+    @PostMapping("/finalitzar/{id}")
+    public String finalitzarLot(@PathVariable Long id, Model model) {
+        try {
+            lotProveidorService.finalitzarLot(id);
+            return "redirect:/lots/list";
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
             return "lots/llistarLots";
         }
     }
