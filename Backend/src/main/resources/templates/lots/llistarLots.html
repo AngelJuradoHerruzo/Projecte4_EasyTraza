@@ -23,7 +23,7 @@
                 <p class="page-eyebrow">Traçabilitat</p>
                 <h1 class="page-heading">Lots</h1>
                 <p class="page-description">
-                    Consulta els lots recepcionats i gestiona el seu inici i finalització.
+                    Consulta els lots recepcionats agrupats per matèria primera i gestiona el seu inici i finalització.
                 </p>
             </div>
         </section>
@@ -42,7 +42,7 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Llistat de lots</h2>
                     <p class="content-subtitle">
-                        Els lots es creen des dels albarans de proveïdor i poden estar en estoc, oberts o acabats.
+                        Els lots es mostren agrupats per matèria primera.
                     </p>
                 </div>
 
@@ -54,143 +54,164 @@
                 </div>
             </div>
 
-            <!----------------------- TAULA ----------------------->
-            <div class="table-container">
-                <table class="data-table lots-table" id="lotsTable">
+            <!----------------------- LLISTAT AGRUPAT ----------------------->
+            <div class="lots-grouped-list" id="lotsTable">
 
-                    <colgroup>
-                        <col class="col-id">
-                        <col class="col-lot">
-                        <col class="col-materia">
-                        <col class="col-quantitat">
-                        <col class="col-estat">
-                        <col class="col-data">
-                        <col class="col-data">
-                        <col class="col-data">
-                        <col class="col-accions">
-                    </colgroup>
+                <section th:each="materia, iterStat : ${materiesPrimeres}"
+                         th:with="lotsMateria=${lots.?[materiaPrimera != null and materiaPrimera.id == #vars.materia.id]}"
+                         class="lot-group">
 
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Lot</th>
-                        <th>Matèria primera</th>
-                        <th class="text-center">Quantitat</th>
-                        <th class="text-center">Estat</th>
-                        <th class="text-center">Caducitat</th>
-                        <th class="text-center">Obertura</th>
-                        <th class="text-center">Acabament</th>
-                        <th class="text-center">Accions</th>
-                    </tr>
-                    </thead>
+                    <!----------------------- TÍTOL GRUP ----------------------->
+                    <div class="lot-group-header">
+                        <div>
+                            <h3 th:text="${materia.nomMateria}">Harina Blanca</h3>
+                            <p th:text="${materia.descripcio != null && !#strings.isEmpty(materia.descripcio) ? materia.descripcio : 'Sense descripció'}">
+                                Descripció
+                            </p>
+                        </div>
+                    </div>
 
-                    <tbody>
-                    <tr th:each="lot : ${lots}" class="lot-row">
+                    <!----------------------- TAULA GRUP ----------------------->
+                    <div class="table-container">
+                        <table class="data-table lots-table lot-group-table">
 
-                        <td class="td-id" th:text="${lot.id}">1</td>
+                            <colgroup>
+                                <col class="col-id">
+                                <col class="col-lot">
+                                <col class="col-quantitat">
+                                <col class="col-estat">
+                                <col class="col-data">
+                                <col class="col-data">
+                                <col class="col-data">
+                                <col class="col-accions">
+                            </colgroup>
 
-                        <td>
-                            <span class="lot-main-text" th:text="${lot.identificadorLot}">LOT-001</span>
-                            <span class="lot-sub-text">
-                                Albarà #
-                                <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">1</span>
-                            </span>
-                        </td>
+                            <thead th:if="${iterStat.first}">
+                            <tr>
+                                <th>ID</th>
+                                <th>Lot</th>
+                                <th class="text-center">Quantitat</th>
+                                <th class="text-center">Estat</th>
+                                <th class="text-center">Caducitat</th>
+                                <th class="text-center">Obertura</th>
+                                <th class="text-center">Acabament</th>
+                                <th class="text-center">Accions</th>
+                            </tr>
+                            </thead>
 
-                        <td>
-                            <span class="lot-main-text"
-                                  th:text="${lot.materiaPrimera != null ? lot.materiaPrimera.nomMateria : '-'}">
-                                Farina
-                            </span>
-                        </td>
+                            <tbody>
+                            <tr th:each="lot : ${lotsMateria}" class="lot-row">
 
-                        <td class="text-center" th:text="${lot.quantitat != null ? lot.quantitat : '-'}">
-                            10
-                        </td>
+                                <td class="td-id" th:text="${lot.id}">1</td>
 
-                        <td class="text-center">
-                            <span class="badge-role operari"
-                                  th:if="${lot.estat.name() == 'EN_ESTOC'}">
-                                EN ESTOC
-                            </span>
+                                <td>
+                                    <span class="lot-main-text" th:text="${lot.identificadorLot}">LOT-001</span>
+                                    <span class="lot-sub-text">
+                                        Albarà #
+                                        <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">1</span>
+                                    </span>
+                                </td>
 
-                            <span class="badge-role admin"
-                                  th:if="${lot.estat.name() == 'OBERT'}">
-                                OBERT
-                            </span>
+                                <td class="text-center"
+                                    th:text="${lot.quantitat != null ? lot.quantitat : '-'}"
+                                    10 kg
+                                </td>
 
-                            <span class="badge-role lot-badge-acabat"
-                                  th:if="${lot.estat.name() == 'ACABAT'}">
-                                ACABAT
-                            </span>
-                        </td>
+                                <td class="text-center">
+                                    <span class="badge-role operari"
+                                          th:if="${lot.estat.name() == 'EN_ESTOC'}">
+                                        EN ESTOC
+                                    </span>
 
-                        <td class="text-center"
-                            th:text="${lot.dataCaducitat != null ? #temporals.format(lot.dataCaducitat, 'dd/MM/yyyy') : '-'}">
-                            -
-                        </td>
+                                    <span class="badge-role admin"
+                                          th:if="${lot.estat.name() == 'OBERT'}">
+                                        OBERT
+                                    </span>
 
-                        <td class="text-center"
-                            th:text="${lot.dataObertura != null ? #temporals.format(lot.dataObertura, 'dd/MM/yyyy') : '-'}">
-                            -
-                        </td>
+                                    <span class="badge-role lot-badge-acabat"
+                                          th:if="${lot.estat.name() == 'ACABAT'}">
+                                        ACABAT
+                                    </span>
+                                </td>
 
-                        <td class="text-center"
-                            th:text="${lot.dataAcabament != null ? #temporals.format(lot.dataAcabament, 'dd/MM/yyyy') : '-'}">
-                            -
-                        </td>
+                                <td class="text-center"
+                                    th:text="${lot.dataCaducitat != null ? #temporals.format(lot.dataCaducitat, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </td>
 
-                        <td>
-                            <div class="lot-actions">
+                                <td class="text-center"
+                                    th:text="${lot.dataObertura != null ? #temporals.format(lot.dataObertura, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </td>
 
-                                <a th:href="@{/lots/detail/{id}(id=${lot.id})}"
-                                   class="lot-action-btn lot-action-view">
-                                    <i class="bi bi-eye"></i>
-                                    <span>Consultar</span>
-                                </a>
+                                <td class="text-center"
+                                    th:text="${lot.dataAcabament != null ? #temporals.format(lot.dataAcabament, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </td>
 
-                                <button th:if="${lot.estat.name() == 'EN_ESTOC'}"
-                                        type="button"
-                                        class="lot-action-btn lot-action-start js-open-modal"
-                                        th:attr="data-action=@{/lots/iniciar/{id}(id=${lot.id})},
-                                                 data-title='Iniciar lot',
-                                                 data-message='Segur que vols iniciar aquest lot?',
-                                                 data-button='Iniciar',
-                                                 data-icon='bi-play-fill'">
-                                    <i class="bi bi-play-fill"></i>
-                                    <span>Iniciar</span>
-                                </button>
+                                <td>
+                                    <div class="lot-actions">
 
-                                <button th:if="${lot.estat.name() == 'OBERT'}"
-                                        type="button"
-                                        class="lot-action-btn lot-action-finish js-open-modal"
-                                        th:attr="data-action=@{/lots/finalitzar/{id}(id=${lot.id})},
-                                                 data-title='Finalitzar lot',
-                                                 data-message='Segur que vols finalitzar aquest lot?',
-                                                 data-button='Finalitzar',
-                                                 data-icon='bi-stop-fill'">
-                                    <i class="bi bi-stop-fill"></i>
-                                    <span>Finalitzar</span>
-                                </button>
+                                        <a th:href="@{/lots/detail/{id}(id=${lot.id})}"
+                                           class="lot-action-btn lot-action-view">
+                                            <i class="bi bi-eye"></i>
+                                            <span>Consultar</span>
+                                        </a>
 
-                            </div>
-                        </td>
+                                        <button th:if="${lot.estat.name() == 'EN_ESTOC'}"
+                                                type="button"
+                                                class="lot-action-btn lot-action-start js-open-modal"
+                                                th:attr="data-action=@{/lots/iniciar/{id}(id=${lot.id})},
+                                                         data-title='Iniciar lot',
+                                                         data-message='Segur que vols iniciar aquest lot?',
+                                                         data-button='Iniciar',
+                                                         data-icon='bi-play-fill'">
+                                            <i class="bi bi-play-fill"></i>
+                                            <span>Iniciar</span>
+                                        </button>
 
-                    </tr>
+                                        <button th:if="${lot.estat.name() == 'OBERT'}"
+                                                type="button"
+                                                class="lot-action-btn lot-action-finish js-open-modal"
+                                                th:attr="data-action=@{/lots/finalitzar/{id}(id=${lot.id})},
+                                                         data-title='Finalitzar lot',
+                                                         data-message='Segur que vols finalitzar aquest lot?',
+                                                         data-button='Finalitzar',
+                                                         data-icon='bi-stop-fill'">
+                                            <i class="bi bi-stop-fill"></i>
+                                            <span>Finalitzar</span>
+                                        </button>
 
-                    <tr th:if="${#lists.isEmpty(lots)}">
-                        <td colspan="9">
-                            <div class="empty-state">
-                                <div class="empty-box">
-                                    <i class="bi bi-archive"></i>
-                                    <p>No hi ha lots registrats.</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
+                                    </div>
+                                </td>
 
-                </table>
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(lotsMateria)}" class="lot-row">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="empty-box">
+                                            <i class="bi bi-archive"></i>
+                                            <p>No hi ha lots registrats per aquesta matèria primera.</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </section>
+
+                <!----------------------- ESTAT BUIT TOTAL ----------------------->
+                <div th:if="${#lists.isEmpty(materiesPrimeres)}" class="empty-state">
+                    <div class="empty-box">
+                        <i class="bi bi-flower1"></i>
+                        <p>No hi ha matèries primeres registrades.</p>
+                    </div>
+                </div>
+
             </div>
 
         </section>

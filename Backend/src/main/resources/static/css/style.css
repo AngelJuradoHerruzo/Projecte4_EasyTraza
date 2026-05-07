@@ -1234,6 +1234,73 @@ input[type="password"] {
     background-color: var(--panel);
 }
 
+/* ---------------------------- LLISTAT AGRUPAT PER MATÈRIA PRIMERA ---------------------------- */
+.lots-grouped-list {
+    padding: 18px 22px 24px;
+}
+
+.lot-group {
+    margin-bottom: 28px;
+}
+
+.lot-group:last-child {
+    margin-bottom: 0;
+}
+
+.lot-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+.lot-group-header h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.lot-group-header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.lot-group-table {
+    min-width: 1020px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.lot-group-table .col-id {
+    width: 70px;
+}
+
+.lot-group-table .col-lot {
+    width: 210px;
+}
+
+.lot-group-table .col-quantitat {
+    width: 120px;
+}
+
+.lot-group-table .col-estat {
+    width: 140px;
+}
+
+.lot-group-table .col-data {
+    width: 135px;
+}
+
+.lot-group-table .col-accions {
+    width: 260px;
+}
+
 /* ---------------------------- RESPONSIVE LOTS ---------------------------- */
 
 @media (max-width: 1150px) {

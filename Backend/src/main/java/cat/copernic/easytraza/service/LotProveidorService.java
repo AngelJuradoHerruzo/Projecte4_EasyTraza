@@ -4,39 +4,55 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cat.copernic.easytraza.entities.LotProveidor;
+import cat.copernic.easytraza.entities.MateriaPrimera;
 import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
+import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 
 @Service
 @Transactional
 public class LotProveidorService {
 
-    // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
-    private final LotProveidorRepository lotProveidorRepository;
+    // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
 
-    public LotProveidorService(LotProveidorRepository lotProveidorRepository) {
+    private final LotProveidorRepository lotProveidorRepository;
+    private final MateriaPrimeraRepository materiaPrimeraRepository;
+
+    public LotProveidorService(LotProveidorRepository lotProveidorRepository,
+                               MateriaPrimeraRepository materiaPrimeraRepository) {
         this.lotProveidorRepository = lotProveidorRepository;
+        this.materiaPrimeraRepository = materiaPrimeraRepository;
     }
 
 
     // OBTENIR TOTS ELS LOTS DE PROVEÏDOR
+
     public List<LotProveidor> getAllLotsProveidor() {
         return lotProveidorRepository.findAll();
     }
 
 
+    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
+
+    public List<MateriaPrimera> getAllMateriesPrimeresOrdenades() {
+        return materiaPrimeraRepository.findAll(Sort.by("nomMateria").ascending());
+    }
+
+
     // OBTENIR LOT DE PROVEÏDOR PER ID
+
     public LotProveidor getLotProveidorById(Long id) {
-        Optional<LotProveidor> lotProveidor = lotProveidorRepository.findById(id);
-        return lotProveidor.orElse(null);
+        return obtenirLotValidat(id);
     }
 
 
     // COMPROVAR SI EXISTEIX UN LOT OBERT DE LA MATEIXA MATÈRIA PRIMERA
+
     public boolean existeixLotObertMateixaMateria(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -55,6 +71,7 @@ public class LotProveidorService {
 
 
     // INICIAR LOT
+
     public LotProveidor iniciarLot(Long id, boolean confirmarFinalitzacioAnterior) {
 
         LotProveidor lotProveidorActual = obtenirLotValidat(id);
@@ -87,6 +104,7 @@ public class LotProveidorService {
 
 
     // FINALITZAR LOT
+
     public LotProveidor finalitzarLot(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -101,6 +119,7 @@ public class LotProveidorService {
 
 
     // OBTENIR LOT VALIDAT
+
     private LotProveidor obtenirLotValidat(Long id) {
 
         Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
@@ -114,6 +133,7 @@ public class LotProveidorService {
 
 
     // VALIDAR LOT PER INICIAR
+
     private void validarLotPerIniciar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getMateriaPrimera() == null) {
@@ -131,6 +151,7 @@ public class LotProveidorService {
 
 
     // VALIDAR LOT PER FINALITZAR
+
     private void validarLotPerFinalitzar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getEstat() == null) {

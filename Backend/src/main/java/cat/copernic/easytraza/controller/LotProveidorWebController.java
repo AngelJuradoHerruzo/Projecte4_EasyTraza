@@ -11,6 +11,7 @@ import cat.copernic.easytraza.service.LotProveidorService;
 public class LotProveidorWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
+
     private final LotProveidorService lotProveidorService;
 
     public LotProveidorWebController(LotProveidorService lotProveidorService) {
@@ -19,14 +20,18 @@ public class LotProveidorWebController {
 
 
     // LLISTAR LOTS DE PROVEÏDOR
+
     @GetMapping("/list")
     public String llistarLots(Model model) {
         model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+        model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+
         return "lots/llistarLots";
     }
 
 
     // CONSULTAR DETALL DEL LOT
+
     @GetMapping("/detail/{id}")
     public String consultarLot(@PathVariable Long id, Model model) {
         try {
@@ -36,12 +41,15 @@ public class LotProveidorWebController {
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+
             return "lots/llistarLots";
         }
     }
 
 
     // INICIAR LOT
+
     @PostMapping("/iniciar/{id}")
     public String iniciarLot(@PathVariable Long id, Model model) {
         try {
@@ -49,6 +57,8 @@ public class LotProveidorWebController {
                 model.addAttribute("confirmarIniciLot", true);
                 model.addAttribute("lotAIniciar", lotProveidorService.getLotProveidorById(id));
                 model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+                model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+
                 return "lots/llistarLots";
             }
 
@@ -58,12 +68,15 @@ public class LotProveidorWebController {
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+
             return "lots/llistarLots";
         }
     }
 
 
     // CONFIRMAR INICI DE LOT
+
     @PostMapping("/iniciar-confirmat/{id}")
     public String confirmarIniciLot(@PathVariable Long id, Model model) {
         try {
@@ -73,12 +86,15 @@ public class LotProveidorWebController {
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+
             return "lots/llistarLots";
         }
     }
 
 
     // FINALITZAR LOT
+
     @PostMapping("/finalitzar/{id}")
     public String finalitzarLot(@PathVariable Long id, Model model) {
         try {
@@ -88,6 +104,8 @@ public class LotProveidorWebController {
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+
             return "lots/llistarLots";
         }
     }
