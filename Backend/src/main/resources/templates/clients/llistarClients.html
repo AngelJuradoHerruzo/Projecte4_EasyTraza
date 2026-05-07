@@ -85,8 +85,8 @@
                         <div class="info-card-meta-item">
                             <i class="bi bi-upc-scan"></i>
                             <div class="info-card-meta-text">
-                                <span class="info-card-meta-label">NIF</span>
-                                <span class="info-card-meta-value" th:text="${client.nif}">NIF</span>
+                                <span class="info-card-meta-label">CIF / DNI</span>
+                                <span class="info-card-meta-value" th:text="${client.cif}">CIF / DNI</span>
                             </div>
                         </div>
 
@@ -94,8 +94,7 @@
                             <i class="bi bi-telephone"></i>
                             <div class="info-card-meta-text">
                                 <span class="info-card-meta-label">Telèfon</span>
-                                <span class="info-card-meta-value"
-                                      th:text="${client.telefon != null && !#strings.isEmpty(client.telefon) ? client.telefon : 'Sense telèfon'}">
+                                <span class="info-card-meta-value" th:text="${client.telefon}">
                                     Telèfon
                                 </span>
                             </div>
@@ -116,8 +115,7 @@
                             <i class="bi bi-geo-alt"></i>
                             <div class="info-card-meta-text">
                                 <span class="info-card-meta-label">Adreça</span>
-                                <span class="info-card-meta-value"
-                                      th:text="${client.adreca != null && !#strings.isEmpty(client.adreca) ? client.adreca : 'Sense adreça'}">
+                                <span class="info-card-meta-value" th:text="${client.adreca}">
                                     Adreça
                                 </span>
                             </div>

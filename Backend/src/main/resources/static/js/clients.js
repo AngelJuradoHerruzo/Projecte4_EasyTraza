@@ -1,6 +1,5 @@
 const form = document.getElementById('clientForm');
-
-const nifInput = document.getElementById('nif');
+const cifInput = document.getElementById('cif');
 const nomInput = document.getElementById('nomComplet');
 const telefonInput = document.getElementById('telefon');
 const emailInput = document.getElementById('email');
@@ -14,6 +13,7 @@ const observacionsCounter = document.getElementById('observacionsCounter');
 nomInput.addEventListener('input', function () {
     let value = this.value;
 
+    value = value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
     value = value.replace(/\s+/g, ' ').trimStart();
 
     value = value
@@ -26,7 +26,7 @@ nomInput.addEventListener('input', function () {
 
 
 // MAJÚSCULES I SENSE CARÀCTERS INVÀLIDS
-nifInput.addEventListener('input', function () {
+cifInput.addEventListener('input', function () {
     let value = this.value.toUpperCase();
 
     value = value.replace(/\s+/g, '');
@@ -118,11 +118,14 @@ function validateField(field) {
     // Si està buit → no color
     if (value === '') {
         clearState(field);
+        field.setCustomValidity('');
         return !field.hasAttribute('required');
     }
 
     // OBSERVACIONS → només validem longitud
     if (field.id === 'observacions') {
+        field.setCustomValidity('');
+
         if (field.value.length <= 50) {
             markValid(field);
             return true;
@@ -164,7 +167,7 @@ function validateField(field) {
 
 
 // EVENTS VALIDACIÓ
-[nifInput, nomInput, telefonInput, emailInput, adrecaInput, observacionsInput].forEach(field => {
+[cifInput, nomInput, telefonInput, emailInput, adrecaInput, observacionsInput].forEach(field => {
     field.addEventListener('input', () => validateField(field));
     field.addEventListener('change', () => validateField(field));
 });
@@ -175,7 +178,7 @@ form.addEventListener('submit', function (event) {
 
     let valid = true;
 
-    const fields = [nifInput, nomInput, telefonInput, emailInput, adrecaInput, observacionsInput];
+    const fields = [cifInput, nomInput, telefonInput, emailInput, adrecaInput, observacionsInput];
 
     fields.forEach(field => {
         const ok = validateField(field);

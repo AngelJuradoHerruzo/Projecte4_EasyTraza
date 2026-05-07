@@ -18,7 +18,7 @@ public class Client {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String nif;
+    private String cif;
 
     @Column(nullable = false)
     private String nomComplet;
@@ -39,10 +39,10 @@ public class Client {
     /*********************       .CONSTRUCTORS.       *********************/
     public Client() { }
 
-    public Client(Long id, String nif, String nomComplet, String telefon, String email,
+    public Client(Long id, String cif, String nomComplet, String telefon, String email,
                   String adreca, String observacions) {
         this.id = id;
-        this.nif = nif;
+        this.cif = cif;
         this.nomComplet = nomComplet;
         this.telefon = telefon;
         this.email = email;
@@ -56,9 +56,9 @@ public class Client {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    // ─────────── NIF ───────────
-    public String getNif() { return nif; }
-    public void setNif(String nif) { this.nif = nif; }
+    // ─────────── CIF ───────────
+    public String getCif() { return cif; }
+    public void setCif(String cif) { this.cif = cif; }
 
     // ─────── NOM COMPLET ───────
     public String getNomComplet() { return nomComplet; }
