@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detall albarà client - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{layout/sidebar :: sidebar('albaransClient')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Detall</p>
+
+                <h1 class="page-heading">
+                    <span>Albarà de client #</span>
+                    <span th:text="${albaraClient.id}">1</span>
+                </h1>
+
+                <p class="page-description">
+                    Consulta les dades generals, els productes lliurats i els lots associats a l'albarà.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-client/list}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Tornar</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- CONTINGUT ----------------------->
+        <section class="content-card">
+
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Fitxa de l'albarà</h2>
+                    <p class="content-subtitle">
+                        Informació completa de l'albarà i de la traçabilitat associada.
+                    </p>
+                </div>
+
+                <div class="toolbar-actions">
+                    <a th:if="${albaraClient.estat.name() == 'PENDENT_LLIURAR'}"
+                       th:href="@{/albarans-client/edit/{id}(id=${albaraClient.id})}"
+                       class="btn btn-soft">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>Editar</span>
+                    </a>
+
+                    <a th:if="${albaraClient.estat.name() == 'PENDENT_LLIURAR'}"
+                       th:href="@{/albarans-client/lliurar/{id}(id=${albaraClient.id})}"
+                       class="btn btn-soft"
+                       onclick="return confirm('Segur que vols marcar aquest albarà com a lliurat?')">
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Lliurar</span>
+                    </a>
+                </div>
+            </div>
+
+            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:26px;">
+
+                <!----------------------- RESUM ----------------------->
+                <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px; background:#fffaf5;">
+
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
+
+                        <div>
+                            <h2 class="content-title">
+                                <span>Albarà #</span>
+                                <span th:text="${albaraClient.id}">1</span>
+                            </h2>
+                            <p class="content-subtitle">
+                                Resum general del lliurament al client.
+                            </p>
+                        </div>
+
+                        <span class="info-card-meta-value"
+                              style="padding:8px 12px; border:1px solid #f0e6dc; border-radius:999px; background:white;"
+                              th:text="${albaraClient.estat}">
+                            PENDENT_LLIURAR
+                        </span>
+
+                    </div>
+
+                    <div style="margin-top:18px; display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;">
+
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-calendar-event"></i>
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Data albarà</span>
+                                    <span class="info-card-meta-value"
+                                          th:text="${#temporals.format(albaraClient.dataAlbara, 'dd/MM/yyyy')}">
+                                        01/01/2026
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-person-vcard"></i>
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Client</span>
+                                    <span class="info-card-meta-value"
+                                          th:text="${albaraClient.client.nomComplet}">
+                                        Client
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-diagram-3"></i>
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Traçabilitat</span>
+                                    <span class="info-card-meta-value">
+                                        <span th:text="${albaraClient.lotsAssociats != null ? #lists.size(albaraClient.lotsAssociats) : 0}">0</span>
+                                        <span> lots</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!----------------------- LÍNIES PRODUCCIÓ ----------------------->
+                <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+                        <div>
+                            <h2 class="content-title">Línies de producció</h2>
+                            <p class="content-subtitle">
+                                Productes i quantitats incloses dins d'aquest albarà.
+                            </p>
+                        </div>
+
+                        <span class="info-card-meta-value"
+                              style="padding:8px 12px; border:1px solid #f0e6dc; border-radius:999px; background:#fffaf5;">
+                            <span th:text="${albaraClient.liniesProduccio != null ? #lists.size(albaraClient.liniesProduccio) : 0}">0</span>
+                            <span> línies</span>
+                        </span>
+                    </div>
+
+                    <div th:if="${albaraClient.liniesProduccio != null and !albaraClient.liniesProduccio.isEmpty()}"
+                         style="margin-top:18px; display:flex; flex-direction:column; gap:12px;">
+
+                        <div th:each="linia, stat : ${albaraClient.liniesProduccio}"
+                             style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
+
+                            <div style="display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;">
+
+                                <div style="width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:14px; background:white; border:1px solid #f0e6dc;">
+                                    <span class="info-card-meta-value" th:text="${stat.index + 1}">1</span>
+                                </div>
+
+                                <div class="info-card-meta-item">
+                                    <i class="bi bi-box-seam"></i>
+                                    <div class="info-card-meta-text">
+                                        <span class="info-card-meta-label">Producte</span>
+                                        <span class="info-card-meta-value"
+                                              th:text="${linia.producte.descripcio}">
+                                            Producte
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div style="min-width:120px; padding:10px 12px; border:1px solid #f0e6dc; border-radius:14px; background:white; text-align:center;">
+                                    <span class="info-card-meta-label">Quantitat</span>
+                                    <div class="info-card-meta-value" th:text="${linia.quantitat}">
+                                        1
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div th:if="${albaraClient.liniesProduccio == null or albaraClient.liniesProduccio.isEmpty()}"
+                         class="empty-state" style="grid-column:1 / -1;">
+                        <div class="empty-box">
+                            <i class="bi bi-list-check"></i>
+                            <p>Aquest albarà no té línies de producció.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!----------------------- LOTS ASSOCIATS ----------------------->
+                <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+                        <div>
+                            <h2 class="content-title">Lots associats</h2>
+                            <p class="content-subtitle">
+                                Lots oberts associats al conjunt de l'albarà. No s'especifica l'ús per producte.
+                            </p>
+                        </div>
+
+                        <span class="info-card-meta-value"
+                              style="padding:8px 12px; border:1px solid #f0e6dc; border-radius:999px; background:#fffaf5;">
+                            <span th:text="${albaraClient.lotsAssociats != null ? #lists.size(albaraClient.lotsAssociats) : 0}">0</span>
+                            <span> lots</span>
+                        </span>
+                    </div>
+
+                    <div th:if="${albaraClient.lotsAssociats != null and !albaraClient.lotsAssociats.isEmpty()}"
+                         style="margin-top:18px; display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;">
+
+                        <div th:each="lot : ${albaraClient.lotsAssociats}"
+                             style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5; display:flex; flex-direction:column; gap:12px;">
+
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-upc-scan"></i>
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Identificador lot</span>
+                                    <span class="info-card-meta-value"
+                                          th:text="${lot.identificadorLot}">
+                                        LOT
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-flower1"></i>
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Matèria primera</span>
+                                    <span class="info-card-meta-value"
+                                          th:text="${lot.materiaPrimera.nomMateria}">
+                                        Matèria
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-flag"></i>
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Estat actual</span>
+                                    <span class="info-card-meta-value"
+                                          th:text="${lot.estat}">
+                                        OBERT
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div th:if="${albaraClient.lotsAssociats == null or albaraClient.lotsAssociats.isEmpty()}"
+                         class="empty-state" style="grid-column:1 / -1;">
+                        <div class="empty-box">
+                            <i class="bi bi-box-seam"></i>
+                            <p>Aquest albarà no té lots associats.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
