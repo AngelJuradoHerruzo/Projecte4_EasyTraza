@@ -141,7 +141,7 @@
                 </article>
 
                 <!----------------------- ESTAT BUIT ----------------------->
-                <div th:if="${#lists.isEmpty(clients)}" class="empty-state">
+                <div th:if="${#lists.isEmpty(clients)}" class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-box">
                         <i class="bi bi-person-vcard"></i>
                         <p>No hi ha clients registrats.</p>

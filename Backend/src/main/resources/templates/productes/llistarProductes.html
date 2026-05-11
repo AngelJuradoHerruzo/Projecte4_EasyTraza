@@ -94,7 +94,7 @@
                 </article>
 
                 <!----------------------- ESTAT BUIT ----------------------->
-                <div th:if="${#lists.isEmpty(productes)}" class="empty-state">
+                <div th:if="${#lists.isEmpty(productes)}" class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-box" style="justify-content: center; width: 100%;">
                         <i class="bi bi-box-seam"></i>
                         <p>No hi ha productes registrats.</p>
