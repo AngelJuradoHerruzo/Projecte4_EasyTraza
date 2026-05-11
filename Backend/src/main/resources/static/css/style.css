@@ -508,6 +508,46 @@ a {
     background-color: #f1d1cb;
 }
 
+.btn-action-view {
+    color: #3f6685;
+    background: #f2f8ff;
+    border: 1px solid #d6e6f5;
+}
+
+.btn-action-view:hover {
+    background: #eaf3fc;
+}
+
+.btn-action-edit {
+    color: #5f6368;
+    background: #f7f7f8;
+    border: 1px solid #e0e2e5;
+}
+
+.btn-action-edit:hover {
+    background: #eeeeef;
+}
+
+.btn-action-deliver {
+    color: #3f6b4d;
+    background: #f1faf4;
+    border: 1px solid #d4eadb;
+}
+
+.btn-action-deliver:hover {
+    background: #e8f5ed;
+}
+
+.btn-action-delete {
+    color: #7b4b4b;
+    background: #fff5f5;
+    border: 1px solid #eed4d4;
+}
+
+.btn-action-delete:hover {
+    background: #f9eeee;
+}
+
 .empty-state {
     padding: 34px 16px !important;
 }
@@ -1299,6 +1339,57 @@ input[type="password"] {
 
 .lot-group-table .col-accions {
     width: 260px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: fit-content;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.status-pendent {
+    color: #7a6432;
+    background: #fff9ec;
+    border-color: #eee2c4;
+}
+
+.status-lliurat {
+    color: #3f6b4d;
+    background: #f1faf4;
+    border-color: #d4eadb;
+}
+
+.status-estoc {
+    color: #486b8f;
+    background: #f2f8ff;
+    border-color: #d7e7f7;
+}
+
+.status-obert {
+    color: #3f715f;
+    background: #f1faf6;
+    border-color: #d3eadf;
+}
+
+.status-acabat {
+    color: #6c7076;
+    background: #f7f7f8;
+    border-color: #e2e4e7;
+}
+
+.status-error {
+    color: #7b4b4b;
+    background: #fff5f5;
+    border-color: #eed4d4;
 }
 
 /* ---------------------------- RESPONSIVE LOTS ---------------------------- */
