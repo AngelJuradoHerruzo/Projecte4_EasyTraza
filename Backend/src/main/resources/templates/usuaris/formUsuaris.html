@@ -5,7 +5,10 @@
     <title>Formulari Usuari - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Full d'estils global del projecte -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- Llibreria d'icones Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -18,26 +21,26 @@
 
     <main class="main">
 
-        <!----------------------- CAPÇALERA ----------------------->
+        <!----------------------- CAPÇALERA DE LA PÀGINA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
 
-                <!-- Secció -->
+                <!-- Secció actual -->
                 <p class="page-eyebrow">Administració</p>
 
-                <!-- Títol dinàmic -->
+                <!-- Títol dinàmic segons si es crea o s'edita -->
                 <h1 class="page-heading"
                     th:text="${usuari.id != null} ? 'Editar usuari' : 'Nou usuari'">
                     Formulari
                 </h1>
 
-                <!-- Descripció -->
+                <!-- Descripció de la pantalla -->
                 <p class="page-description">
                     Introdueix o modifica les dades de l'usuari.
                 </p>
             </div>
 
-            <!-- Botó tornar -->
+            <!-- Botó per tornar al llistat -->
             <div class="page-top-actions">
                 <a th:href="@{/usuaris/list}" class="btn btn-primary">
                     <i class="bi bi-arrow-left"></i>
@@ -46,13 +49,13 @@
             </div>
         </section>
 
-        <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
+        <!----------------------- CONTENIDOR PRINCIPAL DEL FORMULARI ----------------------->
         <section class="content-card">
 
             <!----------------------- TOOLBAR SUPERIOR ----------------------->
             <div class="content-toolbar">
 
-                <!-- Títol del formulari -->
+                <!-- Informació del formulari -->
                 <div class="toolbar-block">
                     <h2 class="content-title">Dades de l'usuari</h2>
                     <p class="content-subtitle">
@@ -60,7 +63,7 @@
                     </p>
                 </div>
 
-                <!-- Missatge d'error del backend -->
+                <!-- Missatge d'error retornat pel backend -->
                 <div th:if="${error}" class="form-error">
                     <i class="bi bi-exclamation-circle"></i>
                     <span th:text="${error}"></span>
@@ -70,40 +73,59 @@
             <!----------------------- COS DEL FORMULARI ----------------------->
             <div style="padding: 20px 24px;">
 
+                <!-- Formulari de creació o modificació d'usuari -->
                 <form id="usuariForm"
                       th:action="${usuari.id != null} ? @{/usuaris/update/{id}(id=${usuari.id})} : @{/usuaris/save}"
                       th:object="${usuari}"
                       method="post">
 
+                    <!-- Graella de camps del formulari -->
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
 
-                        <!-- Nom complet -->
+                        <!----------------------- CAMP DNI ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="nomComplet">Nom complet</label>
+                            <label class="form-label" for="dni">DNI *</label>
+                            <input id="dni"
+                                   type="text"
+                                   th:field="*{dni}"
+                                   class="form-input"
+                                   required
+                                   minlength="9"
+                                   maxlength="9"
+                                   pattern="^[0-9]{8}[A-Za-z]$"
+                                   title="Introdueix un DNI vàlid amb format 12345678A">
+                        </div>
+
+                        <!----------------------- CAMP NOM COMPLET ----------------------->
+                        <div class="form-group">
+                            <label class="form-label" for="nomComplet">Nom complet *</label>
                             <input id="nomComplet"
                                    type="text"
                                    th:field="*{nomComplet}"
                                    class="form-input"
                                    required
+                                   minlength="3"
+                                   maxlength="100"
                                    pattern="^[A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)+$"
                                    title="Introdueix nom i cognoms, només amb lletres">
                         </div>
 
-                        <!-- Correu electrònic -->
+                        <!----------------------- CAMP CORREU ELECTRÒNIC ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="email">Correu electrònic</label>
+                            <label class="form-label" for="email">Correu electrònic *</label>
                             <input id="email"
                                    type="email"
                                    th:field="*{email}"
                                    class="form-input"
                                    required
+                                   maxlength="100"
                                    pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
                                    title="Introdueix un correu electrònic vàlid">
                         </div>
 
-                        <!-- Rol -->
+                        <!----------------------- CAMP ROL ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="rolUsuari">Rol</label>
+                            <label class="form-label" for="rolUsuari">Rol *</label>
                             <select id="rolUsuari"
                                     th:field="*{rolUsuari}"
                                     class="form-select"
@@ -114,17 +136,21 @@
                             </select>
                         </div>
 
-                        <!-- Contrasenya -->
+                        <!----------------------- CAMP CONTRASENYA ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="password">Contrasenya</label>
+                            <label class="form-label" for="password">
+                                Contrasenya <span th:if="${usuari.id == null}">*</span>
+                            </label>
 
-                            <!-- Input amb botó de mostrar/ocultar -->
+                            <!-- Camp de contrasenya amb botó per mostrar o ocultar -->
                             <div class="password-wrapper">
                                 <input id="password"
+                                       name="password"
                                        type="password"
-                                       th:field="*{password}"
                                        class="form-input password-input"
-                                       th:attr="required=${usuari.id == null}"
+                                       th:required="${usuari.id == null}"
+                                       minlength="6"
+                                       maxlength="100"
                                        placeholder="Deixar en blanc per no modificar">
 
                                 <button type="button" class="toggle-password" id="togglePassword">
@@ -138,13 +164,13 @@
                     <!----------------------- BOTONS D'ACCIÓ ----------------------->
                     <div style="margin-top:25px; display:flex; gap:10px;">
 
-                        <!-- Guardar -->
+                        <!-- Botó per guardar l'usuari -->
                         <button type="submit" class="btn btn-soft">
                             <i class="bi bi-save"></i>
                             <span>Guardar</span>
                         </button>
 
-                        <!-- Cancel·lar -->
+                        <!-- Botó per cancel·lar i tornar al llistat -->
                         <a th:href="@{/usuaris/list}" class="btn btn-secondary">
                             Cancel·lar
                         </a>
@@ -158,10 +184,10 @@
         </section>
 
     </main>
-    
+
 </div>
 
-<!----------------------- SCRIPT JS ----------------------->
+<!----------------------- SCRIPT DEL MÒDUL D'USUARIS ----------------------->
 <script th:src="@{/js/usuaris.js}"></script>
 
 </body>

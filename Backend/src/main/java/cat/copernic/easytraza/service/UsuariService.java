@@ -41,8 +41,9 @@ public class UsuariService {
     public Usuari createUsuari(Usuari usuari) {
         validarDadesUsuari(usuari, null);
 
+        usuari.setDni(usuari.getDni().trim().toUpperCase());
         usuari.setNomComplet(usuari.getNomComplet().trim());
-        usuari.setEmail(usuari.getEmail().trim());
+        usuari.setEmail(usuari.getEmail().trim().toLowerCase());
         usuari.setPassword(passwordEncoder.encode(usuari.getPassword().trim()));
 
         return usuariRepository.save(usuari);
@@ -58,13 +59,15 @@ public class UsuariService {
             throw new RuntimeException("Usuari no trobat");
         }
 
+        usuari.setId(id);
         validarDadesUsuari(usuari, id);
 
         Usuari usuariActual = usuariOpt.get();
 
+        usuariActual.setDni(usuari.getDni().trim().toUpperCase());
         usuariActual.setNomComplet(usuari.getNomComplet().trim());
         usuariActual.setRolUsuari(usuari.getRolUsuari());
-        usuariActual.setEmail(usuari.getEmail().trim());
+        usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
 
         // Només actualitza la contrasenya si s'ha introduït
         if (usuari.getPassword() != null && !usuari.getPassword().trim().isEmpty()) {
@@ -84,36 +87,62 @@ public class UsuariService {
     // VALIDAR DADES D'USUARI
     private void validarDadesUsuari(Usuari usuari, Long id) {
 
-        if (usuari.getNomComplet() == null || usuari.getNomComplet().trim().isEmpty()) {
+        if (usuari.getDni() != null) {
+            usuari.setDni(usuari.getDni().trim().toUpperCase());
+        }
+
+        if (usuari.getNomComplet() != null) {
+            usuari.setNomComplet(usuari.getNomComplet().trim());
+        }
+
+        if (usuari.getEmail() != null) {
+            usuari.setEmail(usuari.getEmail().trim().toLowerCase());
+        }
+
+        if (usuari.getDni() == null || usuari.getDni().isBlank()) {
+            throw new RuntimeException("El DNI és obligatori");
+        }
+
+        if (!usuari.getDni().matches("\\d{8}[A-Z]")) {
+            throw new RuntimeException("El DNI ha de tenir el format 12345678A");
+        }
+
+        Optional<Usuari> usuariAmbMateixDni = usuariRepository.findByDni(usuari.getDni());
+
+        if (usuariAmbMateixDni.isPresent()
+                && (id == null || !usuariAmbMateixDni.get().getId().equals(id))) {
+            throw new RuntimeException("Aquest DNI ja està en ús");
+        }
+
+        if (usuari.getNomComplet() == null || usuari.getNomComplet().isBlank()) {
             throw new RuntimeException("El nom complet és obligatori");
         }
 
-        if (usuari.getEmail() == null || usuari.getEmail().trim().isEmpty()) {
+        if (!usuari.getNomComplet().matches("^[A-Za-zÀ-ÿ]+(?:\\s+[A-Za-zÀ-ÿ]+)+$")) {
+            throw new RuntimeException("El nom complet ha d'incloure nom i almenys un cognom");
+        }
+
+        if (usuari.getEmail() == null || usuari.getEmail().isBlank()) {
             throw new RuntimeException("El correu electrònic és obligatori");
+        }
+
+        if (!usuari.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new RuntimeException("El format del correu incorrecte");
         }
 
         if (usuari.getRolUsuari() == null) {
             throw new RuntimeException("El rol és obligatori");
         }
 
-        // Si és creació, la contrasenya és obligatòria
         if (id == null && (usuari.getPassword() == null || usuari.getPassword().trim().isEmpty())) {
             throw new RuntimeException("La contrasenya és obligatòria");
         }
 
-        // Validar email duplicat
-        Optional<Usuari> usuariAmbMateixEmail = usuariRepository.findByEmail(usuari.getEmail().trim());
+        Optional<Usuari> usuariAmbMateixEmail = usuariRepository.findByEmail(usuari.getEmail());
 
-        if (usuariAmbMateixEmail.isPresent()) {
-            // Creació: si ja existeix, error
-            if (id == null) {
-                throw new RuntimeException("Aquest correu electrònic ja està en ús");
-            }
-
-            // Edició: si l'email és d'un altre usuari, error
-            if (!usuariAmbMateixEmail.get().getId().equals(id)) {
-                throw new RuntimeException("Aquest correu electrònic ja està en ús");
-            }
+        if (usuariAmbMateixEmail.isPresent()
+                && (id == null || !usuariAmbMateixEmail.get().getId().equals(id))) {
+            throw new RuntimeException("Correu electrònic ja està en ús");
         }
     }
 }
