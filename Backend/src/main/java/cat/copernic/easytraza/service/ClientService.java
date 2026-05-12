@@ -7,23 +7,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cat.copernic.easytraza.entities.Client;
+import cat.copernic.easytraza.repository.AlbaraClientRepository;
 import cat.copernic.easytraza.repository.ClientRepository;
 
 @Service
 @Transactional
 public class ClientService {
 
-    // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
+    // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
     private final ClientRepository clientRepository;
+    private final AlbaraClientRepository albaraClientRepository;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository,
+                         AlbaraClientRepository albaraClientRepository) {
         this.clientRepository = clientRepository;
+        this.albaraClientRepository = albaraClientRepository;
     }
 
 
-    // OBTENIR TOTS ELS CLIENTS
+    // OBTENIR TOTS ELS CLIENTS ORDENATS PER NOM
     public List<Client> getAllClients() {
-        return clientRepository.findAll();
+        return clientRepository.findAllByOrderByNomCompletAsc();
     }
 
 
@@ -48,12 +52,15 @@ public class ClientService {
 
         if (clientOpt.isPresent()) {
 
-            client.setId(id);
-            validarDadesClient(client);
-
             Client clientActual = clientOpt.get();
 
-            clientActual.setCif(client.getCif().trim().toUpperCase());
+            client.setId(id);
+
+            // El CIF / DNI no es pot modificar un cop creat el client
+            client.setCif(clientActual.getCif());
+
+            validarDadesClient(client);
+
             clientActual.setNomComplet(client.getNomComplet().trim());
             clientActual.setTelefon(client.getTelefon().trim());
             clientActual.setEmail(client.getEmail() != null ? client.getEmail().trim().toLowerCase() : null);
@@ -69,6 +76,11 @@ public class ClientService {
 
     // ELIMINAR CLIENT
     public void deleteClient(Long id) {
+
+        if (albaraClientRepository.existsByClientId(id)) {
+            throw new RuntimeException("No es pot eliminar aquest client perquè té albarans de client associats.");
+        }
+
         clientRepository.deleteById(id);
     }
 

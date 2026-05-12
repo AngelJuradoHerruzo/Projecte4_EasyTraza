@@ -74,6 +74,7 @@ public class ClientWebController {
             return "redirect:/clients/list";
         }
         catch (RuntimeException e) {
+            client.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("client", client);
             return "clients/formClients";
@@ -83,8 +84,15 @@ public class ClientWebController {
 
     // ELIMINAR CLIENT
     @GetMapping("/delete/{id}")
-    public String deleteClient(@PathVariable Long id) {
-        clientService.deleteClient(id);
-        return "redirect:/clients/list";
+    public String deleteClient(@PathVariable Long id, Model model) {
+        try {
+            clientService.deleteClient(id);
+            return "redirect:/clients/list";
+        }
+        catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("clients", clientService.getAllClients());
+            return "clients/llistarClients";
+        }
     }
 }
