@@ -1,5 +1,6 @@
 package cat.copernic.easytraza.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import cat.copernic.easytraza.service.ProducteService;
 @RequestMapping("/albarans-client")
 public class AlbaraClientWebController {
 
-    // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
+    // ---------------------------- SERVICES I CONSTRUCTOR ----------------------------
     private final AlbaraClientService albaraClientService;
     private final ClientService clientService;
     private final ProducteService producteService;
@@ -60,6 +61,8 @@ public class AlbaraClientWebController {
     @GetMapping("/new")
     public String formCrearAlbaraClient(Model model) {
         AlbaraClient albaraClient = new AlbaraClient();
+
+        albaraClient.setDataAlbara(LocalDate.now());
 
         List<LiniaProduccio> liniesProduccio = new ArrayList<>();
         liniesProduccio.add(new LiniaProduccio());
@@ -132,6 +135,8 @@ public class AlbaraClientWebController {
             return "redirect:/albarans-client/list";
         }
         catch (RuntimeException e) {
+            albaraClient.setId(id);
+
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraClient", albaraClient);
             model.addAttribute("clients", clientService.getAllClients());

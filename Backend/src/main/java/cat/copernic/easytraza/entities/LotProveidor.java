@@ -26,6 +26,9 @@ public class LotProveidor {
     @Column(nullable = false)
     private Integer quantitat;
 
+    @Column(nullable = false, length = 4)
+    private String unitats;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstatLot estat = EstatLot.EN_ESTOC;
@@ -44,18 +47,17 @@ public class LotProveidor {
     @JoinColumn(name = "albara_proveidor_id", nullable = false)
     private AlbaraProveidor albaraProveidor;
 
-    @Column(nullable = false, length = 50)
-    private String unitats;
-
 
     /*********************       .CONSTRUCTORS.       *********************/
     public LotProveidor() { }
 
-    public LotProveidor(Long id, String identificadorLot, Integer quantitat, EstatLot estat, LocalDate dataCaducitat,
-                        LocalDate dataObertura, LocalDate dataAcabament, MateriaPrimera materiaPrimera, AlbaraProveidor albaraProveidor) {
+    public LotProveidor(Long id, String identificadorLot, Integer quantitat, String unitats, EstatLot estat,
+                        LocalDate dataCaducitat, LocalDate dataObertura, LocalDate dataAcabament,
+                        MateriaPrimera materiaPrimera, AlbaraProveidor albaraProveidor) {
         this.id = id;
         this.identificadorLot = identificadorLot;
         this.quantitat = quantitat;
+        this.unitats = unitats;
         this.estat = estat;
         this.dataCaducitat = dataCaducitat;
         this.dataObertura = dataObertura;
@@ -77,6 +79,10 @@ public class LotProveidor {
     // ───────── QUANTITAT ─────────
     public Integer getQuantitat() { return quantitat; }
     public void setQuantitat(Integer quantitat) { this.quantitat = quantitat; }
+
+    // ────────── UNITATS ──────────
+    public String getUnitats() { return unitats; }
+    public void setUnitats(String unitats) { this.unitats = unitats; }
 
     // ─────────── ESTAT ───────────
     public EstatLot getEstat() { return estat; }
@@ -101,8 +107,4 @@ public class LotProveidor {
     // ──── ALBARÀ DE PROVEÏDOR ────
     public AlbaraProveidor getAlbaraProveidor() { return albaraProveidor; }
     public void setAlbaraProveidor(AlbaraProveidor albaraProveidor) { this.albaraProveidor = albaraProveidor; }
-
-    // ────────── UNITATS ──────────
-    public String getUnitats() { return unitats; }
-    public void setUnitats(String unitats) { this.unitats = unitats; }
 }

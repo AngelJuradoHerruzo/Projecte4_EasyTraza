@@ -21,6 +21,9 @@ public class Usuari {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true, length = 9)
+    private String dni;
+
     @Column(nullable = false)
     private String nomComplet;
 
@@ -36,19 +39,24 @@ public class Usuari {
     /*********************       .CONSTRUCTORS.       *********************/
     public Usuari() { }
 
-    public Usuari (Long id, String nomComplet, RolUsuari rolUsuari, String email, String password) {
+    public Usuari(Long id, String dni, String nomComplet, RolUsuari rolUsuari, String email, String password) {
         this.id = id;
+        this.dni = dni;
         this.nomComplet = nomComplet;
         this.rolUsuari = rolUsuari;
         this.email = email;
         this.password = password;
     }
 
-    
+
     /*********************       .GETTERS & SETTERS.       *********************/
     // ─────────── ID ───────────
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    // ─────────── DNI ───────────
+    public String getDni() { return dni; }
+    public void setDni(String dni) { this.dni = dni; }
 
     // ─────── NOM COMPLET ───────
     public String getNomComplet() { return nomComplet; }
@@ -56,7 +64,7 @@ public class Usuari {
 
     // ─────────── ROL ───────────
     public RolUsuari getRolUsuari() { return rolUsuari; }
-    public void setRolUsuari(RolUsuari rolUsuari) { this.rolUsuari = rolUsuari; }   
+    public void setRolUsuari(RolUsuari rolUsuari) { this.rolUsuari = rolUsuari; }
 
     // ────────── EMAIL ──────────
     public String getEmail() { return email; }

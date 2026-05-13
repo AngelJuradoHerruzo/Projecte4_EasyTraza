@@ -41,7 +41,7 @@ public class UsuariWebController {
         try {
             usuariService.createUsuari(usuari);
             return "redirect:/usuaris/list";
-        } 
+        }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("usuari", usuari);
@@ -72,15 +72,16 @@ public class UsuariWebController {
         try {
             usuariService.updateUsuari(id, usuari);
             return "redirect:/usuaris/list";
-        } 
+        }
         catch (RuntimeException e) {
+            usuari.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("usuari", usuari);
             return "usuaris/formUsuaris";
         }
     }
 
-    
+
     // ELIMINAR USUARI
     @GetMapping("/delete/{id}")
     public String deleteUsuari(@PathVariable Long id) {

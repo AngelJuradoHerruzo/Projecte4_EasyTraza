@@ -22,19 +22,19 @@
         <section class="page-top">
             <div class="page-top-left">
 
-                <!-- Secció -->
+                <!-- Secció actual -->
                 <p class="page-eyebrow">Administració</p>
 
                 <!-- Títol principal -->
                 <h1 class="page-heading">Usuaris</h1>
 
-                <!-- Descripció -->
+                <!-- Descripció de la pantalla -->
                 <p class="page-description">
                     Consulta i gestiona els usuaris registrats al sistema EasyTraza.
                 </p>
             </div>
 
-            <!-- Botó nou usuari -->
+            <!-- Botó per crear un nou usuari -->
             <div class="page-top-actions">
                 <a th:href="@{/usuaris/new}" class="btn btn-primary">
                     <i class="bi bi-plus-lg"></i>
@@ -43,114 +43,150 @@
             </div>
         </section>
 
-        <!----------------------- CONTENIDOR DEL LLISTAT ----------------------->
+        <!----------------------- CONTENIDOR PRINCIPAL ----------------------->
         <section class="content-card">
 
             <!----------------------- TOOLBAR SUPERIOR ----------------------->
             <div class="content-toolbar">
 
-                <!-- Títol del llistat -->
+                <!-- Informació del llistat -->
                 <div class="toolbar-block">
-                    <h2 class="content-title">Gestió d'usuaris</h2>
+                    <h2 class="content-title">Llistat d'usuaris</h2>
                     <p class="content-subtitle">
-                        Consulta i administra els usuaris registrats al sistema.
+                        Vista resumida dels usuaris registrats.
                     </p>
                 </div>
 
-                <!-- Cercador -->
+                <!-- Cercador del llistat -->
                 <div class="toolbar-actions">
                     <div class="search-field">
                         <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar usuari...">
+                        <input id="searchInput"
+                               type="text"
+                               placeholder="Cercar per nom, DNI o correu...">
                     </div>
                 </div>
             </div>
 
-            <!----------------------- TAULA D'USUARIS ----------------------->
-            <div class="table-container">
-                <table class="data-table" id="usersTable">
+            <!----------------------- LLISTA D'USUARIS ----------------------->
+            <div class="table-container" style="padding:0; overflow:hidden;">
 
-                    <!-- Capçalera de la taula -->
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nom complet</th>
-                            <th>Rol</th>
-                            <th>Correu electrònic</th>
-                            <th class="th-actions">Accions</th>
-                        </tr>
-                    </thead>
+                <div id="usersTable"
+                     style="width:100%; display:flex; flex-direction:column;">
 
-                    <!-- Cos de la taula -->
-                    <tbody>
-                        <tr th:each="usuari : ${usuaris}">
+                    <!----------------------- CAPÇALERA DE LA LLISTA ----------------------->
+                    <div th:if="${!#lists.isEmpty(usuaris)}"
+                         style="display:grid;
+                                grid-template-columns:70px 130px minmax(220px, 1.6fr) 120px minmax(240px, 1.7fr) 220px;
+                                gap:16px;
+                                align-items:center;
+                                padding:14px 24px;
+                                background:#fffaf5;
+                                border-bottom:1px solid #f0e6dc;">
 
-                            <!-- ID de l'usuari -->
-                            <td class="td-id" th:text="${usuari.id}"></td>
+                        <span class="info-card-meta-label">ID</span>
+                        <span class="info-card-meta-label">DNI</span>
+                        <span class="info-card-meta-label">Nom complet</span>
+                        <span class="info-card-meta-label">Rol</span>
+                        <span class="info-card-meta-label">Correu electrònic</span>
+                        <span class="info-card-meta-label" style="text-align:right;">Accions</span>
+                    </div>
 
-                            <!-- Nom complet amb avatar -->
-                            <td>
-                                <div class="user-info">
+                    <!----------------------- FILA D'USUARI ----------------------->
+                    <div th:each="usuari : ${usuaris}"
+                         class="user-list-row"
+                         style="display:grid;
+                                grid-template-columns:70px 130px minmax(220px, 1.6fr) 120px minmax(240px, 1.7fr) 220px;
+                                gap:16px;
+                                align-items:center;
+                                padding:16px 24px;
+                                background:#ffffff;
+                                border-bottom:1px solid #f0e6dc;">
 
-                                    <!-- Inicial de l'usuari -->
-                                    <div class="user-avatar"
-                                         th:text="${#strings.substring(usuari.nomComplet,0,1)}">U</div>
+                        <!----------------------- ID ----------------------->
+                        <div>
+                            <span class="info-card-meta-value td-id"
+                                  th:text="${usuari.id}">
+                                1
+                            </span>
+                        </div>
 
-                                    <!-- Nom complet -->
-                                    <div class="user-text">
-                                        <span class="user-name" th:text="${usuari.nomComplet}"></span>
-                                    </div>
+                        <!----------------------- DNI ----------------------->
+                        <div>
+                            <span class="info-card-meta-value user-dni"
+                                  th:text="${usuari.dni}">
+                                12345678A
+                            </span>
+                        </div>
 
-                                </div>
-                            </td>
+                        <!----------------------- NOM COMPLET ----------------------->
+                        <div style="display:flex; align-items:center; gap:12px; min-width:0;">
 
-                            <!-- Rol de l'usuari -->
-                            <td>
-                                <span class="badge-role"
-                                      th:classappend="${usuari.rolUsuari.name() == 'OPERARI'} ? ' operari' : ' admin'"
-                                      th:text="${usuari.rolUsuari}">
+                            <!-- Avatar amb la inicial del nom -->
+                            <div class="user-avatar"
+                                 th:text="${#strings.substring(usuari.nomComplet,0,1)}">
+                                U
+                            </div>
+
+                            <!-- Nom complet de l'usuari -->
+                            <div class="user-text" style="min-width:0;">
+                                <span class="info-card-meta-value user-name"
+                                      style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                                      th:text="${usuari.nomComplet}">
+                                    Nom Usuari
                                 </span>
-                            </td>
+                            </div>
+                        </div>
 
-                            <!-- Correu electrònic -->
-                            <td>
-                                <span class="user-email" th:text="${usuari.email}"></span>
-                            </td>
+                        <!----------------------- ROL ----------------------->
+                        <div>
+                            <span class="badge-role"
+                                  th:classappend="${usuari.rolUsuari.name() == 'OPERARI'} ? ' operari' : ' admin'"
+                                  th:text="${usuari.rolUsuari}">
+                                OPERARI
+                            </span>
+                        </div>
 
-                            <!-- Accions (editar i eliminar) -->
-                            <td class="td-actions">
-                                <div class="table-actions" style="display:inline-flex; gap:8px;">
+                        <!----------------------- CORREU ELECTRÒNIC ----------------------->
+                        <div style="min-width:0;">
+                            <span class="info-card-meta-value user-email"
+                                  style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                                  th:text="${usuari.email}">
+                                correu@exemple.com
+                            </span>
+                        </div>
 
-                                    <!-- Botó editar -->
-                                    <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}" class="btn-table btn-soft">
-                                        <i class="bi bi-pencil-square"></i>
-                                        <span>Editar</span>
-                                    </a>
+                        <!----------------------- ACCIONS ----------------------->
+                        <div style="display:flex; justify-content:flex-end; gap:8px;">
 
-                                    <!-- Botó eliminar -->
-                                    <a th:href="@{/usuaris/delete/{id}(id=${usuari.id})}"
-                                       class="btn-table btn-delete"
-                                       onclick="return confirm('Segur que vols eliminar aquest usuari?')">
-                                        <i class="bi bi-trash3"></i>
-                                        <span>Eliminar</span>
-                                    </a>
+                            <!-- Botó per editar l'usuari -->
+                            <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}"
+                               class="btn-table btn-action-edit"
+                               style="justify-content:center;">
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Editar</span>
+                            </a>
 
-                                </div>
-                            </td>
+                            <!-- Botó per eliminar l'usuari -->
+                            <a th:href="@{/usuaris/delete/{id}(id=${usuari.id})}"
+                               class="btn-table btn-action-delete"
+                               style="justify-content:center;"
+                               onclick="return confirm('Segur que vols eliminar aquest usuari?')">
+                                <i class="bi bi-trash3"></i>
+                                <span>Eliminar</span>
+                            </a>
+                        </div>
+                    </div>
 
-                        </tr>
+                    <!----------------------- ESTAT BUIT ----------------------->
+                    <div th:if="${#lists.isEmpty(usuaris)}" class="empty-state">
+                        <div class="empty-box">
+                            <i class="bi bi-people"></i>
+                            <p>No hi ha usuaris registrats.</p>
+                        </div>
+                    </div>
 
-                        <!-- Missatge si no hi ha usuaris -->
-                        <tr th:if="${#lists.isEmpty(usuaris)}">
-                            <td colspan="5" class="empty-state">
-                                <div class="empty-box">
-                                    <i class="bi bi-people"></i>
-                                    <p>No hi ha usuaris registrats.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                </div>
             </div>
 
         </section>
@@ -159,28 +195,8 @@
 
 </div>
 
-<!----------------------- SCRIPT DE CERCA ----------------------->
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('usersTable');
-    const rows = table.querySelectorAll('tbody tr');
-
-    // Filtra la taula en temps real segons el nom complet
-    searchInput.addEventListener('keyup', function () {
-
-        const filter = this.value.toLowerCase();
-
-        rows.forEach(row => {
-
-            // Ignorem la fila del missatge buit
-            if (row.querySelector('.empty-state')) return;
-
-            const name = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
-
-            row.style.display = name.includes(filter) ? '' : 'none';
-        });
-    });
-</script>
+<!----------------------- SCRIPT DEL MÒDUL D'USUARIS ----------------------->
+<script th:src="@{/js/usuaris.js}"></script>
 
 </body>
 </html>

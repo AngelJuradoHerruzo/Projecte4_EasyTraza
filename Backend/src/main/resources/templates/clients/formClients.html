@@ -5,7 +5,10 @@
     <title>Formulari Client - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Full d'estils global del projecte -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- Llibreria d'icones Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -73,7 +76,7 @@
 
                         <!----------------------- CIF / DNI ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="cif">CIF / DNI</label>
+                            <label class="form-label" for="cif">CIF / DNI *</label>
                             <input id="cif"
                                    type="text"
                                    th:field="*{cif}"
@@ -81,12 +84,13 @@
                                    required
                                    maxlength="9"
                                    pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"
-                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid">
+                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid"
+                                   th:readonly="${client.id != null}">
                         </div>
 
                         <!----------------------- NOM COMPLET ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="nomComplet">Nom complet</label>
+                            <label class="form-label" for="nomComplet">Nom complet *</label>
                             <input id="nomComplet"
                                    type="text"
                                    th:field="*{nomComplet}"
@@ -98,7 +102,7 @@
 
                         <!----------------------- TELÈFON ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="telefon">Telèfon</label>
+                            <label class="form-label" for="telefon">Telèfon *</label>
                             <input id="telefon"
                                    type="text"
                                    th:field="*{telefon}"
@@ -117,12 +121,12 @@
                                    th:field="*{email}"
                                    class="form-input"
                                    pattern="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
-                                   title="Introdueix un correu electrònic vàlid, per exemple.exemple@gmail.com">
+                                   title="Introdueix un correu electrònic vàlid, per exemple exemple@gmail.com">
                         </div>
 
                         <!----------------------- ADREÇA ----------------------->
                         <div class="form-group">
-                            <label class="form-label" for="adreca">Adreça</label>
+                            <label class="form-label" for="adreca">Adreça *</label>
                             <input id="adreca"
                                    type="text"
                                    th:field="*{adreca}"

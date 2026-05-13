@@ -20,7 +20,7 @@ import cat.copernic.easytraza.repository.LotProveidorRepository;
 @Transactional
 public class AlbaraClientService {
 
-    // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
+    // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
     private final AlbaraClientRepository albaraClientRepository;
     private final LotProveidorRepository lotProveidorRepository;
 
@@ -31,9 +31,9 @@ public class AlbaraClientService {
     }
 
 
-    // OBTENIR TOTS ELS ALBARANS DE CLIENT
+    // OBTENIR TOTS ELS ALBARANS DE CLIENT ORDENATS
     public List<AlbaraClient> getAllAlbaransClient() {
-        return albaraClientRepository.findAll();
+        return albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc();
     }
 
 

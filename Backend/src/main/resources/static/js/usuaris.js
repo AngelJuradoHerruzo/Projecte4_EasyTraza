@@ -1,107 +1,182 @@
 const form = document.getElementById('usuariForm');
+
+const dniInput = document.getElementById('dni');
 const nomInput = document.getElementById('nomComplet');
 const emailInput = document.getElementById('email');
 const rolSelect = document.getElementById('rolUsuari');
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
 
-
-// NOM: NOMÉS LLETRES, ESPAIS I FORMAT CORRECTE (MAJÚSCULA INICIAL)
-nomInput.addEventListener('input', function () {
-    let value = this.value;
-
-    value = value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');       // Eliminem caràcters no vàlids
-    value = value.replace(/\s+/g, ' ').trimStart();     // Evitem espais duplicats
-
-    value = value
-        .split(' ')
-        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
-        .join(' ');
-
-    this.value = value;
-});
+const searchInput = document.getElementById('searchInput');
+const table = document.getElementById('usersTable');
 
 
-// PERMET MOSTRAR O OCULTAR LA CONTRASENYA FENT CLIC A LA ICONA
-togglePassword.addEventListener('click', function () {
-    const icon = this.querySelector('i');
+// ---------------------------- AJUDES DEL FORMULARI ----------------------------
+if (form) {
 
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text'; // Mostra la contrasenya
-        icon.className = 'bi bi-eye-slash';
-    } 
-    else {
-        passwordInput.type = 'password'; // Amaga la contrasenya
-        icon.className = 'bi bi-eye';
-    }
-});
+    // DNI: elimina caràcters no vàlids, passa la lletra a majúscula i limita a 9 caràcters
+    if (dniInput) {
+        dniInput.addEventListener('input', function () {
+            let value = this.value;
 
+            value = value.replace(/[^0-9A-Za-z]/g, '');
+            value = value.toUpperCase();
 
-// ELIMINA QUALSEVOL ESTAT DE VALIDACIÓ (VERD O VERMELL)
-function clearState(field) {
-    field.classList.remove('field-valid', 'field-invalid');
-}
+            if (value.length > 9) {
+                value = value.substring(0, 9);
+            }
 
-
-// MARCA EL CAMP COM A VÀLID (VERD)
-function markValid(field) {
-    field.classList.remove('field-invalid');
-    field.classList.add('field-valid');
-}
-
-
-// MARCA EL CAMP COM A INVÀLID (VERMELL)
-function markInvalid(field) {
-    field.classList.remove('field-valid');
-    field.classList.add('field-invalid');
-}
-
-
-// VALIDA UN CAMP CONCRET SEGONS LES REGLES HTML
-function validateField(field) {
-    const value = field.value.trim();
-
-    // Comprovem si la contrasenya és opcional (mode edició)
-    const passwordOptional = field.id === 'password' && !field.hasAttribute('required');
-
-    // Si està buit → no aplicar cap color
-    if (value === '') {
-        clearState(field);
-        return passwordOptional;
+            this.value = value;
+        });
     }
 
-    // Validació amb checkValidity (pattern, required, etc.)
-    if (field.checkValidity()) {
-        markValid(field);
-        return true;
-    } 
-    else {
+
+    // Nom complet: només permet lletres i espais, evita espais duplicats i capitalitza cada paraula
+    if (nomInput) {
+        nomInput.addEventListener('input', function () {
+            let value = this.value;
+
+            value = value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+            value = value.replace(/\s+/g, ' ');
+            value = value.trimStart();
+
+            value = value
+                .split(' ')
+                .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
+                .join(' ');
+
+            this.value = value;
+        });
+
+        // En sortir del camp, elimina espais sobrants al principi i al final
+        nomInput.addEventListener('blur', function () {
+            this.value = this.value.trim();
+        });
+    }
+
+
+    // Correu electrònic: elimina espais i passa tot el text a minúscules
+    if (emailInput) {
+        emailInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\s/g, '').toLowerCase();
+        });
+    }
+
+
+    // Contrasenya: permet mostrar o ocultar el contingut del camp
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            }
+            else {
+                passwordInput.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        });
+    }
+
+
+    // Elimina els estats visuals de validació del camp
+    function clearState(field) {
+        field.classList.remove('field-valid', 'field-invalid');
+    }
+
+
+    // Marca visualment el camp com a vàlid
+    function markValid(field) {
+        field.classList.remove('field-invalid');
+        field.classList.add('field-valid');
+    }
+
+
+    // Marca visualment el camp com a invàlid
+    function markInvalid(field) {
+        field.classList.remove('field-valid');
+        field.classList.add('field-invalid');
+    }
+
+
+    // Valida visualment un camp utilitzant les regles definides a l'HTML
+    function validateField(field) {
+        const value = field.value.trim();
+
+        const passwordOptional = field.id === 'password' && !field.hasAttribute('required');
+
+        if (value === '') {
+            clearState(field);
+            return passwordOptional;
+        }
+
+        if (field.checkValidity()) {
+            markValid(field);
+            return true;
+        }
+
         markInvalid(field);
         return false;
     }
+
+
+    // Camps que participen en la validació visual del formulari
+    const fields = [dniInput, nomInput, emailInput, rolSelect, passwordInput].filter(Boolean);
+
+
+    // Valida visualment els camps mentre l'usuari escriu o canvia valors
+    fields.forEach(field => {
+        field.addEventListener('input', () => validateField(field));
+        field.addEventListener('change', () => validateField(field));
+    });
+
+
+    // Abans d'enviar, comprova que tots els camps compleixin les validacions HTML
+    form.addEventListener('submit', function (event) {
+        let valid = true;
+
+        fields.forEach(field => {
+            const ok = validateField(field);
+
+            if (!ok) {
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
 }
 
 
-// VALIDACIÓ EN TEMPS REAL QUAN L'USUARI ESCRIU O CANVIA UN VALOR
-[nomInput, emailInput, rolSelect, passwordInput].forEach(field => {
-    field.addEventListener('input', () => validateField(field));
-    field.addEventListener('change', () => validateField(field)); // per als selects
-});
+// ---------------------------- CERCADOR DEL LLISTAT ----------------------------
+if (searchInput && table) {
 
+    // Files de la taula d'usuaris
+    const rows = table.querySelectorAll('tbody tr');
 
-// VALIDACIÓ FINAL ABANS D'ENVIAR EL FORMULARI
-form.addEventListener('submit', function (event) {
-    let valid = true;
+    // Filtra el llistat per nom, DNI o correu electrònic
+    searchInput.addEventListener('keyup', function () {
 
-    const fields = [nomInput, emailInput, rolSelect, passwordInput];
+        const filter = this.value.toLowerCase().trim();
 
-    fields.forEach(field => {
-        const ok = validateField(field); // Validem cada camp
-        if (!ok) valid = false;
+        rows.forEach(row => {
+
+            // Ignora la fila buida de missatge quan no hi ha usuaris
+            if (row.querySelector('.empty-state')) return;
+
+            const name = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
+            const dni = row.querySelector('.user-dni')?.textContent.toLowerCase() || '';
+            const email = row.querySelector('.user-email')?.textContent.toLowerCase() || '';
+
+            row.style.display =
+                name.includes(filter) ||
+                dni.includes(filter) ||
+                email.includes(filter)
+                    ? ''
+                    : 'none';
+        });
     });
-
-    // Si hi ha algun error → es bloqueja l'enviament
-    if (!valid) {
-        event.preventDefault();
-    }
-});
+}

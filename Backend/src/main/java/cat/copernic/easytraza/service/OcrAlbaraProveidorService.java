@@ -4,8 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -131,7 +129,7 @@ public class OcrAlbaraProveidorService {
 
 
     // DETECTAR DATA EN FORMAT DD/MM/AAAA, DD-MM-AAAA O DD.MM.AAAA
-    private LocalDateTime detectarData(String textOcr) {
+    private LocalDate detectarData(String textOcr) {
 
         Pattern pattern = Pattern.compile("(\\d{2})[\\-/\\.](\\d{2})[\\-/\\.](\\d{4})");
         Matcher matcher = pattern.matcher(textOcr);
@@ -141,7 +139,7 @@ public class OcrAlbaraProveidorService {
             int mes = Integer.parseInt(matcher.group(2));
             int any = Integer.parseInt(matcher.group(3));
 
-            return LocalDateTime.of(LocalDate.of(any, mes, dia), LocalTime.now());
+            return LocalDate.of(any, mes, dia);
         }
 
         return null;
