@@ -6,16 +6,24 @@ const usuariInput = document.getElementById('usuariReceptor');
 const lotsContainer = document.getElementById('lotsContainer');
 const addLotBtn = document.getElementById('addLotBtn');
 
+const ocrFile = document.getElementById('ocrFile');
+const ocrPreview = document.getElementById('ocrPreview');
+const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
+const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
+const ocrFileName = document.getElementById('ocrFileName');
 
-/*----------------------- FUNCIONS ESTAT -----------------------*/
+
+// ---------------------------- FUNCIONS ESTAT ----------------------------
 function clearState(field) {
     field.classList.remove('field-valid', 'field-invalid');
 }
+
 
 function markValid(field) {
     field.classList.remove('field-invalid');
     field.classList.add('field-valid');
 }
+
 
 function markInvalid(field) {
     field.classList.remove('field-valid');
@@ -23,7 +31,7 @@ function markInvalid(field) {
 }
 
 
-/*----------------------- VALIDACIÓ -----------------------*/
+// ---------------------------- VALIDACIÓ ----------------------------
 function validateField(field) {
     const value = field.value.trim();
 
@@ -42,7 +50,7 @@ function validateField(field) {
 }
 
 
-/*----------------------- IDENTIFICADOR LOT -----------------------*/
+// ---------------------------- IDENTIFICADOR LOT ----------------------------
 function formatDateForLot(value) {
     if (!value) return '';
 
@@ -57,7 +65,10 @@ function formatDateForLot(value) {
     return parts[2] + '_' + parts[1] + '_' + parts[0];
 }
 
+
 function updateIdentificadorsLot() {
+    if (!dataInput) return;
+
     const dataFormatada = formatDateForLot(dataInput.value);
     const identificadors = document.querySelectorAll('.identificadorLotPreview');
 
@@ -72,7 +83,7 @@ function updateIdentificadorsLot() {
 }
 
 
-/*----------------------- EVENTS VALIDACIÓ -----------------------*/
+// ---------------------------- CAMPS DEL FORMULARI ----------------------------
 function getAllFields() {
     return [
         dataInput,
@@ -81,23 +92,31 @@ function getAllFields() {
         ...document.querySelectorAll('.materiaPrimeraInput'),
         ...document.querySelectorAll('.quantitatInput'),
         ...document.querySelectorAll('.unitatsInput')
-    ];
+    ].filter(Boolean);
 }
 
-getAllFields().forEach(field => {
-    field.addEventListener('input', () => validateField(field));
-    field.addEventListener('change', () => validateField(field));
-});
 
-dataInput.addEventListener('input', updateIdentificadorsLot);
-dataInput.addEventListener('change', updateIdentificadorsLot);
+// ---------------------------- EVENTS VALIDACIÓ ----------------------------
+if (form) {
+
+    getAllFields().forEach(field => {
+        field.addEventListener('input', () => validateField(field));
+        field.addEventListener('change', () => validateField(field));
+    });
+
+    if (dataInput) {
+        dataInput.addEventListener('input', updateIdentificadorsLot);
+        dataInput.addEventListener('change', updateIdentificadorsLot);
+    }
+}
 
 
-/*----------------------- LOTS -----------------------*/
+// ---------------------------- LOTS ----------------------------
 function reindexLots() {
     const rows = document.querySelectorAll('.lot-row');
 
     rows.forEach((row, index) => {
+
         row.querySelectorAll('input, select').forEach(field => {
             const name = field.getAttribute('name');
 
@@ -111,8 +130,20 @@ function reindexLots() {
                 field.setAttribute('id', id.replace(/lots\d+/, 'lots' + index));
             }
         });
+
+        const unitatsSelect = row.querySelector('.unitat-mesura-select');
+        const addUnitatButton = row.querySelector('.btn-add-unitat-mesura');
+
+        if (unitatsSelect) {
+            unitatsSelect.setAttribute('id', 'lots' + index + 'Unitats');
+        }
+
+        if (addUnitatButton) {
+            addUnitatButton.dataset.targetSelect = 'lots' + index + 'Unitats';
+        }
     });
 }
+
 
 function bindRemoveButtons() {
     document.querySelectorAll('.remove-lot-btn').forEach(button => {
@@ -122,13 +153,27 @@ function bindRemoveButtons() {
             if (rows.length > 1) {
                 this.closest('.lot-row').remove();
                 reindexLots();
+                bindLotFields();
                 updateIdentificadorsLot();
             }
         };
     });
 }
 
-if (addLotBtn) {
+
+function bindLotFields() {
+    getAllFields().forEach(field => {
+        field.oninput = () => validateField(field);
+        field.onchange = () => validateField(field);
+    });
+
+    if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
+        inicialitzarBotonsUnitatsMesura();
+    }
+}
+
+
+if (addLotBtn && lotsContainer) {
     addLotBtn.addEventListener('click', function () {
         const rows = document.querySelectorAll('.lot-row');
         const newRow = rows[rows.length - 1].cloneNode(true);
@@ -139,59 +184,97 @@ if (addLotBtn) {
         });
 
         lotsContainer.appendChild(newRow);
+
         reindexLots();
         bindRemoveButtons();
+        bindLotFields();
         updateIdentificadorsLot();
     });
 }
 
-bindRemoveButtons();
-updateIdentificadorsLot();
+
+if (form) {
+    bindRemoveButtons();
+    bindLotFields();
+    updateIdentificadorsLot();
+}
 
 
-/*----------------------- SUBMIT -----------------------*/
-form.addEventListener('submit', function (event) {
+// ---------------------------- SUBMIT ----------------------------
+if (form) {
+    form.addEventListener('submit', function (event) {
 
-    let valid = true;
+        const submitter = event.submitter;
 
-    const fields = getAllFields();
+        // Permet guardar una unitat de mesura sense validar tot l'albarà
+        if (submitter && submitter.dataset.action === 'guardar-unitat') {
+            return;
+        }
 
-    fields.forEach(field => {
-        const ok = validateField(field);
-        if (!ok) valid = false;
+        let valid = true;
+
+        const fields = getAllFields();
+
+        fields.forEach(field => {
+            const ok = validateField(field);
+
+            if (!ok) {
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            event.preventDefault();
+        }
     });
-
-    if (!valid) {
-        event.preventDefault();
-    }
-});
+}
 
 
-const ocrFile = document.getElementById('ocrFile');
-const ocrPreview = document.getElementById('ocrPreview');
-const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
-const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
-const ocrFileName = document.getElementById('ocrFileName');
-
+// ---------------------------- VISTA PRÈVIA OCR ----------------------------
 if (ocrFile) {
     ocrFile.addEventListener('change', function () {
         const file = this.files[0];
 
         if (!file) {
-            ocrPreviewContainer.style.display = 'none';
-            ocrPreviewEmpty.style.display = 'block';
-            ocrPreview.src = '';
-            ocrFileName.textContent = '';
+            if (ocrPreviewContainer) {
+                ocrPreviewContainer.style.display = 'none';
+            }
+
+            if (ocrPreviewEmpty) {
+                ocrPreviewEmpty.style.display = 'block';
+            }
+
+            if (ocrPreview) {
+                ocrPreview.src = '';
+                ocrPreview.style.display = 'none';
+            }
+
+            if (ocrFileName) {
+                ocrFileName.textContent = '';
+            }
+
             return;
         }
 
         const reader = new FileReader();
 
         reader.onload = function (event) {
-            ocrPreview.src = event.target.result;
-            ocrFileName.textContent = file.name;
-            ocrPreviewContainer.style.display = 'block';
-            ocrPreviewEmpty.style.display = 'none';
+            if (ocrPreview) {
+                ocrPreview.src = event.target.result;
+                ocrPreview.style.display = 'block';
+            }
+
+            if (ocrFileName) {
+                ocrFileName.textContent = file.name;
+            }
+
+            if (ocrPreviewContainer) {
+                ocrPreviewContainer.style.display = 'block';
+            }
+
+            if (ocrPreviewEmpty) {
+                ocrPreviewEmpty.style.display = 'none';
+            }
         };
 
         reader.readAsDataURL(file);

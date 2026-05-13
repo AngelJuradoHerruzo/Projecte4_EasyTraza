@@ -22,13 +22,16 @@ import cat.copernic.easytraza.repository.AlbaraProveidorRepository;
 @Transactional
 public class AlbaraProveidorService {
 
-    // ---------------------------- REPOSITORI I CONFIGURACIÓ ----------------------------
+    // ---------------------------- REPOSITORIS, SERVICES I CONFIGURACIÓ ----------------------------
     private final AlbaraProveidorRepository albaraProveidorRepository;
+    private final UnitatMesuraService unitatMesuraService;
 
     private static final String DIRECTORI_FITXERS = "C:/Users/crono/Desktop/DAM/Projecte4_EasyTraza/Backend/uploads/albarans-proveidor";
 
-    public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository) {
+    public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository,
+                                  UnitatMesuraService unitatMesuraService) {
         this.albaraProveidorRepository = albaraProveidorRepository;
+        this.unitatMesuraService = unitatMesuraService;
     }
 
 
@@ -57,7 +60,9 @@ public class AlbaraProveidorService {
             validarDadesLotProveidor(lot);
 
             lot.setIdentificadorLot(generarIdentificadorLot(albaraProveidor, index));
+            lot.setUnitats(unitatMesuraService.normalitzarNom(lot.getUnitats()));
             lot.setEstat(EstatLot.EN_ESTOC);
+            lot.setDataObertura(null);
             lot.setAlbaraProveidor(albaraProveidor);
 
             index++;
@@ -97,7 +102,9 @@ public class AlbaraProveidorService {
                 validarDadesLotProveidor(lot);
 
                 lot.setIdentificadorLot(generarIdentificadorLot(albaraProveidorActual, index));
+                lot.setUnitats(unitatMesuraService.normalitzarNom(lot.getUnitats()));
                 lot.setEstat(EstatLot.EN_ESTOC);
+                lot.setDataObertura(null);
                 lot.setAlbaraProveidor(albaraProveidorActual);
 
                 albaraProveidorActual.getLots().add(lot);
@@ -179,12 +186,14 @@ public class AlbaraProveidorService {
             throw new RuntimeException("La quantitat ha de ser superior a zero.");
         }
 
-        if (lotProveidor.getUnitats() != null) {
-            lotProveidor.setUnitats(lotProveidor.getUnitats().trim());
-        }
+        lotProveidor.setUnitats(unitatMesuraService.normalitzarNom(lotProveidor.getUnitats()));
 
         if (lotProveidor.getUnitats() == null || lotProveidor.getUnitats().isBlank()) {
             throw new RuntimeException("Les unitats són obligatòries.");
+        }
+
+        if (!unitatMesuraService.existsByNom(lotProveidor.getUnitats())) {
+            throw new RuntimeException("La unitat de mesura seleccionada no existeix.");
         }
     }
 

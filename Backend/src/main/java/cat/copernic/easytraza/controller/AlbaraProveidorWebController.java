@@ -14,29 +14,33 @@ import cat.copernic.easytraza.service.AlbaraProveidorService;
 import cat.copernic.easytraza.service.MateriaPrimeraService;
 import cat.copernic.easytraza.service.OcrAlbaraProveidorService;
 import cat.copernic.easytraza.service.ProveidorService;
+import cat.copernic.easytraza.service.UnitatMesuraService;
 import cat.copernic.easytraza.service.UsuariService;
 
 @Controller
 @RequestMapping("/albarans-proveidor")
 public class AlbaraProveidorWebController {
 
-    // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
+    // ---------------------------- SERVICES I CONSTRUCTOR ----------------------------
     private final AlbaraProveidorService albaraProveidorService;
     private final ProveidorService proveidorService;
     private final UsuariService usuariService;
     private final MateriaPrimeraService materiaPrimeraService;
     private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
+    private final UnitatMesuraService unitatMesuraService;
 
     public AlbaraProveidorWebController(AlbaraProveidorService albaraProveidorService,
                                         ProveidorService proveidorService,
                                         UsuariService usuariService,
                                         MateriaPrimeraService materiaPrimeraService,
-                                        OcrAlbaraProveidorService ocrAlbaraProveidorService) {
+                                        OcrAlbaraProveidorService ocrAlbaraProveidorService,
+                                        UnitatMesuraService unitatMesuraService) {
         this.albaraProveidorService = albaraProveidorService;
         this.proveidorService = proveidorService;
         this.usuariService = usuariService;
         this.materiaPrimeraService = materiaPrimeraService;
         this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
+        this.unitatMesuraService = unitatMesuraService;
     }
 
 
@@ -60,10 +64,11 @@ public class AlbaraProveidorWebController {
 
         albaraProveidor.setLots(lots);
 
-        model.addAttribute("albaraProveidor", albaraProveidor);
         model.addAttribute("proveidors", proveidorService.getAllProveidors());
         model.addAttribute("usuaris", usuariService.getAllUsuaris());
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+        model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
+        model.addAttribute("albaraProveidor", albaraProveidor);
 
         return "albaransProveidor/formAlbaraProveidor";
     }
@@ -87,6 +92,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("proveidors", proveidorService.getAllProveidors());
             model.addAttribute("usuaris", usuariService.getAllUsuaris());
             model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+            model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
             return "albaransProveidor/formAlbaraProveidor";
         }
@@ -111,6 +117,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("proveidors", proveidorService.getAllProveidors());
             model.addAttribute("usuaris", usuariService.getAllUsuaris());
             model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+            model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
             return "albaransProveidor/formAlbaraProveidor";
         }
@@ -136,6 +143,7 @@ public class AlbaraProveidorWebController {
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
+            albaraProveidor.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
             model.addAttribute("ocrImageBase64", ocrImageBase64);
@@ -143,6 +151,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("proveidors", proveidorService.getAllProveidors());
             model.addAttribute("usuaris", usuariService.getAllUsuaris());
             model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+            model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
             return "albaransProveidor/formAlbaraProveidor";
         }
@@ -189,6 +198,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("proveidors", proveidorService.getAllProveidors());
             model.addAttribute("usuaris", usuariService.getAllUsuaris());
             model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+            model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
             return "albaransProveidor/formAlbaraProveidor";
         }
@@ -205,6 +215,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("proveidors", proveidorService.getAllProveidors());
             model.addAttribute("usuaris", usuariService.getAllUsuaris());
             model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+            model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
             return "albaransProveidor/formAlbaraProveidor";
         }

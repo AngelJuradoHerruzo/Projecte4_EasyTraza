@@ -158,31 +158,8 @@
 
 </div>
 
-<script>
-    const ocrFile = document.getElementById('ocrFile');
-    const ocrPreview = document.getElementById('ocrPreview');
-    const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
-
-    ocrFile.addEventListener('change', function () {
-        const file = this.files[0];
-
-        if (!file) {
-            ocrPreview.style.display = 'none';
-            ocrPreviewEmpty.style.display = 'block';
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = function (event) {
-            ocrPreview.src = event.target.result;
-            ocrPreview.style.display = 'block';
-            ocrPreviewEmpty.style.display = 'none';
-        };
-
-        reader.readAsDataURL(file);
-    });
-</script>
+<!----------------------- SCRIPT DEL MÒDUL D'ALBARANS DE PROVEÏDOR ----------------------->
+<script th:src="@{/js/albaransProveidor.js}"></script>
 
 </body>
 </html>

@@ -24,6 +24,7 @@
 
                 <h1 class="page-heading"
                     th:text="${albaraProveidor != null and albaraProveidor.id != null} ? 'Editar albarà de proveïdor' : 'Nou albarà de proveïdor'">
+                    Albarà de proveïdor
                 </h1>
 
                 <p class="page-description">
@@ -42,6 +43,7 @@
         <!----------------------- CONTINGUT ----------------------->
         <section class="content-card">
 
+            <!----------------------- TOOLBAR SUPERIOR ----------------------->
             <div class="content-toolbar">
                 <div class="toolbar-block">
                     <h2 class="content-title">Albarà de proveïdor</h2>
@@ -50,11 +52,13 @@
                     </p>
                 </div>
 
+                <!-- Missatge d'error general -->
                 <div th:if="${error}" class="form-error">
                     <i class="bi bi-exclamation-circle"></i>
                     <span th:text="${error}"></span>
                 </div>
 
+                <!-- Missatge informatiu OCR -->
                 <div th:if="${ocrInfo}" class="form-success">
                     <i class="bi bi-check-circle"></i>
                     <span th:text="${ocrInfo}"></span>
@@ -79,6 +83,7 @@
 
                         <div style="display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end;">
 
+                            <!----------------------- IMATGE OCR ----------------------->
                             <div class="form-group" style="margin:0;">
                                 <label class="form-label">Imatge de l'albarà</label>
                                 <input id="ocrFile"
@@ -89,6 +94,7 @@
                                        required>
                             </div>
 
+                            <!----------------------- BOTÓ PROCESSAR OCR ----------------------->
                             <button type="submit" class="btn btn-soft">
                                 <i class="bi bi-camera"></i>
                                 Processar OCR
@@ -96,8 +102,10 @@
 
                         </div>
 
+                        <!----------------------- VISTA PRÈVIA OCR ----------------------->
                         <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:220px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:white;">
 
+                            <!-- Estat sense imatge -->
                             <div id="ocrPreviewEmpty"
                                  th:style="${ocrImageBase64 != null and !#strings.isEmpty(ocrImageBase64)} ? 'display:none;' : 'text-align:center; padding:30px;'">
                                 <i class="bi bi-file-earmark-image" style="font-size:44px; color:#c9b8a6;"></i>
@@ -107,6 +115,7 @@
                                 </p>
                             </div>
 
+                            <!-- Imatge seleccionada o processada -->
                             <div id="ocrPreviewContainer"
                                  th:style="${ocrImageBase64 != null and !#strings.isEmpty(ocrImageBase64)} ? 'display:block; width:100%; padding:16px; text-align:center;' : 'display:none; width:100%; padding:16px; text-align:center;'">
 
@@ -135,9 +144,14 @@
                       th:object="${albaraProveidor}"
                       method="post">
 
+                    <!-- Identificador de l'albarà quan s'està editant -->
+                    <input type="hidden" th:field="*{id}">
+
+                    <!-- Imatge OCR pendent de guardar definitivament -->
                     <input type="hidden" name="ocrImageBase64" th:value="${ocrImageBase64}">
                     <input type="hidden" name="ocrImageOriginalName" th:value="${ocrImageOriginalName}">
 
+                    <!-- Fitxers ja guardats de l'albarà -->
                     <div th:each="fitxer, stat : *{fitxers}">
                         <input type="hidden" th:field="*{fitxers[__${stat.index}__]}">
                     </div>
@@ -152,8 +166,9 @@
 
                         <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px;">
 
+                            <!----------------------- DATA RECEPCIÓ ----------------------->
                             <div class="form-group">
-                                <label class="form-label">Data recepció</label>
+                                <label class="form-label">Data recepció *</label>
                                 <input id="dataRecepcio"
                                        type="datetime-local"
                                        name="dataRecepcio"
@@ -162,8 +177,9 @@
                                        required>
                             </div>
 
+                            <!----------------------- PROVEÏDOR ----------------------->
                             <div class="form-group">
-                                <label class="form-label">Proveïdor</label>
+                                <label class="form-label">Proveïdor *</label>
                                 <select id="proveidor"
                                         th:field="*{proveidor.id}"
                                         class="form-select"
@@ -176,8 +192,9 @@
                                 </select>
                             </div>
 
+                            <!----------------------- USUARI RECEPTOR ----------------------->
                             <div class="form-group">
-                                <label class="form-label">Usuari receptor</label>
+                                <label class="form-label">Usuari receptor *</label>
                                 <select id="usuariReceptor"
                                         th:field="*{usuariReceptor.id}"
                                         class="form-select"
@@ -192,6 +209,7 @@
 
                         </div>
 
+                        <!----------------------- IMATGE GUARDADA ----------------------->
                         <div th:if="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()}"
                              style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; padding:16px; background:white; text-align:center;">
 
@@ -214,6 +232,7 @@
                     <!----------------------- LOTS ----------------------->
                     <div style="margin-top:26px; padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
 
+                        <!----------------------- CAPÇALERA LOTS ----------------------->
                         <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
                             <div>
                                 <h2 class="content-title">Lots recepcionats</h2>
@@ -228,16 +247,20 @@
                             </button>
                         </div>
 
+                        <!----------------------- CONTENIDOR DE LOTS ----------------------->
                         <div id="lotsContainer" style="margin-top:18px; display:flex; flex-direction:column; gap:14px;">
 
+                            <!-- Fila de lot -->
                             <div th:each="lot, stat : *{lots}"
                                  class="lot-row"
                                  style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
 
+                                <!-- Identificador intern del lot quan s'edita -->
                                 <input type="hidden" th:field="*{lots[__${stat.index}__].id}">
 
-                                <div style="display:grid; grid-template-columns:1.2fr 1.2fr 0.7fr 0.7fr auto; gap:14px; align-items:end;">
+                                <div style="display:grid; grid-template-columns:1.2fr 1.2fr 0.7fr 0.9fr auto; gap:14px; align-items:end;">
 
+                                    <!----------------------- IDENTIFICADOR DEL LOT ----------------------->
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Identificador lot</label>
                                         <input type="text"
@@ -245,8 +268,9 @@
                                                readonly>
                                     </div>
 
+                                    <!----------------------- MATÈRIA PRIMERA ----------------------->
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">Matèria primera</label>
+                                        <label class="form-label">Matèria primera *</label>
                                         <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
                                                 class="form-select materiaPrimeraInput"
                                                 required>
@@ -258,8 +282,9 @@
                                         </select>
                                     </div>
 
+                                    <!----------------------- QUANTITAT ----------------------->
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">Quantitat</label>
+                                        <label class="form-label">Quantitat *</label>
                                         <input type="number"
                                                th:field="*{lots[__${stat.index}__].quantitat}"
                                                class="form-input quantitatInput"
@@ -267,14 +292,34 @@
                                                required>
                                     </div>
 
+                                    <!----------------------- UNITATS ----------------------->
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">Unitats</label>
-                                        <input type="text"
-                                               th:field="*{lots[__${stat.index}__].unitats}"
-                                               class="form-input unitatsInput"
-                                               required>
+                                        <label class="form-label">Unitats *</label>
+
+                                        <!-- Desplegable real d'unitats existents -->
+                                        <div style="display:grid; grid-template-columns:1fr auto; gap:8px;">
+                                            <select th:field="*{lots[__${stat.index}__].unitats}"
+                                                    th:id="'lots' + ${stat.index} + 'Unitats'"
+                                                    class="form-select unitatsInput unitat-mesura-select"
+                                                    required>
+                                                <option value="">-- Selecciona --</option>
+                                                <option th:each="unitat : ${unitatsMesura}"
+                                                        th:value="${unitat.nom}"
+                                                        th:text="${unitat.nom}">
+                                                </option>
+                                            </select>
+
+                                            <!-- Botó per obrir el panel de nova unitat -->
+                                            <button type="button"
+                                                    class="btn btn-secondary btn-toggle-unitat-mesura"
+                                                    th:attr="data-lot-index=${stat.index}"
+                                                    title="Afegir unitat de mesura">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
                                     </div>
 
+                                    <!----------------------- ELIMINAR LOT ----------------------->
                                     <button type="button" class="btn btn-secondary remove-lot-btn">
                                         <i class="bi bi-trash3"></i>
                                     </button>
@@ -285,18 +330,95 @@
 
                         </div>
 
+                        <!----------------------- APARTAT DESPLEGABLE NOVA UNITAT ----------------------->
+                        <div id="unitatMesuraPanel"
+                            th:style="${(unitatMesuraPanelObert != null and unitatMesuraPanelObert) or errorUnitatMesura != null or infoUnitatMesura != null} ? 'display:block; margin-top:18px; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;' : 'display:none; margin-top:18px; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;'">
+
+                            <!----------------------- CAPÇALERA NOVA UNITAT ----------------------->
+                            <div class="content-toolbar" style="padding:0; border-bottom:none; margin-bottom:14px; min-height:0; align-items:flex-start;">
+
+                                <!-- Títol i descripció -->
+                                <div class="toolbar-block">
+                                    <h2 class="content-title">Nova unitat de mesura</h2>
+                                    <p class="content-subtitle">
+                                        Escriu una abreviatura de màxim 4 caràcters. Si existeix una unitat igual o semblant, el sistema t'avisarà.
+                                    </p>
+                                </div>
+
+                                <!-- Missatge d'error del service -->
+                                <div th:if="${errorUnitatMesura != null}" class="form-error">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    <span th:text="${errorUnitatMesura}"></span>
+                                </div>
+
+                                <!-- Missatge correcte del service -->
+                                <div th:if="${infoUnitatMesura != null}" class="form-success">
+                                    <i class="bi bi-check-circle"></i>
+                                    <span th:text="${infoUnitatMesura}"></span>
+                                </div>
+
+                            </div>
+
+                            <!-- Índex del lot des del qual s'ha obert l'apartat -->
+                            <input id="indexUnitatMesura"
+                                type="hidden"
+                                name="indexUnitatMesura"
+                                th:value="${unitatMesuraPanelIndex}">
+
+                            <div style="margin-top:14px; display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:end;">
+
+                                <!----------------------- CAMP NOVA UNITAT ----------------------->
+                                <div class="form-group" style="margin:0;">
+                                    <label class="form-label" for="novaUnitatMesura">Nova unitat *</label>
+
+                                    <input id="novaUnitatMesura"
+                                        type="text"
+                                        name="novaUnitatMesura"
+                                        class="form-input nova-unitat-mesura-input"
+                                        th:value="${novaUnitatMesuraValor}"
+                                        maxlength="4"
+                                        title="La unitat només pot contenir lletres i números, amb un màxim de 4 caràcters"
+                                        placeholder="Ex: kg">
+                                </div>
+
+                                <!----------------------- BOTÓ GUARDAR UNITAT ----------------------->
+                                <button type="submit"
+                                        class="btn btn-soft"
+                                        th:formaction="@{/unitats-mesura/save-from-albara-proveidor}"
+                                        formmethod="post"
+                                        formnovalidate
+                                        data-action="guardar-unitat">
+                                    <i class="bi bi-save"></i>
+                                    <span>Guardar unitat</span>
+                                </button>
+
+                                <!----------------------- BOTÓ CANCEL·LAR ----------------------->
+                                <button type="button"
+                                        id="cancelarUnitatMesura"
+                                        class="btn btn-secondary">
+                                    Cancel·lar
+                                </button>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <!----------------------- BOTONS ----------------------->
+                    <!----------------------- BOTONS DEL FORMULARI ----------------------->
                     <div style="margin-top:25px; display:flex; gap:10px;">
+
+                        <!-- Botó per guardar l'albarà -->
                         <button type="submit" class="btn btn-soft">
                             <i class="bi bi-save"></i>
                             Guardar
                         </button>
 
+                        <!-- Botó per cancel·lar -->
                         <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
                             Cancel·lar
                         </a>
+
                     </div>
 
                 </form>
@@ -309,6 +431,8 @@
 
 </div>
 
+<!----------------------- SCRIPTS ----------------------->
+<script th:src="@{/js/unitatsMesura.js}"></script>
 <script th:src="@{/js/albaransProveidor.js}"></script>
 
 </body>
