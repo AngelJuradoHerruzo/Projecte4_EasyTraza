@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detall albarà proveïdor - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Full d'estils global del projecte -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- Llibreria d'icones Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Recepcions</p>
+
+                <h1 class="page-heading">
+                    <span>Albarà #</span>
+                    <span th:text="${albaraProveidor.id}">1</span>
+                </h1>
+
+                <p class="page-description">
+                    Consulta la informació completa de l'albarà, la imatge associada i els lots recepcionats.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-proveidor/list}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left"></i>
+                    Tornar
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- CONTINGUT ----------------------->
+        <section class="content-card">
+
+            <!----------------------- TOOLBAR ----------------------->
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Detall de l'albarà</h2>
+                    <p class="content-subtitle">
+                        Informació general de la recepció i lots vinculats.
+                    </p>
+                </div>
+            </div>
+
+            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:24px;">
+
+                <!----------------------- DADES GENERALS ----------------------->
+                <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                    <h2 class="content-title">Dades generals</h2>
+                    <p class="content-subtitle">
+                        Dades principals de l'albarà de proveïdor.
+                    </p>
+
+                    <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+
+                        <!----------------------- DATA RECEPCIÓ ----------------------->
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-calendar-event"></i>
+
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Data recepció</span>
+                                    <span class="info-card-meta-value"
+                                        th:text="${albaraProveidor.dataRecepcio != null ? #temporals.format(albaraProveidor.dataRecepcio, 'dd/MM/yyyy') : '-'}">
+                                        -
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!----------------------- PROVEÏDOR ----------------------->
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-buildings"></i>
+
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Proveïdor</span>
+                                    <span class="info-card-meta-value"
+                                        th:text="${albaraProveidor.proveidor != null ? albaraProveidor.proveidor.nomProveidor : '-'}">
+                                        Proveïdor
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!----------------------- USUARI RECEPTOR ----------------------->
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-person-check"></i>
+
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Usuari receptor</span>
+                                    <span class="info-card-meta-value"
+                                        th:text="${albaraProveidor.usuariReceptor != null ? albaraProveidor.usuariReceptor.nomComplet : '-'}">
+                                        Usuari
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!----------------------- IMATGE ----------------------->
+                <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                    <h2 class="content-title">Imatge de l'albarà</h2>
+                    <p class="content-subtitle">
+                        Imatge guardada associada a aquest albarà.
+                    </p>
+
+                    <div th:if="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()}"
+                         style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; padding:16px; background:white; text-align:center;">
+
+                        <p class="content-subtitle"
+                           th:text="${albaraProveidor.fitxers[0]}"
+                           style="margin-bottom:12px; font-weight:600;">
+                            /uploads/albarans-proveidor/imatge.png
+                        </p>
+
+                        <img th:src="@{${albaraProveidor.fitxers[0]}}"
+                             alt="Imatge de l'albarà"
+                             style="width:100%; max-height:460px; object-fit:contain; border-radius:14px;">
+                    </div>
+
+                    <div th:if="${albaraProveidor.fitxers == null or albaraProveidor.fitxers.isEmpty()}"
+                         class="empty-state"
+                         style="margin-top:18px;">
+                        <div class="empty-box">
+                            <i class="bi bi-file-earmark-image"></i>
+                            <p>Aquest albarà no té cap imatge guardada.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!----------------------- LOTS ----------------------->
+                <div style="padding:18px; border:1px solid #f0e6dc; border-radius:18px;">
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+                        <div>
+                            <h2 class="content-title">Lots recepcionats</h2>
+                            <p class="content-subtitle">
+                                Línies de matèria primera rebudes en aquest albarà.
+                            </p>
+                        </div>
+
+                        <span style="display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; background:#fffaf5; border:1px solid #ead8c5;">
+                            <span class="info-card-meta-value"
+                                  th:text="${albaraProveidor.lots != null ? #lists.size(albaraProveidor.lots) : 0}">
+                                0
+                            </span>
+                            <span style="font-size:13px; font-weight:700; color:#7a5c3f;">
+                                lots
+                            </span>
+                        </span>
+                    </div>
+
+                    <!----------------------- TAULA LOTS ----------------------->
+                    <div th:if="${albaraProveidor.lots != null and !albaraProveidor.lots.isEmpty()}"
+                         class="table-container"
+                         style="margin-top:18px;">
+
+                        <table class="data-table lots-table lot-group-table">
+
+                            <colgroup>
+                                <col class="col-id">
+                                <col class="col-lot">
+                                <col>
+                                <col class="col-quantitat">
+                                <col class="col-estat">
+                            </colgroup>
+
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Lot</th>
+                                <th>Matèria primera</th>
+                                <th class="text-center">Quantitat</th>
+                                <th class="text-center">Estat</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="lot : ${albaraProveidor.lots}" class="lot-row">
+
+                                <td class="td-id" th:text="${lot.id}">1</td>
+
+                                <td>
+                                    <span class="lot-main-text" th:text="${lot.identificadorLot}">
+                                        LOT-001
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="info-card-meta-value"
+                                          th:text="${lot.materiaPrimera != null ? lot.materiaPrimera.nomMateria : '-'}">
+                                        Matèria primera
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <span th:text="${lot.quantitat != null ? lot.quantitat : '-'}">0</span>
+                                    <span th:text="${lot.unitats != null ? lot.unitats : ''}">kg</span>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge-role operari"
+                                          th:if="${lot.estat != null and lot.estat.name() == 'EN_ESTOC'}">
+                                        EN ESTOC
+                                    </span>
+
+                                    <span class="badge-role admin"
+                                          th:if="${lot.estat != null and lot.estat.name() == 'OBERT'}">
+                                        OBERT
+                                    </span>
+
+                                    <span class="badge-role lot-badge-acabat"
+                                          th:if="${lot.estat != null and lot.estat.name() == 'ACABAT'}">
+                                        ACABAT
+                                    </span>
+
+                                    <span th:if="${lot.estat == null}">-</span>
+                                </td>
+
+                            </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!----------------------- ESTAT SENSE LOTS ----------------------->
+                    <div th:if="${albaraProveidor.lots == null or albaraProveidor.lots.isEmpty()}"
+                         class="empty-state"
+                         style="margin-top:18px;">
+                        <div class="empty-box">
+                            <i class="bi bi-box-seam"></i>
+                            <p>Aquest albarà no té lots recepcionats.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html> 

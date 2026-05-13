@@ -1,5 +1,6 @@
 package cat.copernic.easytraza.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,10 +48,25 @@ public class AlbaraProveidorWebController {
     // LLISTAR ALBARANS DE PROVEÏDOR
     @GetMapping("/list")
     public String llistarAlbaransProveidor(Model model) {
-        model.addAttribute("albarans", albaraProveidorService.getAllAlbaransProveidor());
+        model.addAttribute("albaransPerProveidor", albaraProveidorService.getAlbaransAgrupatsPerProveidor());
         model.addAttribute("albaraProveidorService", albaraProveidorService);
 
         return "albaransProveidor/llistarAlbaransProveidor";
+    }
+
+
+    // DETALL ALBARÀ DE PROVEÏDOR
+    @GetMapping("/detail/{id}")
+    public String detallAlbaraProveidor(@PathVariable Long id, Model model) {
+        AlbaraProveidor albaraProveidor = albaraProveidorService.getAlbaraProveidorDetallById(id);
+
+        if (albaraProveidor == null) {
+            return "redirect:/albarans-proveidor/list";
+        }
+
+        model.addAttribute("albaraProveidor", albaraProveidor);
+
+        return "albaransProveidor/detallAlbaraProveidor";
     }
 
 
@@ -59,16 +75,18 @@ public class AlbaraProveidorWebController {
     public String formCrearAlbaraProveidor(Model model) {
         AlbaraProveidor albaraProveidor = new AlbaraProveidor();
 
+        albaraProveidor.setDataRecepcio(LocalDate.now());
+
         List<LotProveidor> lots = new ArrayList<>();
         lots.add(new LotProveidor());
 
         albaraProveidor.setLots(lots);
 
+        model.addAttribute("albaraProveidor", albaraProveidor);
         model.addAttribute("proveidors", proveidorService.getAllProveidors());
         model.addAttribute("usuaris", usuariService.getAllUsuaris());
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
         model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
-        model.addAttribute("albaraProveidor", albaraProveidor);
 
         return "albaransProveidor/formAlbaraProveidor";
     }
@@ -79,9 +97,10 @@ public class AlbaraProveidorWebController {
     public String guardarAlbaraProveidor(@ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
                                          @RequestParam(value = "ocrImageBase64", required = false) String ocrImageBase64,
                                          @RequestParam(value = "ocrImageOriginalName", required = false) String ocrImageOriginalName,
+                                         @RequestParam(value = "imatgeAlbara", required = false) MultipartFile imatgeAlbara,
                                          Model model) {
         try {
-            albaraProveidorService.createAlbaraProveidor(albaraProveidor, ocrImageBase64, ocrImageOriginalName);
+            albaraProveidorService.createAlbaraProveidor(albaraProveidor, ocrImageBase64, ocrImageOriginalName, imatgeAlbara);
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
@@ -102,7 +121,8 @@ public class AlbaraProveidorWebController {
     // FORMULARI EDITAR ALBARÀ DE PROVEÏDOR
     @GetMapping("/edit/{id}")
     public String formEditarAlbaraProveidor(@PathVariable Long id, Model model) {
-        AlbaraProveidor albaraProveidor = albaraProveidorService.getAlbaraProveidorById(id);
+
+        AlbaraProveidor albaraProveidor = albaraProveidorService.getAlbaraProveidorDetallById(id);
 
         if (albaraProveidor == null) {
             return "redirect:/albarans-proveidor/list";
@@ -110,7 +130,7 @@ public class AlbaraProveidorWebController {
 
         try {
             if (!albaraProveidorService.esModificable(albaraProveidor)) {
-                throw new RuntimeException("No es pot modificar un albarà amb lots iniciats o finalitzats.");
+                throw new RuntimeException("No es pot modificar aquest albarà perquè té algun lot que no està en estoc.");
             }
 
             model.addAttribute("albaraProveidor", albaraProveidor);
@@ -123,7 +143,7 @@ public class AlbaraProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("albarans", albaraProveidorService.getAllAlbaransProveidor());
+            model.addAttribute("albaransPerProveidor", albaraProveidorService.getAlbaransAgrupatsPerProveidor());
             model.addAttribute("albaraProveidorService", albaraProveidorService);
 
             return "albaransProveidor/llistarAlbaransProveidor";
@@ -137,13 +157,15 @@ public class AlbaraProveidorWebController {
                                         @ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
                                         @RequestParam(value = "ocrImageBase64", required = false) String ocrImageBase64,
                                         @RequestParam(value = "ocrImageOriginalName", required = false) String ocrImageOriginalName,
+                                        @RequestParam(value = "imatgeAlbara", required = false) MultipartFile imatgeAlbara,
                                         Model model) {
         try {
-            albaraProveidorService.updateAlbaraProveidor(id, albaraProveidor, ocrImageBase64, ocrImageOriginalName);
+            albaraProveidorService.updateAlbaraProveidor(id, albaraProveidor, ocrImageBase64, ocrImageOriginalName, imatgeAlbara);
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
             albaraProveidor.setId(id);
+
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
             model.addAttribute("ocrImageBase64", ocrImageBase64);
@@ -166,7 +188,7 @@ public class AlbaraProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("albarans", albaraProveidorService.getAllAlbaransProveidor());
+            model.addAttribute("albaransPerProveidor", albaraProveidorService.getAlbaransAgrupatsPerProveidor());
             model.addAttribute("albaraProveidorService", albaraProveidorService);
 
             return "albaransProveidor/llistarAlbaransProveidor";

@@ -5,7 +5,10 @@
     <title>Albarà Proveïdor - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Full d'estils global del projecte -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- Llibreria d'icones Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -13,6 +16,7 @@
 
 <div class="app-layout">
 
+    <!-- SIDEBAR -->
     <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
 
     <main class="main">
@@ -28,7 +32,7 @@
                 </h1>
 
                 <p class="page-description">
-                    Registra la recepció, processa la imatge de l'albarà i afegeix els lots associats.
+                    Registra la recepció, revisa la imatge de l'albarà i gestiona els lots associats.
                 </p>
             </div>
 
@@ -48,7 +52,7 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Albarà de proveïdor</h2>
                     <p class="content-subtitle">
-                        Introdueix les dades manualment o utilitza OCR per omplir-les a partir d'una imatge.
+                        Introdueix o modifica les dades de l'albarà i la imatge associada.
                     </p>
                 </div>
 
@@ -67,93 +71,85 @@
 
             <div style="padding:20px 24px;">
 
-                <!----------------------- OCR ----------------------->
-                <div th:if="${albaraProveidor == null or albaraProveidor.id == null}"
-                     style="margin-bottom:24px; padding:18px; border:1px solid #f0e6dc; border-radius:18px; background:#fffaf5;">
-
-                    <h2 class="content-title">Entrada OCR</h2>
-                    <p class="content-subtitle">
-                        Selecciona una imatge de l'albarà. La imatge només es guardarà quan premis el botó Guardar.
-                    </p>
-
-                    <form th:action="@{/albarans-proveidor/ocr/process}"
-                          method="post"
-                          enctype="multipart/form-data"
-                          style="margin-top:18px;">
-
-                        <div style="display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end;">
-
-                            <!----------------------- IMATGE OCR ----------------------->
-                            <div class="form-group" style="margin:0;">
-                                <label class="form-label">Imatge de l'albarà</label>
-                                <input id="ocrFile"
-                                       type="file"
-                                       name="file"
-                                       class="form-input"
-                                       accept="image/*"
-                                       required>
-                            </div>
-
-                            <!----------------------- BOTÓ PROCESSAR OCR ----------------------->
-                            <button type="submit" class="btn btn-soft">
-                                <i class="bi bi-camera"></i>
-                                Processar OCR
-                            </button>
-
-                        </div>
-
-                        <!----------------------- VISTA PRÈVIA OCR ----------------------->
-                        <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:220px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:white;">
-
-                            <!-- Estat sense imatge -->
-                            <div id="ocrPreviewEmpty"
-                                 th:style="${ocrImageBase64 != null and !#strings.isEmpty(ocrImageBase64)} ? 'display:none;' : 'text-align:center; padding:30px;'">
-                                <i class="bi bi-file-earmark-image" style="font-size:44px; color:#c9b8a6;"></i>
-                                <h2 class="content-title" style="margin-top:12px;">Cap imatge seleccionada</h2>
-                                <p class="content-subtitle">
-                                    La imatge seleccionada es mostrarà aquí abans de processar-la.
-                                </p>
-                            </div>
-
-                            <!-- Imatge seleccionada o processada -->
-                            <div id="ocrPreviewContainer"
-                                 th:style="${ocrImageBase64 != null and !#strings.isEmpty(ocrImageBase64)} ? 'display:block; width:100%; padding:16px; text-align:center;' : 'display:none; width:100%; padding:16px; text-align:center;'">
-
-                                <p id="ocrFileName"
-                                   class="content-subtitle"
-                                   style="margin-bottom:12px; font-weight:600;"
-                                   th:text="${ocrImageOriginalName}">
-                                </p>
-
-                                <img id="ocrPreview"
-                                     th:src="${ocrImageBase64}"
-                                     src=""
-                                     alt="Vista prèvia de l'albarà"
-                                     style="width:100%; max-height:420px; object-fit:contain; border-radius:14px;">
-                            </div>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
                 <!----------------------- FORMULARI PRINCIPAL ----------------------->
                 <form id="albaraProveidorForm"
                       th:action="${albaraProveidor.id != null} ? @{/albarans-proveidor/update/{id}(id=${albaraProveidor.id})} : @{/albarans-proveidor/save}"
                       th:object="${albaraProveidor}"
-                      method="post">
+                      method="post"
+                      enctype="multipart/form-data">
 
                     <!-- Identificador de l'albarà quan s'està editant -->
                     <input type="hidden" th:field="*{id}">
 
-                    <!-- Imatge OCR pendent de guardar definitivament -->
+                    <!-- Imatge OCR pendent de guardar definitivament, si ve d'un processat anterior -->
                     <input type="hidden" name="ocrImageBase64" th:value="${ocrImageBase64}">
                     <input type="hidden" name="ocrImageOriginalName" th:value="${ocrImageOriginalName}">
 
                     <!-- Fitxers ja guardats de l'albarà -->
                     <div th:each="fitxer, stat : *{fitxers}">
                         <input type="hidden" th:field="*{fitxers[__${stat.index}__]}">
+                    </div>
+
+                    <!----------------------- ENTRADA OCR / IMATGE ALBARÀ ----------------------->
+                    <div style="margin-bottom:24px; padding:18px; border:1px solid #f0e6dc; border-radius:18px; background:#fffaf5;">
+
+                        <h2 class="content-title">Entrada OCR</h2>
+                        <p class="content-subtitle">
+                            Selecciona la imatge de l'albarà. En editar, si ja hi ha una imatge guardada, es mostra a la vista prèvia.
+                        </p>
+
+                        <div style="margin-top:18px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end;">
+
+                            <!----------------------- IMATGE DE L'ALBARÀ ----------------------->
+                            <div class="form-group" style="margin:0;">
+                                <label class="form-label">Imatge de l'albarà</label>
+                                <input id="ocrFile"
+                                       type="file"
+                                       name="imatgeAlbara"
+                                       class="form-input"
+                                       accept="image/*">
+                            </div>
+
+                            <!----------------------- BOTÓ OCR SENSE ACCIÓ ----------------------->
+                            <button type="button" class="btn btn-soft">
+                                <i class="bi bi-camera"></i>
+                                Processar OCR
+                            </button>
+
+                        </div>
+
+                        <!----------------------- VISTA PRÈVIA IMATGE ----------------------->
+                        <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:220px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:white;">
+
+                            <!-- Estat sense imatge -->
+                            <div id="ocrPreviewEmpty"
+                                th:style="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? 'display:none;' : 'text-align:center; padding:30px;'">
+                                <i class="bi bi-file-earmark-image" style="font-size:44px; color:#c9b8a6;"></i>
+                                <h2 class="content-title" style="margin-top:12px;">Cap imatge seleccionada</h2>
+                                <p class="content-subtitle">
+                                    La imatge seleccionada es mostrarà aquí abans de guardar l'albarà.
+                                </p>
+                            </div>
+
+                            <!-- Imatge seleccionada o ja guardada -->
+                            <div id="ocrPreviewContainer"
+                                th:style="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? 'display:block; width:100%; padding:16px; text-align:center;' : 'display:none; width:100%; padding:16px; text-align:center;'">
+
+                                <p id="ocrFileName"
+                                class="content-subtitle"
+                                style="margin-bottom:12px; font-weight:600;"
+                                th:text="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : ''">
+                                </p>
+
+                                <img id="ocrPreview"
+                                    th:src="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? @{${albaraProveidor.fitxers[0]}} : ''"
+                                    src=""
+                                    alt="Vista prèvia de l'albarà"
+                                    style="width:100%; max-height:420px; object-fit:contain; border-radius:14px;">
+                            </div>
+
+                        </div>
+
                     </div>
 
                     <!----------------------- DADES GENERALS ----------------------->
@@ -170,9 +166,9 @@
                             <div class="form-group">
                                 <label class="form-label">Data recepció *</label>
                                 <input id="dataRecepcio"
-                                       type="datetime-local"
+                                       type="date"
                                        name="dataRecepcio"
-                                       th:value="${albaraProveidor.dataRecepcio != null} ? ${#temporals.format(albaraProveidor.dataRecepcio, 'yyyy-MM-dd''T''HH:mm')} : ''"
+                                       th:value="${albaraProveidor.dataRecepcio != null} ? ${#temporals.format(albaraProveidor.dataRecepcio, 'yyyy-MM-dd')} : ''"
                                        class="form-input"
                                        required>
                             </div>
@@ -209,24 +205,6 @@
 
                         </div>
 
-                        <!----------------------- IMATGE GUARDADA ----------------------->
-                        <div th:if="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()}"
-                             style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; padding:16px; background:white; text-align:center;">
-
-                            <p class="content-subtitle" style="font-weight:600; margin-bottom:12px;">
-                                Imatge guardada
-                            </p>
-
-                            <p class="content-subtitle"
-                               th:text="${#strings.substringAfterLast(albaraProveidor.fitxers[0], '/')}"
-                               style="margin-bottom:12px;">
-                            </p>
-
-                            <img th:src="@{${albaraProveidor.fitxers[0]}}"
-                                 alt="Imatge guardada"
-                                 style="width:100%; max-height:420px; object-fit:contain; border-radius:14px;">
-                        </div>
-
                     </div>
 
                     <!----------------------- LOTS ----------------------->
@@ -258,21 +236,22 @@
                                 <!-- Identificador intern del lot quan s'edita -->
                                 <input type="hidden" th:field="*{lots[__${stat.index}__].id}">
 
-                                <div style="display:grid; grid-template-columns:1.2fr 1.2fr 0.7fr 0.9fr auto; gap:14px; align-items:end;">
+                                <div style="display:grid; grid-template-columns:1.2fr 1.2fr 0.7fr 0.9fr; gap:14px; align-items:end;">
 
                                     <!----------------------- IDENTIFICADOR DEL LOT ----------------------->
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Identificador lot</label>
                                         <input type="text"
-                                               class="form-input identificadorLotPreview"
-                                               readonly>
+                                            class="form-input"
+                                            th:value="${lot.identificadorLot}"
+                                            readonly>
                                     </div>
 
                                     <!----------------------- MATÈRIA PRIMERA ----------------------->
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Matèria primera *</label>
                                         <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
-                                                class="form-select materiaPrimeraInput"
+                                                class="form-select"
                                                 required>
                                             <option value="">-- Selecciona --</option>
                                             <option th:each="m : ${materiesPrimeres}"
@@ -286,21 +265,19 @@
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Quantitat *</label>
                                         <input type="number"
-                                               th:field="*{lots[__${stat.index}__].quantitat}"
-                                               class="form-input quantitatInput"
-                                               min="1"
-                                               required>
+                                            th:field="*{lots[__${stat.index}__].quantitat}"
+                                            class="form-input"
+                                            min="1"
+                                            required>
                                     </div>
 
-                                    <!----------------------- UNITATS ----------------------->
+                                    <!----------------------- UNITATS I ACCIONS ----------------------->
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Unitats *</label>
 
-                                        <!-- Desplegable real d'unitats existents -->
-                                        <div style="display:grid; grid-template-columns:1fr auto; gap:8px;">
+                                        <div style="display:grid; grid-template-columns:1fr auto auto; gap:8px;">
                                             <select th:field="*{lots[__${stat.index}__].unitats}"
-                                                    th:id="'lots' + ${stat.index} + 'Unitats'"
-                                                    class="form-select unitatsInput unitat-mesura-select"
+                                                    class="form-select"
                                                     required>
                                                 <option value="">-- Selecciona --</option>
                                                 <option th:each="unitat : ${unitatsMesura}"
@@ -309,20 +286,22 @@
                                                 </option>
                                             </select>
 
-                                            <!-- Botó per obrir el panel de nova unitat -->
+                                            <!----------------------- AFEGIR UNITAT ----------------------->
                                             <button type="button"
-                                                    class="btn btn-secondary btn-toggle-unitat-mesura"
+                                                    class="btn-table btn-action-edit btn-toggle-unitat-mesura"
                                                     th:attr="data-lot-index=${stat.index}"
                                                     title="Afegir unitat de mesura">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
+
+                                            <!----------------------- ELIMINAR LOT ----------------------->
+                                            <button type="button"
+                                                    class="btn-table btn-action-delete remove-lot-btn"
+                                                    title="Eliminar lot">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <!----------------------- ELIMINAR LOT ----------------------->
-                                    <button type="button" class="btn btn-secondary remove-lot-btn">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
 
                                 </div>
 
@@ -332,12 +311,11 @@
 
                         <!----------------------- APARTAT DESPLEGABLE NOVA UNITAT ----------------------->
                         <div id="unitatMesuraPanel"
-                            th:style="${(unitatMesuraPanelObert != null and unitatMesuraPanelObert) or errorUnitatMesura != null or infoUnitatMesura != null} ? 'display:block; margin-top:18px; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;' : 'display:none; margin-top:18px; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;'">
+                             th:style="${(unitatMesuraPanelObert != null and unitatMesuraPanelObert) or errorUnitatMesura != null or infoUnitatMesura != null} ? 'display:block; margin-top:18px; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;' : 'display:none; margin-top:18px; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:white;'">
 
                             <!----------------------- CAPÇALERA NOVA UNITAT ----------------------->
                             <div class="content-toolbar" style="padding:0; border-bottom:none; margin-bottom:14px; min-height:0; align-items:flex-start;">
 
-                                <!-- Títol i descripció -->
                                 <div class="toolbar-block">
                                     <h2 class="content-title">Nova unitat de mesura</h2>
                                     <p class="content-subtitle">
@@ -345,13 +323,11 @@
                                     </p>
                                 </div>
 
-                                <!-- Missatge d'error del service -->
                                 <div th:if="${errorUnitatMesura != null}" class="form-error">
                                     <i class="bi bi-exclamation-circle"></i>
                                     <span th:text="${errorUnitatMesura}"></span>
                                 </div>
 
-                                <!-- Missatge correcte del service -->
                                 <div th:if="${infoUnitatMesura != null}" class="form-success">
                                     <i class="bi bi-check-circle"></i>
                                     <span th:text="${infoUnitatMesura}"></span>
@@ -359,26 +335,25 @@
 
                             </div>
 
-                            <!-- Índex del lot des del qual s'ha obert l'apartat -->
                             <input id="indexUnitatMesura"
-                                type="hidden"
-                                name="indexUnitatMesura"
-                                th:value="${unitatMesuraPanelIndex}">
+                                   type="hidden"
+                                   name="indexUnitatMesura"
+                                   th:value="${unitatMesuraPanelIndex}">
 
-                            <div style="margin-top:14px; display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:end;">
+                            <div style="display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:end;">
 
                                 <!----------------------- CAMP NOVA UNITAT ----------------------->
                                 <div class="form-group" style="margin:0;">
                                     <label class="form-label" for="novaUnitatMesura">Nova unitat *</label>
 
                                     <input id="novaUnitatMesura"
-                                        type="text"
-                                        name="novaUnitatMesura"
-                                        class="form-input nova-unitat-mesura-input"
-                                        th:value="${novaUnitatMesuraValor}"
-                                        maxlength="4"
-                                        title="La unitat només pot contenir lletres i números, amb un màxim de 4 caràcters"
-                                        placeholder="Ex: kg">
+                                           type="text"
+                                           name="novaUnitatMesura"
+                                           class="form-input nova-unitat-mesura-input"
+                                           th:value="${novaUnitatMesuraValor}"
+                                           maxlength="4"
+                                           title="La unitat només pot contenir lletres i números, amb un màxim de 4 caràcters"
+                                           placeholder="Ex: kg">
                                 </div>
 
                                 <!----------------------- BOTÓ GUARDAR UNITAT ----------------------->
@@ -386,8 +361,7 @@
                                         class="btn btn-soft"
                                         th:formaction="@{/unitats-mesura/save-from-albara-proveidor}"
                                         formmethod="post"
-                                        formnovalidate
-                                        data-action="guardar-unitat">
+                                        formnovalidate>
                                     <i class="bi bi-save"></i>
                                     <span>Guardar unitat</span>
                                 </button>
@@ -408,13 +382,11 @@
                     <!----------------------- BOTONS DEL FORMULARI ----------------------->
                     <div style="margin-top:25px; display:flex; gap:10px;">
 
-                        <!-- Botó per guardar l'albarà -->
                         <button type="submit" class="btn btn-soft">
                             <i class="bi bi-save"></i>
                             Guardar
                         </button>
 
-                        <!-- Botó per cancel·lar -->
                         <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
                             Cancel·lar
                         </a>
