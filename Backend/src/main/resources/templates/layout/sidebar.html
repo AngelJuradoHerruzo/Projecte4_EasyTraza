@@ -87,6 +87,7 @@
     </nav>
 
     <div class="sidebar-footer">
+
         <a th:href="@{/perfil}"
            class="sidebar-link"
            th:classappend="${activePage == 'perfil'} ? ' active' : ''">
@@ -100,6 +101,29 @@
             <i class="bi bi-box-arrow-left sidebar-icon"></i>
             <span>Tancar sessió</span>
         </a>
+
+        <div class="sidebar-user-bottom" th:if="${session.usuariId != null}">
+
+            <div class="sidebar-user-avatar-bottom">
+                <i class="bi bi-person-fill"></i>
+            </div>
+
+            <div class="sidebar-user-data">
+                <p class="sidebar-user-name-bottom" th:text="${session.usuariNom}">
+                    Nom usuari
+                </p>
+
+                <p class="sidebar-user-email-bottom" th:text="${session.usuariEmail}">
+                    email@exemple.com
+                </p>
+
+                <p class="sidebar-user-role-bottom" th:text="${session.usuariRol}">
+                    ROL
+                </p>
+            </div>
+
+        </div>
+
     </div>
 
 </aside>

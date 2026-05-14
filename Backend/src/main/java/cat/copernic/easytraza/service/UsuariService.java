@@ -37,6 +37,19 @@ public class UsuariService {
     }
 
 
+    // OBTENIR USUARI PER EMAIL
+    public Usuari getUsuariByEmail(String email) {
+
+        if (email == null || email.trim().isEmpty()) {
+            return null;
+        }
+
+        Optional<Usuari> usuariOpt = usuariRepository.findByEmail(email.trim().toLowerCase());
+
+        return usuariOpt.orElse(null);
+    }
+
+
     // CREAR USUARI
     public Usuari createUsuari(Usuari usuari) {
         validarDadesUsuari(usuari, null);
