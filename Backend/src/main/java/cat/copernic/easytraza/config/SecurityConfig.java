@@ -50,7 +50,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",
                     "/login",
-                    "/error"
+                    "/error",
+                    "/api/mobile/auth/identificar",
+                    "/api/mobile/auth/usuaris"
                 ).permitAll()
 
                 .requestMatchers(
