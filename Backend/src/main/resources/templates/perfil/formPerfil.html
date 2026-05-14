@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar perfil - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Full d'estils global del projecte -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- Llibreria d'icones Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('perfil')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA DE LA PÀGINA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+
+                <p class="page-eyebrow">Perfil</p>
+
+                <h1 class="page-heading">Editar perfil</h1>
+
+                <p class="page-description">
+                    Modifica les dades associades al teu usuari.
+                </p>
+            </div>
+        </section>
+
+        <!----------------------- CONTENIDOR PRINCIPAL DEL FORMULARI ----------------------->
+        <section class="content-card">
+
+            <!----------------------- TOOLBAR SUPERIOR ----------------------->
+            <div class="content-toolbar">
+
+                <div class="toolbar-block">
+                    <h2 class="content-title">Dades personals</h2>
+                    <p class="content-subtitle">
+                        Actualitza la informació del teu perfil.
+                    </p>
+                </div>
+
+                <div th:if="${error}" class="form-error">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span th:text="${error}"></span>
+                </div>
+
+                <a th:href="@{/perfil}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Tornar</span>
+                </a>
+            </div>
+
+            <!----------------------- COS DEL FORMULARI ----------------------->
+            <div style="padding: 20px 24px;">
+
+                <form th:action="@{/perfil/update}"
+                      th:object="${usuari}"
+                      method="post">
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+
+                        <!----------------------- CAMP DNI ----------------------->
+                        <div class="form-group">
+                            <label class="form-label" for="dni">DNI *</label>
+                            <input id="dni"
+                                   type="text"
+                                   th:field="*{dni}"
+                                   class="form-input">
+                        </div>
+
+                        <!----------------------- CAMP NOM COMPLET ----------------------->
+                        <div class="form-group">
+                            <label class="form-label" for="nomComplet">Nom complet *</label>
+                            <input id="nomComplet"
+                                   type="text"
+                                   th:field="*{nomComplet}"
+                                   class="form-input">
+                        </div>
+
+                        <!----------------------- CAMP CORREU ELECTRÒNIC ----------------------->
+                        <div class="form-group">
+                            <label class="form-label" for="email">Correu electrònic *</label>
+                            <input id="email"
+                                   type="text"
+                                   th:field="*{email}"
+                                   class="form-input">
+                        </div>
+
+                        <!----------------------- CAMP ROL ----------------------->
+                        <div class="form-group">
+                            <label class="form-label" for="rolUsuari">Rol</label>
+                            <input id="rolUsuari"
+                                   type="text"
+                                   th:value="${usuari.rolUsuari}"
+                                   class="form-input"
+                                   readonly>
+                        </div>
+
+                        <!----------------------- CAMP CONTRASENYA ----------------------->
+                        <div class="form-group">
+                            <label class="form-label" for="password">Contrasenya</label>
+
+                            <div class="password-wrapper">
+                                <input id="password"
+                                       name="password"
+                                       type="password"
+                                       class="form-input password-input"
+                                       placeholder="Deixar en blanc per no modificar">
+
+                                <button type="button"
+                                        class="toggle-password"
+                                        id="togglePassword"
+                                        aria-label="Mostrar o amagar contrasenya">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                    <div style="margin-top:25px; display:flex; gap:10px;">
+
+                        <button type="submit" class="btn btn-soft">
+                            <i class="bi bi-save"></i>
+                            <span>Guardar canvis</span>
+                        </button>
+
+                        <a th:href="@{/perfil}" class="btn btn-secondary">
+                            <span>Cancel·lar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!----------------------- SCRIPT DEL PERFIL ----------------------->
+<script th:src="@{/js/login.js}"></script>
+
+</body>
+</html>
