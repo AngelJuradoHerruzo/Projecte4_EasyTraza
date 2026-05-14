@@ -53,6 +53,7 @@ fun AppNavigation() {
         )
 
         else -> MainScreen(
+            usuari = UsuariSessionManager.obtenirUsuari(context),
             onConfigurarIpClick = {
                 screen = "config"
             },

@@ -34,6 +34,26 @@ object UsuariSessionManager {
 
 
     /**
+     * Obté l'usuari identificat.
+     */
+    fun obtenirUsuari(context: Context): UsuariIdentificat? {
+        val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+        if (!preferences.contains(KEY_USUARI_ID)) {
+            return null
+        }
+
+        return UsuariIdentificat(
+            id = preferences.getLong(KEY_USUARI_ID, 0L),
+            dni = preferences.getString(KEY_USUARI_DNI, "") ?: "",
+            nomComplet = preferences.getString(KEY_USUARI_NOM, "") ?: "",
+            email = preferences.getString(KEY_USUARI_EMAIL, "") ?: "",
+            rolUsuari = preferences.getString(KEY_USUARI_ROL, "") ?: ""
+        )
+    }
+
+
+    /**
      * Indica si hi ha un usuari identificat.
      */
     fun hiHaUsuariIdentificat(context: Context): Boolean {
