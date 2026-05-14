@@ -91,6 +91,35 @@ public class UsuariService {
     }
 
 
+    // ACTUALITZAR PERFIL D'USUARI
+    public Usuari updatePerfilUsuari(Long id, Usuari usuari) {
+
+        Optional<Usuari> usuariOpt = usuariRepository.findById(id);
+
+        if (usuariOpt.isEmpty()) {
+            throw new RuntimeException("Usuari no trobat");
+        }
+
+        Usuari usuariActual = usuariOpt.get();
+
+        usuari.setId(id);
+        usuari.setRolUsuari(usuariActual.getRolUsuari());
+
+        validarDadesUsuari(usuari, id);
+
+        usuariActual.setDni(usuari.getDni().trim().toUpperCase());
+        usuariActual.setNomComplet(usuari.getNomComplet().trim());
+        usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
+
+        // Només actualitza la contrasenya si s'ha introduït
+        if (usuari.getPassword() != null && !usuari.getPassword().trim().isEmpty()) {
+            usuariActual.setPassword(passwordEncoder.encode(usuari.getPassword().trim()));
+        }
+
+        return usuariRepository.save(usuariActual);
+    }
+
+
     // ELIMINAR USUARI
     public void deleteUsuari(Long id) {
         usuariRepository.deleteById(id);
