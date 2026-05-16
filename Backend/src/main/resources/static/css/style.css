@@ -912,6 +912,25 @@ a {
     outline: none;
 }
 
+/* CAMPS BLOQUEJATS / NOMÉS LECTURA */
+.form-input[readonly],
+.form-select[readonly],
+.input-readonly {
+    background-color: #e9e4df;
+    color: #7a6a5f;
+    border-color: #d2c7bd;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.form-input[readonly]:focus,
+.form-select[readonly]:focus,
+.input-readonly:focus {
+    border-color: #d2c7bd;
+    box-shadow: none;
+    outline: none;
+}
+
 /* PASSWORD igual que input */
 input[type="password"] {
     width: 100%;

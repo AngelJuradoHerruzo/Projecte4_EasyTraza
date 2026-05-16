@@ -74,7 +74,8 @@
                             <input id="dni"
                                    type="text"
                                    th:field="*{dni}"
-                                   class="form-input">
+                                   class="form-input input-readonly"
+                                   readonly>
                         </div>
 
                         <!----------------------- CAMP NOM COMPLET ----------------------->
@@ -101,7 +102,7 @@
                             <input id="rolUsuari"
                                    type="text"
                                    th:value="${usuari.rolUsuari}"
-                                   class="form-input"
+                                   class="form-input input-readonly"
                                    readonly>
                         </div>
 

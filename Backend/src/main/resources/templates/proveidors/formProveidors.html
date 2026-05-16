@@ -82,10 +82,12 @@
                                    type="text"
                                    th:field="*{cif}"
                                    class="form-input"
+                                   th:classappend="${proveidor.id != null} ? ' input-readonly' : ''"
                                    required
                                    maxlength="9"
                                    pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"
-                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid">
+                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid"
+                                   th:readonly="${proveidor.id != null}">
                         </div>
 
                         <!----------------------- NOM PROVEÏDOR ----------------------->

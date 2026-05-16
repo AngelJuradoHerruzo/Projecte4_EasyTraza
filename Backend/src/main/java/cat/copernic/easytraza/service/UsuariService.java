@@ -72,12 +72,15 @@ public class UsuariService {
             throw new RuntimeException("Usuari no trobat");
         }
 
-        usuari.setId(id);
-        validarDadesUsuari(usuari, id);
-
         Usuari usuariActual = usuariOpt.get();
 
-        usuariActual.setDni(usuari.getDni().trim().toUpperCase());
+        usuari.setId(id);
+
+        // El DNI no es pot modificar un cop creat l'usuari
+        usuari.setDni(usuariActual.getDni());
+
+        validarDadesUsuari(usuari, id);
+
         usuariActual.setNomComplet(usuari.getNomComplet().trim());
         usuariActual.setRolUsuari(usuari.getRolUsuari());
         usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
@@ -103,11 +106,13 @@ public class UsuariService {
         Usuari usuariActual = usuariOpt.get();
 
         usuari.setId(id);
+
+        // El DNI i el rol no es poden modificar des del perfil
+        usuari.setDni(usuariActual.getDni());
         usuari.setRolUsuari(usuariActual.getRolUsuari());
 
         validarDadesUsuari(usuari, id);
 
-        usuariActual.setDni(usuari.getDni().trim().toUpperCase());
         usuariActual.setNomComplet(usuari.getNomComplet().trim());
         usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
 

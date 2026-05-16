@@ -53,16 +53,16 @@ public class ProveidorService {
         Optional<Proveidor> proveidorOpt = proveidorRepository.findById(id);
 
         if (proveidorOpt.isPresent()) {
-            validarDadesProveidor(proveidor);
-
-            Optional<Proveidor> proveidorExistent = proveidorRepository.findByCif(proveidor.getCif());
-            if (proveidorExistent.isPresent() && !proveidorExistent.get().getId().equals(id)) {
-                throw new RuntimeException("Ja existeix un proveïdor amb aquest CIF o DNI.");
-            }
 
             Proveidor proveidorActual = proveidorOpt.get();
 
-            proveidorActual.setCif(proveidor.getCif().trim().toUpperCase());
+            proveidor.setId(id);
+
+            // El CIF o DNI no es pot modificar un cop creat el proveïdor
+            proveidor.setCif(proveidorActual.getCif());
+
+            validarDadesProveidor(proveidor);
+
             proveidorActual.setNomProveidor(proveidor.getNomProveidor().trim());
             proveidorActual.setAdreca(proveidor.getAdreca() != null ? proveidor.getAdreca().trim() : null);
             proveidorActual.setDescripcio(proveidor.getDescripcio() != null ? proveidor.getDescripcio().trim() : null);
