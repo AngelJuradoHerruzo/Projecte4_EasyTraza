@@ -27,7 +27,14 @@ public class ClientService {
 
     // OBTENIR TOTS ELS CLIENTS ORDENATS PER NOM
     public List<Client> getAllClients() {
-        return clientRepository.findAllByOrderByNomCompletAsc();
+
+        List<Client> clients = clientRepository.findAllByOrderByNomCompletAsc();
+
+        for (Client client : clients) {
+            client.setTeAlbarans(albaraClientRepository.existsByClientId(client.getId()));
+        }
+
+        return clients;
     }
 
 
