@@ -36,17 +36,38 @@ public class UsuariService {
         return usuariOpt.orElse(null);
     }
 
+    
+    // PREPARAR LLISTAT WEB D'USUARIS AMB ORDENACIÓ OPCIONAL
+    public List<Usuari> getUsuarisLlistat(String sort, String dir, Long usuariId) {
 
-    // OBTENIR USUARI PER EMAIL
-    public Usuari getUsuariByEmail(String email) {
+        List<Usuari> usuaris = new java.util.ArrayList<>(usuariRepository.findAll());
 
-        if (email == null || email.trim().isEmpty()) {
-            return null;
+        usuaris.removeIf(usuari -> usuariId != null && usuari.getId().equals(usuariId));
+
+        if (sort == null || sort.isBlank() || dir == null || dir.isBlank()) {
+            return usuaris;
         }
 
-        Optional<Usuari> usuariOpt = usuariRepository.findByEmail(email.trim().toLowerCase());
+        java.util.Comparator<Usuari> comparador = switch (sort) {
+            case "id" -> java.util.Comparator.comparing(Usuari::getId);
+            case "dni" -> java.util.Comparator.comparing(Usuari::getDni, String.CASE_INSENSITIVE_ORDER);
+            case "nomComplet" -> java.util.Comparator.comparing(Usuari::getNomComplet, String.CASE_INSENSITIVE_ORDER);
+            case "rol" -> java.util.Comparator.comparing(usuari -> usuari.getRolUsuari().name(), String.CASE_INSENSITIVE_ORDER);
+            case "email" -> java.util.Comparator.comparing(Usuari::getEmail, String.CASE_INSENSITIVE_ORDER);
+            default -> null;
+        };
 
-        return usuariOpt.orElse(null);
+        if (comparador == null) {
+            return usuaris;
+        }
+
+        if ("desc".equalsIgnoreCase(dir)) {
+            comparador = comparador.reversed();
+        }
+
+        usuaris.sort(comparador);
+
+        return usuaris;
     }
 
 

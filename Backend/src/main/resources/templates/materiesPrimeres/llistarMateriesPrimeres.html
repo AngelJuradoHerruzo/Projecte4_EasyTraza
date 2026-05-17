@@ -74,8 +74,34 @@
                     <!-- Capçalera de la taula -->
                     <thead style="position: sticky; top: 0; z-index: 2; background: white;">
                         <tr>
-                            <th>Nom matèria</th>
-                            <th>Descripció</th>
+                            <th>
+                                <a class="sort-header"
+                                   th:classappend="${sort == 'nomMateria'} ? ' active' : ''"
+                                   th:href="${sort == 'nomMateria' && dir == 'asc'}
+                                            ? @{/materies-primeres/list(sort='nomMateria', dir='desc')}
+                                            : (${sort == 'nomMateria' && dir == 'desc'}
+                                                ? @{/materies-primeres/list}
+                                                : @{/materies-primeres/list(sort='nomMateria', dir='asc')})">
+                                    <span>Nom matèria</span>
+                                    <i th:if="${sort == 'nomMateria' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                    <i th:if="${sort == 'nomMateria' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                </a>
+                            </th>
+
+                            <th>
+                                <a class="sort-header"
+                                   th:classappend="${sort == 'descripcio'} ? ' active' : ''"
+                                   th:href="${sort == 'descripcio' && dir == 'asc'}
+                                            ? @{/materies-primeres/list(sort='descripcio', dir='desc')}
+                                            : (${sort == 'descripcio' && dir == 'desc'}
+                                                ? @{/materies-primeres/list}
+                                                : @{/materies-primeres/list(sort='descripcio', dir='asc')})">
+                                    <span>Descripció</span>
+                                    <i th:if="${sort == 'descripcio' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                    <i th:if="${sort == 'descripcio' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                </a>
+                            </th>
+
                             <th class="th-actions">Accions</th>
                         </tr>
                     </thead>
@@ -88,8 +114,8 @@
                             <td style="vertical-align: top;">
                                 <div class="user-text" style="min-width: 0;">
                                     <span class="materia-name"
-                                        th:text="${materiaPrimera.nomMateria}"
-                                        style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
+                                          th:text="${materiaPrimera.nomMateria}"
+                                          style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
                                         Nom matèria
                                     </span>
                                 </div>
@@ -98,8 +124,8 @@
                             <!-- Descripció -->
                             <td style="vertical-align: top;">
                                 <span class="user-email"
-                                    th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio) ? materiaPrimera.descripcio : 'Sense descripció'}"
-                                    style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
+                                      th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio) ? materiaPrimera.descripcio : 'Sense descripció'}"
+                                      style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
                                     Descripció
                                 </span>
                             </td>
@@ -110,15 +136,15 @@
 
                                     <!-- Botó editar -->
                                     <a th:href="@{/materies-primeres/edit/{id}(id=${materiaPrimera.id})}"
-                                    class="btn-table btn-soft">
+                                       class="btn-table btn-soft">
                                         <i class="bi bi-pencil-square"></i>
                                         <span>Editar</span>
                                     </a>
 
                                     <!-- Botó eliminar -->
-                                        <a th:href="@{/materies-primeres/delete/{id}(id=${materiaPrimera.id})}"
-                                    class="btn-table btn-delete"
-                                    onclick="return confirm('Segur que vols eliminar aquesta matèria primera?')">
+                                    <a th:href="@{/materies-primeres/delete/{id}(id=${materiaPrimera.id})}"
+                                       class="btn-table btn-delete"
+                                       onclick="return confirm('Segur que vols eliminar aquesta matèria primera?')">
                                         <i class="bi bi-trash3"></i>
                                         <span>Eliminar</span>
                                     </a>
@@ -140,7 +166,7 @@
                     </tbody>
 
                 </table>
-                
+
             </div>
 
         </section>

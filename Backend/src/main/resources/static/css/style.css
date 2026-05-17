@@ -860,6 +860,32 @@ a {
     color: #9c5257;
 }
 
+/* CAPÇALERES ORDENABLES */
+.sort-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    color: #7a6a5f;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.sort-header:hover {
+    color: #3c2f28;
+    text-decoration: underline;
+}
+
+.sort-header.active {
+    color: #3c2f28;
+    font-weight: 700;
+}
+
+.sort-header i {
+    font-size: 13px;
+}
+
 .empty-state {
     padding: 34px 16px !important;
 }

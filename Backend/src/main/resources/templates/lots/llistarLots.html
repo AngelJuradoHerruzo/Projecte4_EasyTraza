@@ -88,13 +88,104 @@
 
                             <thead th:if="${iterStat.first}">
                             <tr>
-                                <th>ID</th>
-                                <th>Lot</th>
-                                <th class="text-center">Quantitat</th>
-                                <th class="text-center">Estat</th>
-                                <th class="text-center">Caducitat</th>
-                                <th class="text-center">Obertura</th>
-                                <th class="text-center">Acabament</th>
+                                <th>
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'id'} ? ' active' : ''"
+                                       th:href="${sort == 'id' && dir == 'asc'}
+                                                ? @{/lots/list(sort='id', dir='desc')}
+                                                : (${sort == 'id' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='id', dir='asc')})">
+                                        <span>ID</span>
+                                        <i th:if="${sort == 'id' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'id' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
+                                <th>
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'identificadorLot'} ? ' active' : ''"
+                                       th:href="${sort == 'identificadorLot' && dir == 'asc'}
+                                                ? @{/lots/list(sort='identificadorLot', dir='desc')}
+                                                : (${sort == 'identificadorLot' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='identificadorLot', dir='asc')})">
+                                        <span>Lot</span>
+                                        <i th:if="${sort == 'identificadorLot' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'identificadorLot' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
+                                <th class="text-center">
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'quantitat'} ? ' active' : ''"
+                                       th:href="${sort == 'quantitat' && dir == 'asc'}
+                                                ? @{/lots/list(sort='quantitat', dir='desc')}
+                                                : (${sort == 'quantitat' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='quantitat', dir='asc')})">
+                                        <span>Quantitat</span>
+                                        <i th:if="${sort == 'quantitat' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'quantitat' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
+                                <th class="text-center">
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'estat'} ? ' active' : ''"
+                                       th:href="${sort == 'estat' && dir == 'asc'}
+                                                ? @{/lots/list(sort='estat', dir='desc')}
+                                                : (${sort == 'estat' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='estat', dir='asc')})">
+                                        <span>Estat</span>
+                                        <i th:if="${sort == 'estat' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'estat' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
+                                <th class="text-center">
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'dataCaducitat'} ? ' active' : ''"
+                                       th:href="${sort == 'dataCaducitat' && dir == 'asc'}
+                                                ? @{/lots/list(sort='dataCaducitat', dir='desc')}
+                                                : (${sort == 'dataCaducitat' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='dataCaducitat', dir='asc')})">
+                                        <span>Caducitat</span>
+                                        <i th:if="${sort == 'dataCaducitat' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'dataCaducitat' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
+                                <th class="text-center">
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'dataObertura'} ? ' active' : ''"
+                                       th:href="${sort == 'dataObertura' && dir == 'asc'}
+                                                ? @{/lots/list(sort='dataObertura', dir='desc')}
+                                                : (${sort == 'dataObertura' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='dataObertura', dir='asc')})">
+                                        <span>Obertura</span>
+                                        <i th:if="${sort == 'dataObertura' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'dataObertura' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
+                                <th class="text-center">
+                                    <a class="sort-header"
+                                       th:classappend="${sort == 'dataAcabament'} ? ' active' : ''"
+                                       th:href="${sort == 'dataAcabament' && dir == 'asc'}
+                                                ? @{/lots/list(sort='dataAcabament', dir='desc')}
+                                                : (${sort == 'dataAcabament' && dir == 'desc'}
+                                                    ? @{/lots/list}
+                                                    : @{/lots/list(sort='dataAcabament', dir='asc')})">
+                                        <span>Acabament</span>
+                                        <i th:if="${sort == 'dataAcabament' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                                        <i th:if="${sort == 'dataAcabament' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                                    </a>
+                                </th>
+
                                 <th class="text-center">Accions</th>
                             </tr>
                             </thead>
@@ -113,7 +204,7 @@
                                 </td>
 
                                 <td class="text-center"
-                                    th:text="${lot.quantitat != null ? lot.quantitat : '-'}"
+                                    th:text="${lot.quantitat != null ? lot.quantitat + ' ' + lot.unitats : '-'}">
                                     10 kg
                                 </td>
 

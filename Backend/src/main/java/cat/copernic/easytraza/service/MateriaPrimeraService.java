@@ -34,6 +34,43 @@ public class MateriaPrimeraService {
     }
 
 
+    // PREPARAR LLISTAT WEB DE MATÈRIES PRIMERES AMB ORDENACIÓ OPCIONAL
+    public List<MateriaPrimera> getMateriesPrimeresLlistat(String sort, String dir) {
+
+        List<MateriaPrimera> materiesPrimeres = new java.util.ArrayList<>(materiaPrimeraRepository.findAll());
+
+        if (sort == null || sort.isBlank() || dir == null || dir.isBlank()) {
+            return materiesPrimeres;
+        }
+
+        java.util.Comparator<MateriaPrimera> comparador = switch (sort) {
+            case "nomMateria" -> java.util.Comparator.comparing(
+                    MateriaPrimera::getNomMateria,
+                    String.CASE_INSENSITIVE_ORDER
+            );
+
+            case "descripcio" -> java.util.Comparator.comparing(
+                    materia -> materia.getDescripcio() != null ? materia.getDescripcio() : "",
+                    String.CASE_INSENSITIVE_ORDER
+            );
+
+            default -> null;
+        };
+
+        if (comparador == null) {
+            return materiesPrimeres;
+        }
+
+        if ("desc".equalsIgnoreCase(dir)) {
+            comparador = comparador.reversed();
+        }
+
+        materiesPrimeres.sort(comparador);
+
+        return materiesPrimeres;
+    }
+
+
     // CREAR MATÈRIA PRIMERA
     public MateriaPrimera createMateriaPrimera(MateriaPrimera materiaPrimera) {
         validarDadesMateriesPrimeres(materiaPrimera);

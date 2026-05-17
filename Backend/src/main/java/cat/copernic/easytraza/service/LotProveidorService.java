@@ -19,7 +19,6 @@ import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 public class LotProveidorService {
 
     // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
-
     private final LotProveidorRepository lotProveidorRepository;
     private final MateriaPrimeraRepository materiaPrimeraRepository;
 
@@ -31,28 +30,82 @@ public class LotProveidorService {
 
 
     // OBTENIR TOTS ELS LOTS DE PROVEÏDOR
-
     public List<LotProveidor> getAllLotsProveidor() {
         return lotProveidorRepository.findAll();
     }
 
 
-    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
+    // PREPARAR LLISTAT WEB DE LOTS AMB ORDENACIÓ OPCIONAL
+    public List<LotProveidor> getLotsProveidorLlistat(String sort, String dir) {
 
+        List<LotProveidor> lots = new java.util.ArrayList<>(lotProveidorRepository.findAll());
+
+        if (sort == null || sort.isBlank() || dir == null || dir.isBlank()) {
+            return lots;
+        }
+
+        java.util.Comparator<LotProveidor> comparador = switch (sort) {
+            case "id" -> java.util.Comparator.comparing(LotProveidor::getId);
+
+            case "identificadorLot" -> java.util.Comparator.comparing(
+                    lot -> lot.getIdentificadorLot() != null ? lot.getIdentificadorLot() : "",
+                    String.CASE_INSENSITIVE_ORDER
+            );
+
+            case "quantitat" -> java.util.Comparator.comparing(
+                    lot -> lot.getQuantitat() != null ? lot.getQuantitat() : 0
+            );
+
+            case "estat" -> java.util.Comparator.comparing(
+                    lot -> lot.getEstat() != null ? lot.getEstat().name() : "",
+                    String.CASE_INSENSITIVE_ORDER
+            );
+
+            case "dataCaducitat" -> java.util.Comparator.comparing(
+                    LotProveidor::getDataCaducitat,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())
+            );
+
+            case "dataObertura" -> java.util.Comparator.comparing(
+                    LotProveidor::getDataObertura,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())
+            );
+
+            case "dataAcabament" -> java.util.Comparator.comparing(
+                    LotProveidor::getDataAcabament,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())
+            );
+
+            default -> null;
+        };
+
+        if (comparador == null) {
+            return lots;
+        }
+
+        if ("desc".equalsIgnoreCase(dir)) {
+            comparador = comparador.reversed();
+        }
+
+        lots.sort(comparador);
+
+        return lots;
+    }
+
+
+    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
     public List<MateriaPrimera> getAllMateriesPrimeresOrdenades() {
         return materiaPrimeraRepository.findAll(Sort.by("nomMateria").ascending());
     }
 
 
     // OBTENIR LOT DE PROVEÏDOR PER ID
-
     public LotProveidor getLotProveidorById(Long id) {
         return obtenirLotValidat(id);
     }
 
 
     // COMPROVAR SI EXISTEIX UN LOT OBERT DE LA MATEIXA MATÈRIA PRIMERA
-
     public boolean existeixLotObertMateixaMateria(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -71,7 +124,6 @@ public class LotProveidorService {
 
 
     // INICIAR LOT
-
     public LotProveidor iniciarLot(Long id, boolean confirmarFinalitzacioAnterior) {
 
         LotProveidor lotProveidorActual = obtenirLotValidat(id);
@@ -104,7 +156,6 @@ public class LotProveidorService {
 
 
     // FINALITZAR LOT
-
     public LotProveidor finalitzarLot(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -119,7 +170,6 @@ public class LotProveidorService {
 
 
     // OBTENIR LOT VALIDAT
-
     private LotProveidor obtenirLotValidat(Long id) {
 
         Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
@@ -133,7 +183,6 @@ public class LotProveidorService {
 
 
     // VALIDAR LOT PER INICIAR
-
     private void validarLotPerIniciar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getMateriaPrimera() == null) {
@@ -151,7 +200,6 @@ public class LotProveidorService {
 
 
     // VALIDAR LOT PER FINALITZAR
-
     private void validarLotPerFinalitzar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getEstat() == null) {

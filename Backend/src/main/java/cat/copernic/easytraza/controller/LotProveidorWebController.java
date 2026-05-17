@@ -20,18 +20,21 @@ public class LotProveidorWebController {
 
 
     // LLISTAR LOTS DE PROVEÏDOR
-
     @GetMapping("/list")
-    public String llistarLots(Model model) {
-        model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+    public String llistarLots(@RequestParam(required = false) String sort,
+                              @RequestParam(required = false) String dir,
+                              Model model) {
+
+        model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(sort, dir));
         model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
+        model.addAttribute("sort", sort);
+        model.addAttribute("dir", dir);
 
         return "lots/llistarLots";
     }
 
 
     // CONSULTAR DETALL DEL LOT
-
     @GetMapping("/detail/{id}")
     public String consultarLot(@PathVariable Long id, Model model) {
         try {
@@ -40,7 +43,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";
@@ -49,14 +52,13 @@ public class LotProveidorWebController {
 
 
     // INICIAR LOT
-
     @PostMapping("/iniciar/{id}")
     public String iniciarLot(@PathVariable Long id, Model model) {
         try {
             if (lotProveidorService.existeixLotObertMateixaMateria(id)) {
                 model.addAttribute("confirmarIniciLot", true);
                 model.addAttribute("lotAIniciar", lotProveidorService.getLotProveidorById(id));
-                model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+                model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
                 model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
                 return "lots/llistarLots";
@@ -67,7 +69,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";
@@ -76,7 +78,6 @@ public class LotProveidorWebController {
 
 
     // CONFIRMAR INICI DE LOT
-
     @PostMapping("/iniciar-confirmat/{id}")
     public String confirmarIniciLot(@PathVariable Long id, Model model) {
         try {
@@ -85,7 +86,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";
@@ -94,7 +95,6 @@ public class LotProveidorWebController {
 
 
     // FINALITZAR LOT
-
     @PostMapping("/finalitzar/{id}")
     public String finalitzarLot(@PathVariable Long id, Model model) {
         try {
@@ -103,7 +103,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getAllLotsProveidor());
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";

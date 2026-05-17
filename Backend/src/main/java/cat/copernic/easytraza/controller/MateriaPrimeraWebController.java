@@ -21,8 +21,14 @@ public class MateriaPrimeraWebController {
 
     // LLISTAR MATÈRIES PRIMERES
     @GetMapping("/list")
-    public String llistarMateriesPrimeres(Model model) {
-        model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
+    public String llistarMateriesPrimeres(@RequestParam(required = false) String sort,
+                                        @RequestParam(required = false) String dir,
+                                        Model model) {
+
+        model.addAttribute("materiesPrimeres", materiaPrimeraService.getMateriesPrimeresLlistat(sort, dir));
+        model.addAttribute("sort", sort);
+        model.addAttribute("dir", dir);
+
         return "materiesPrimeres/llistarMateriesPrimeres";
     }
 

@@ -84,11 +84,71 @@
                                 background:#fffaf5;
                                 border-bottom:1px solid #f0e6dc;">
 
-                        <span class="info-card-meta-label">ID</span>
-                        <span class="info-card-meta-label">DNI</span>
-                        <span class="info-card-meta-label">Nom complet</span>
-                        <span class="info-card-meta-label">Rol</span>
-                        <span class="info-card-meta-label">Correu electrònic</span>
+                        <!----------------------- ORDENAR PER ID ----------------------->
+                        <a class="info-card-meta-label sort-header"
+                           th:classappend="${sort == 'id'} ? ' active' : ''"
+                           th:href="${sort == 'id' && dir == 'asc'}
+                                    ? @{/usuaris/list(sort='id', dir='desc')}
+                                    : (${sort == 'id' && dir == 'desc'}
+                                        ? @{/usuaris/list}
+                                        : @{/usuaris/list(sort='id', dir='asc')})">
+                            <span>ID</span>
+                            <i th:if="${sort == 'id' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                            <i th:if="${sort == 'id' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                        </a>
+
+                        <!----------------------- ORDENAR PER DNI ----------------------->
+                        <a class="info-card-meta-label sort-header"
+                           th:classappend="${sort == 'dni'} ? ' active' : ''"
+                           th:href="${sort == 'dni' && dir == 'asc'}
+                                    ? @{/usuaris/list(sort='dni', dir='desc')}
+                                    : (${sort == 'dni' && dir == 'desc'}
+                                        ? @{/usuaris/list}
+                                        : @{/usuaris/list(sort='dni', dir='asc')})">
+                            <span>DNI</span>
+                            <i th:if="${sort == 'dni' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                            <i th:if="${sort == 'dni' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                        </a>
+
+                        <!----------------------- ORDENAR PER NOM COMPLET ----------------------->
+                        <a class="info-card-meta-label sort-header"
+                           th:classappend="${sort == 'nomComplet'} ? ' active' : ''"
+                           th:href="${sort == 'nomComplet' && dir == 'asc'}
+                                    ? @{/usuaris/list(sort='nomComplet', dir='desc')}
+                                    : (${sort == 'nomComplet' && dir == 'desc'}
+                                        ? @{/usuaris/list}
+                                        : @{/usuaris/list(sort='nomComplet', dir='asc')})">
+                            <span>Nom complet</span>
+                            <i th:if="${sort == 'nomComplet' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                            <i th:if="${sort == 'nomComplet' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                        </a>
+
+                        <!----------------------- ORDENAR PER ROL ----------------------->
+                        <a class="info-card-meta-label sort-header"
+                           th:classappend="${sort == 'rol'} ? ' active' : ''"
+                           th:href="${sort == 'rol' && dir == 'asc'}
+                                    ? @{/usuaris/list(sort='rol', dir='desc')}
+                                    : (${sort == 'rol' && dir == 'desc'}
+                                        ? @{/usuaris/list}
+                                        : @{/usuaris/list(sort='rol', dir='asc')})">
+                            <span>Rol</span>
+                            <i th:if="${sort == 'rol' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                            <i th:if="${sort == 'rol' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                        </a>
+
+                        <!----------------------- ORDENAR PER CORREU ----------------------->
+                        <a class="info-card-meta-label sort-header"
+                           th:classappend="${sort == 'email'} ? ' active' : ''"
+                           th:href="${sort == 'email' && dir == 'asc'}
+                                    ? @{/usuaris/list(sort='email', dir='desc')}
+                                    : (${sort == 'email' && dir == 'desc'}
+                                        ? @{/usuaris/list}
+                                        : @{/usuaris/list(sort='email', dir='asc')})">
+                            <span>Correu electrònic</span>
+                            <i th:if="${sort == 'email' && dir == 'asc'}" class="bi bi-arrow-up"></i>
+                            <i th:if="${sort == 'email' && dir == 'desc'}" class="bi bi-arrow-down"></i>
+                        </a>
+
                         <span class="info-card-meta-label" style="text-align:right;">Accions</span>
                     </div>
 
