@@ -7,8 +7,6 @@ const rolSelect = document.getElementById('rolUsuari');
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
 
-const searchInput = document.getElementById('searchInput');
-const table = document.getElementById('usersTable');
 
 
 // ---------------------------- AJUDES DEL FORMULARI ----------------------------
@@ -147,36 +145,5 @@ if (form) {
         if (!valid) {
             event.preventDefault();
         }
-    });
-}
-
-
-// ---------------------------- CERCADOR DEL LLISTAT ----------------------------
-if (searchInput && table) {
-
-    // Files de la taula d'usuaris
-    const rows = table.querySelectorAll('tbody tr');
-
-    // Filtra el llistat per nom, DNI o correu electrònic
-    searchInput.addEventListener('keyup', function () {
-
-        const filter = this.value.toLowerCase().trim();
-
-        rows.forEach(row => {
-
-            // Ignora la fila buida de missatge quan no hi ha usuaris
-            if (row.querySelector('.empty-state')) return;
-
-            const name = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
-            const dni = row.querySelector('.user-dni')?.textContent.toLowerCase() || '';
-            const email = row.querySelector('.user-email')?.textContent.toLowerCase() || '';
-
-            row.style.display =
-                name.includes(filter) ||
-                dni.includes(filter) ||
-                email.includes(filter)
-                    ? ''
-                    : 'none';
-        });
     });
 }

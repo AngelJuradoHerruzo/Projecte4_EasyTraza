@@ -35,8 +35,14 @@ public class AlbaraClientWebController {
 
     // LLISTAR ALBARANS DE CLIENT
     @GetMapping("/list")
-    public String llistarAlbaransClient(Model model) {
-        model.addAttribute("albarans", albaraClientService.getAllAlbaransClient());
+    public String llistarAlbaransClient(@RequestParam(required = false) Long clientId,
+                                        @RequestParam(required = false) String numeroAlbara,
+                                        Model model) {
+
+        model.addAttribute("albarans", albaraClientService.getAlbaransClientLlistat(clientId, numeroAlbara));
+        model.addAttribute("clients", clientService.getAllClients());
+        model.addAttribute("clientId", clientId);
+        model.addAttribute("numeroAlbara", numeroAlbara);
 
         return "albaransClient/llistarAlbaransClient";
     }
@@ -118,7 +124,8 @@ public class AlbaraClientWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("albarans", albaraClientService.getAllAlbaransClient());
+            model.addAttribute("albarans", albaraClientService.getAlbaransClientLlistat(null, null));
+            model.addAttribute("clients", clientService.getAllClients());
 
             return "albaransClient/llistarAlbaransClient";
         }
@@ -155,7 +162,8 @@ public class AlbaraClientWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("albarans", albaraClientService.getAllAlbaransClient());
+            model.addAttribute("albarans", albaraClientService.getAlbaransClientLlistat(null, null));
+            model.addAttribute("clients", clientService.getAllClients());
 
             return "albaransClient/llistarAlbaransClient";
         }
@@ -172,7 +180,8 @@ public class AlbaraClientWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("albarans", albaraClientService.getAllAlbaransClient());
+            model.addAttribute("albarans", albaraClientService.getAlbaransClientLlistat(null, null));
+            model.addAttribute("clients", clientService.getAllClients());
 
             return "albaransClient/llistarAlbaransClient";
         }

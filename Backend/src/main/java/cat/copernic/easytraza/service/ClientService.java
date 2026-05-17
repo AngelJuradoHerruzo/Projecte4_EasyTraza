@@ -45,6 +45,31 @@ public class ClientService {
     }
 
 
+    // PREPARAR LLISTAT WEB DE CLIENTS AMB FILTRES OPCIONALS
+    public List<Client> getClientsLlistat(String nomComplet, String cif, String email, String telefon) {
+
+        List<Client> clients = getAllClients();
+
+        if (nomComplet != null && !nomComplet.isBlank()) {
+            clients.removeIf(client -> !conteText(client.getNomComplet(), nomComplet));
+        }
+
+        if (cif != null && !cif.isBlank()) {
+            clients.removeIf(client -> !conteText(client.getCif(), cif));
+        }
+
+        if (email != null && !email.isBlank()) {
+            clients.removeIf(client -> !conteText(client.getEmail(), email));
+        }
+
+        if (telefon != null && !telefon.isBlank()) {
+            clients.removeIf(client -> !conteTelefon(client.getTelefon(), telefon));
+        }
+
+        return clients;
+    }
+
+
     // CREAR CLIENT
     public Client createClient(Client client) {
         validarDadesClient(client);
@@ -268,5 +293,41 @@ public class ClientService {
 
         // Si no compleix cap dels formats anteriors → no vàlid
         return false;
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
+    }
+
+
+    // COMPROVAR TELÈFONS IGNORANT ESPAIS
+    private boolean conteTelefon(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return normalitzarTelefon(valor).contains(normalitzarTelefon(filtre));
+    }
+
+
+    // NORMALITZAR TELÈFON PER CERCAR
+    private String normalitzarTelefon(String telefon) {
+        return telefon.replaceAll("\\D", "");
     }
 }

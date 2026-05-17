@@ -34,38 +34,14 @@ public class MateriaPrimeraService {
     }
 
 
-    // PREPARAR LLISTAT WEB DE MATÈRIES PRIMERES AMB ORDENACIÓ OPCIONAL
-    public List<MateriaPrimera> getMateriesPrimeresLlistat(String sort, String dir) {
+    // PREPARAR LLISTAT WEB DE MATÈRIES PRIMERES AMB FILTRE OPCIONAL
+    public List<MateriaPrimera> getMateriesPrimeresLlistat(String nomMateria) {
 
         List<MateriaPrimera> materiesPrimeres = new java.util.ArrayList<>(materiaPrimeraRepository.findAll());
 
-        if (sort == null || sort.isBlank() || dir == null || dir.isBlank()) {
-            return materiesPrimeres;
+        if (nomMateria != null && !nomMateria.isBlank()) {
+            materiesPrimeres.removeIf(materia -> !conteText(materia.getNomMateria(), nomMateria));
         }
-
-        java.util.Comparator<MateriaPrimera> comparador = switch (sort) {
-            case "nomMateria" -> java.util.Comparator.comparing(
-                    MateriaPrimera::getNomMateria,
-                    String.CASE_INSENSITIVE_ORDER
-            );
-
-            case "descripcio" -> java.util.Comparator.comparing(
-                    materia -> materia.getDescripcio() != null ? materia.getDescripcio() : "",
-                    String.CASE_INSENSITIVE_ORDER
-            );
-
-            default -> null;
-        };
-
-        if (comparador == null) {
-            return materiesPrimeres;
-        }
-
-        if ("desc".equalsIgnoreCase(dir)) {
-            comparador = comparador.reversed();
-        }
-
-        materiesPrimeres.sort(comparador);
 
         return materiesPrimeres;
     }
@@ -130,5 +106,20 @@ public class MateriaPrimeraService {
         if (materiaPrimera.getDescripcio() != null && materiaPrimera.getDescripcio().length() > 50) {
             throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

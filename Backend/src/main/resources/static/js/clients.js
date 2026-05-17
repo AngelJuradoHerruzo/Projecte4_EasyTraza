@@ -11,11 +11,6 @@ const observacionsInput = document.getElementById('observacions');
 const observacionsCounter = document.getElementById('observacionsCounter');
 
 
-// ---------------------------- ELEMENTS DEL LLISTAT ----------------------------
-const searchInput = document.getElementById('searchInput');
-const clientsContainer = document.getElementById('clientsContainer');
-
-
 // ---------------------------- AJUDES DEL FORMULARI ----------------------------
 if (form) {
 
@@ -237,28 +232,4 @@ if (form) {
 
     // Inicialitza el comptador d'observacions
     updateObservacionsCounter();
-}
-
-
-// ---------------------------- CERCADOR DEL LLISTAT ----------------------------
-if (searchInput && clientsContainer) {
-
-    // Targetes de clients del llistat
-    const cards = clientsContainer.querySelectorAll('.client-card');
-
-    // Filtra el llistat per nom complet o CIF / DNI
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase().trim();
-
-        cards.forEach(card => {
-            const name = card.querySelector('.client-name')?.textContent.toLowerCase() || '';
-            const cif = card.querySelector('.client-cif')?.textContent.toLowerCase() || '';
-
-            card.style.display =
-                name.includes(filter) ||
-                cif.includes(filter)
-                    ? ''
-                    : 'none';
-        });
-    });
 }

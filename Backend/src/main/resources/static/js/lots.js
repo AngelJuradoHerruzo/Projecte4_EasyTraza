@@ -1,6 +1,3 @@
-const searchInput = document.getElementById('searchInput');
-const rows = document.querySelectorAll('.lot-row');
-
 const modal = document.getElementById('confirmModal');
 const modalForm = document.getElementById('modalForm');
 const modalTitle = document.getElementById('modalTitle');
@@ -12,19 +9,6 @@ const modalCancel = document.getElementById('modalCancel');
 
 const conflictAction = document.getElementById('conflictAction');
 const conflictLot = document.getElementById('conflictLot');
-
-
-/*----------------------- CERCA -----------------------*/
-if (searchInput) {
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
-        });
-    });
-}
 
 
 /*----------------------- MODAL -----------------------*/

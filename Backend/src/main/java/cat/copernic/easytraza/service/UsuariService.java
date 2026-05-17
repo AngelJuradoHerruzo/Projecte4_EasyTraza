@@ -37,35 +37,24 @@ public class UsuariService {
     }
 
     
-    // PREPARAR LLISTAT WEB D'USUARIS AMB ORDENACIÓ OPCIONAL
-    public List<Usuari> getUsuarisLlistat(String sort, String dir, Long usuariId) {
+    // PREPARAR LLISTAT WEB D'USUARIS AMB FILTRES OPCIONALS
+    public List<Usuari> getUsuarisLlistat(String dni, String nomComplet, String email, Long usuariId) {
 
         List<Usuari> usuaris = new java.util.ArrayList<>(usuariRepository.findAll());
 
         usuaris.removeIf(usuari -> usuariId != null && usuari.getId().equals(usuariId));
 
-        if (sort == null || sort.isBlank() || dir == null || dir.isBlank()) {
-            return usuaris;
+        if (dni != null && !dni.isBlank()) {
+            usuaris.removeIf(usuari -> !conteText(usuari.getDni(), dni));
         }
 
-        java.util.Comparator<Usuari> comparador = switch (sort) {
-            case "id" -> java.util.Comparator.comparing(Usuari::getId);
-            case "dni" -> java.util.Comparator.comparing(Usuari::getDni, String.CASE_INSENSITIVE_ORDER);
-            case "nomComplet" -> java.util.Comparator.comparing(Usuari::getNomComplet, String.CASE_INSENSITIVE_ORDER);
-            case "rol" -> java.util.Comparator.comparing(usuari -> usuari.getRolUsuari().name(), String.CASE_INSENSITIVE_ORDER);
-            case "email" -> java.util.Comparator.comparing(Usuari::getEmail, String.CASE_INSENSITIVE_ORDER);
-            default -> null;
-        };
-
-        if (comparador == null) {
-            return usuaris;
+        if (nomComplet != null && !nomComplet.isBlank()) {
+            usuaris.removeIf(usuari -> !conteText(usuari.getNomComplet(), nomComplet));
         }
 
-        if ("desc".equalsIgnoreCase(dir)) {
-            comparador = comparador.reversed();
+        if (email != null && !email.isBlank()) {
+            usuaris.removeIf(usuari -> !conteText(usuari.getEmail(), email));
         }
-
-        usuaris.sort(comparador);
 
         return usuaris;
     }
@@ -212,5 +201,20 @@ public class UsuariService {
                 && (id == null || !usuariAmbMateixEmail.get().getId().equals(id))) {
             throw new RuntimeException("Correu electrònic ja està en ús");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

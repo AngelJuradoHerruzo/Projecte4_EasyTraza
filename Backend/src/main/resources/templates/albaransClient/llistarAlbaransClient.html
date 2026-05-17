@@ -48,16 +48,42 @@
 
                     <h2 class="content-title">Llistat d'albarans</h2>
                     <p class="content-subtitle">
-                        Vista resumida dels albarans registrats.
+                        Filtra per client o número d'albarà.
                     </p>
                 </div>
 
-                <div class="toolbar-actions">
-                    <div class="search-field">
-                        <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar albarà...">
+                <form th:action="@{/albarans-client/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+
+                    <div class="search-field" style="width:270px;">
+                        <i class="bi bi-person-vcard"></i>
+                        <select name="clientId"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="">Tots els clients</option>
+                            <option th:each="client : ${clients}"
+                                    th:value="${client.id}"
+                                    th:selected="${clientId != null && clientId == client.id}"
+                                    th:text="${client.nomComplet}">
+                                Client
+                            </option>
+                        </select>
                     </div>
-                </div>
+
+                    <div class="search-field" style="width:220px;">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        <input name="numeroAlbara" type="text" th:value="${numeroAlbara}" placeholder="Número albarà...">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/albarans-client/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
             <!----------------------- TARGETES ----------------------->
@@ -203,7 +229,7 @@
                 <div th:if="${#lists.isEmpty(albarans)}" class="empty-state" style="grid-column:1 / -1;">
                     <div class="empty-box">
                         <i class="bi bi-receipt-cutoff"></i>
-                        <p>No hi ha albarans de client registrats.</p>
+                        <p>No hi ha albarans de client que coincideixin amb els filtres.</p>
                     </div>
                 </div>
 

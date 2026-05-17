@@ -21,8 +21,12 @@ public class ProducteWebController {
 
     // LLISTAR PRODUCTES
     @GetMapping("/list")
-    public String llistarProductes(Model model) {
-        model.addAttribute("productes", producteService.getAllProductes());
+    public String llistarProductes(@RequestParam(required = false) String nomProducte,
+                                  Model model) {
+
+        model.addAttribute("productes", producteService.getProductesLlistat(nomProducte));
+        model.addAttribute("nomProducte", nomProducte);
+
         return "productes/llistarProductes";
     }
 

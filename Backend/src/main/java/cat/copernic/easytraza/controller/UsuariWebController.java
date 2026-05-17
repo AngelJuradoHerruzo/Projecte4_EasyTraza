@@ -22,16 +22,18 @@ public class UsuariWebController {
 
     // LLISTAR USUARIS
     @GetMapping("/list")
-    public String llistarUsuaris(@RequestParam(required = false) String sort,
-                                @RequestParam(required = false) String dir,
+    public String llistarUsuaris(@RequestParam(required = false) String dni,
+                                @RequestParam(required = false) String nomComplet,
+                                @RequestParam(required = false) String email,
                                 Model model,
                                 HttpSession session) {
 
         Long usuariId = (Long) session.getAttribute("usuariId");
 
-        model.addAttribute("usuaris", usuariService.getUsuarisLlistat(sort, dir, usuariId));
-        model.addAttribute("sort", sort);
-        model.addAttribute("dir", dir);
+        model.addAttribute("usuaris", usuariService.getUsuarisLlistat(dni, nomComplet, email, usuariId));
+        model.addAttribute("dni", dni);
+        model.addAttribute("nomComplet", nomComplet);
+        model.addAttribute("email", email);
 
         return "usuaris/llistarUsuaris";
     }

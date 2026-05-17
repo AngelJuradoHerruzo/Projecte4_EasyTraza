@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +23,26 @@ public class LotProveidorWebController {
 
     // LLISTAR LOTS DE PROVEÏDOR
     @GetMapping("/list")
-    public String llistarLots(@RequestParam(required = false) String sort,
-                              @RequestParam(required = false) String dir,
+    public String llistarLots(@RequestParam(required = false) Long materiaId,
+                              @RequestParam(required = false) String identificadorLot,
+                              @RequestParam(required = false) LocalDate dataCaducitat,
+                              @RequestParam(required = false) LocalDate dataObertura,
+                              @RequestParam(required = false) LocalDate dataAcabament,
                               Model model) {
 
-        model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(sort, dir));
+        model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(
+                materiaId,
+                identificadorLot,
+                dataCaducitat,
+                dataObertura,
+                dataAcabament
+        ));
         model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
-        model.addAttribute("sort", sort);
-        model.addAttribute("dir", dir);
+        model.addAttribute("materiaId", materiaId);
+        model.addAttribute("identificadorLot", identificadorLot);
+        model.addAttribute("dataCaducitat", dataCaducitat);
+        model.addAttribute("dataObertura", dataObertura);
+        model.addAttribute("dataAcabament", dataAcabament);
 
         return "lots/llistarLots";
     }
@@ -43,7 +57,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";
@@ -58,7 +72,7 @@ public class LotProveidorWebController {
             if (lotProveidorService.existeixLotObertMateixaMateria(id)) {
                 model.addAttribute("confirmarIniciLot", true);
                 model.addAttribute("lotAIniciar", lotProveidorService.getLotProveidorById(id));
-                model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
+                model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
                 model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
                 return "lots/llistarLots";
@@ -69,7 +83,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";
@@ -86,7 +100,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";
@@ -103,7 +117,7 @@ public class LotProveidorWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null));
+            model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
 
             return "lots/llistarLots";

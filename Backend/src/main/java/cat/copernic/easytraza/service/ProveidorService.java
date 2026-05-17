@@ -27,6 +27,23 @@ public class ProveidorService {
     }
 
 
+    // PREPARAR LLISTAT WEB DE PROVEÏDORS AMB FILTRES OPCIONALS
+    public List<Proveidor> getProveidorsLlistat(String nomProveidor, String cif) {
+
+        List<Proveidor> proveidors = new java.util.ArrayList<>(proveidorRepository.findAll());
+
+        if (nomProveidor != null && !nomProveidor.isBlank()) {
+            proveidors.removeIf(proveidor -> !conteText(proveidor.getNomProveidor(), nomProveidor));
+        }
+
+        if (cif != null && !cif.isBlank()) {
+            proveidors.removeIf(proveidor -> !conteText(proveidor.getCif(), cif));
+        }
+
+        return proveidors;
+    }
+
+
     // OBTENIR PROVEÏDOR PER ID
     public Proveidor getProveidorById(Long id) {
         Optional<Proveidor> proveidor = proveidorRepository.findById(id);
@@ -200,5 +217,20 @@ public class ProveidorService {
 
         // Si no compleix cap dels formats anteriors → no vàlid
         return false;
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

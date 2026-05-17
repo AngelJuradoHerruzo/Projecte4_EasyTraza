@@ -21,8 +21,18 @@ public class ClientWebController {
 
     // LLISTAR CLIENTS
     @GetMapping("/list")
-    public String llistarClients(Model model) {
-        model.addAttribute("clients", clientService.getAllClients());
+    public String llistarClients(@RequestParam(required = false) String nomComplet,
+                                 @RequestParam(required = false) String cif,
+                                 @RequestParam(required = false) String email,
+                                 @RequestParam(required = false) String telefon,
+                                 Model model) {
+
+        model.addAttribute("clients", clientService.getClientsLlistat(nomComplet, cif, email, telefon));
+        model.addAttribute("nomComplet", nomComplet);
+        model.addAttribute("cif", cif);
+        model.addAttribute("email", email);
+        model.addAttribute("telefon", telefon);
+
         return "clients/llistarClients";
     }
 
@@ -91,7 +101,7 @@ public class ClientWebController {
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("clients", clientService.getAllClients());
+            model.addAttribute("clients", clientService.getClientsLlistat(null, null, null, null));
             return "clients/llistarClients";
         }
     }

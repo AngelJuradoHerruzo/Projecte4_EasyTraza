@@ -35,59 +35,34 @@ public class LotProveidorService {
     }
 
 
-    // PREPARAR LLISTAT WEB DE LOTS AMB ORDENACIÓ OPCIONAL
-    public List<LotProveidor> getLotsProveidorLlistat(String sort, String dir) {
+    // PREPARAR LLISTAT WEB DE LOTS AMB FILTRES OPCIONALS
+    public List<LotProveidor> getLotsProveidorLlistat(Long materiaId,
+                                                       String identificadorLot,
+                                                       LocalDate dataCaducitat,
+                                                       LocalDate dataObertura,
+                                                       LocalDate dataAcabament) {
 
         List<LotProveidor> lots = new java.util.ArrayList<>(lotProveidorRepository.findAll());
 
-        if (sort == null || sort.isBlank() || dir == null || dir.isBlank()) {
-            return lots;
+        if (materiaId != null) {
+            lots.removeIf(lot -> lot.getMateriaPrimera() == null || !materiaId.equals(lot.getMateriaPrimera().getId()));
         }
 
-        java.util.Comparator<LotProveidor> comparador = switch (sort) {
-            case "id" -> java.util.Comparator.comparing(LotProveidor::getId);
-
-            case "identificadorLot" -> java.util.Comparator.comparing(
-                    lot -> lot.getIdentificadorLot() != null ? lot.getIdentificadorLot() : "",
-                    String.CASE_INSENSITIVE_ORDER
-            );
-
-            case "quantitat" -> java.util.Comparator.comparing(
-                    lot -> lot.getQuantitat() != null ? lot.getQuantitat() : 0
-            );
-
-            case "estat" -> java.util.Comparator.comparing(
-                    lot -> lot.getEstat() != null ? lot.getEstat().name() : "",
-                    String.CASE_INSENSITIVE_ORDER
-            );
-
-            case "dataCaducitat" -> java.util.Comparator.comparing(
-                    LotProveidor::getDataCaducitat,
-                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())
-            );
-
-            case "dataObertura" -> java.util.Comparator.comparing(
-                    LotProveidor::getDataObertura,
-                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())
-            );
-
-            case "dataAcabament" -> java.util.Comparator.comparing(
-                    LotProveidor::getDataAcabament,
-                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())
-            );
-
-            default -> null;
-        };
-
-        if (comparador == null) {
-            return lots;
+        if (identificadorLot != null && !identificadorLot.isBlank()) {
+            lots.removeIf(lot -> !conteText(lot.getIdentificadorLot(), identificadorLot));
         }
 
-        if ("desc".equalsIgnoreCase(dir)) {
-            comparador = comparador.reversed();
+        if (dataCaducitat != null) {
+            lots.removeIf(lot -> lot.getDataCaducitat() == null || !dataCaducitat.equals(lot.getDataCaducitat()));
         }
 
-        lots.sort(comparador);
+        if (dataObertura != null) {
+            lots.removeIf(lot -> lot.getDataObertura() == null || !dataObertura.equals(lot.getDataObertura()));
+        }
+
+        if (dataAcabament != null) {
+            lots.removeIf(lot -> lot.getDataAcabament() == null || !dataAcabament.equals(lot.getDataAcabament()));
+        }
 
         return lots;
     }
@@ -209,5 +184,20 @@ public class LotProveidorService {
         if (lotProveidor.getEstat() != EstatLot.OBERT) {
             throw new RuntimeException("Només es poden finalitzar lots oberts.");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

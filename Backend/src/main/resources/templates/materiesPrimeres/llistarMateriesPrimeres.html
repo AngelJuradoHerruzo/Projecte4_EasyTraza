@@ -53,55 +53,38 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Catàleg de matèries primeres</h2>
                     <p class="content-subtitle">
-                        Consulta i gestiona les matèries primeres disponibles al sistema.
+                        Filtra les matèries primeres pel seu nom.
                     </p>
                 </div>
 
-                <!-- Cercador -->
-                <div class="toolbar-actions">
+                <form th:action="@{/materies-primeres/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+
                     <div class="search-field">
                         <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar matèria primera...">
+                        <input name="nomMateria" type="text" th:value="${nomMateria}" placeholder="Filtrar per nom...">
                     </div>
-                </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/materies-primeres/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
-            <!----------------------- TAULA DE MATÈRIES PRIMERES ----------------------->
-            <div class="table-container"
-                 style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;">
+            <div class="table-container" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;">
                 <table class="data-table" id="materiesTable">
 
                     <!-- Capçalera de la taula -->
                     <thead style="position: sticky; top: 0; z-index: 2; background: white;">
                         <tr>
-                            <th>
-                                <a class="sort-header"
-                                   th:classappend="${sort == 'nomMateria'} ? ' active' : ''"
-                                   th:href="${sort == 'nomMateria' && dir == 'asc'}
-                                            ? @{/materies-primeres/list(sort='nomMateria', dir='desc')}
-                                            : (${sort == 'nomMateria' && dir == 'desc'}
-                                                ? @{/materies-primeres/list}
-                                                : @{/materies-primeres/list(sort='nomMateria', dir='asc')})">
-                                    <span>Nom matèria</span>
-                                    <i th:if="${sort == 'nomMateria' && dir == 'asc'}" class="bi bi-arrow-up"></i>
-                                    <i th:if="${sort == 'nomMateria' && dir == 'desc'}" class="bi bi-arrow-down"></i>
-                                </a>
-                            </th>
-
-                            <th>
-                                <a class="sort-header"
-                                   th:classappend="${sort == 'descripcio'} ? ' active' : ''"
-                                   th:href="${sort == 'descripcio' && dir == 'asc'}
-                                            ? @{/materies-primeres/list(sort='descripcio', dir='desc')}
-                                            : (${sort == 'descripcio' && dir == 'desc'}
-                                                ? @{/materies-primeres/list}
-                                                : @{/materies-primeres/list(sort='descripcio', dir='asc')})">
-                                    <span>Descripció</span>
-                                    <i th:if="${sort == 'descripcio' && dir == 'asc'}" class="bi bi-arrow-up"></i>
-                                    <i th:if="${sort == 'descripcio' && dir == 'desc'}" class="bi bi-arrow-down"></i>
-                                </a>
-                            </th>
-
+                            <th>Nom matèria</th>
+                            <th>Descripció</th>
                             <th class="th-actions">Accions</th>
                         </tr>
                     </thead>
@@ -159,7 +142,7 @@
                             <td colspan="3" class="empty-state">
                                 <div class="empty-box">
                                     <i class="bi bi-box-seam"></i>
-                                    <p>No hi ha matèries primeres registrades.</p>
+                                    <p>No hi ha matèries primeres que coincideixin amb el filtre.</p>
                                 </div>
                             </td>
                         </tr>
@@ -174,40 +157,6 @@
     </main>
 
 </div>
-
-<!----------------------- SCRIPT DE CERCA ----------------------->
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('materiesTable');
-    const rows = table.querySelectorAll('tbody tr');
-    const emptyRow = document.getElementById('emptyRow');
-
-    // Filtra la taula en temps real segons el nom de la matèria primera
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-        let visibles = 0;
-
-        rows.forEach(row => {
-            if (row.id === 'emptyRow') {
-                return;
-            }
-
-            const name = row.querySelector('.materia-name')?.textContent.toLowerCase() || '';
-            const visible = name.includes(filter);
-
-            row.style.display = visible ? '' : 'none';
-
-            if (visible) {
-                visibles++;
-            }
-        });
-
-        // Mostra l'estat buit si no hi ha coincidències
-        if (emptyRow) {
-            emptyRow.style.display = visibles === 0 ? '' : 'none';
-        }
-    });
-</script>
 
 </body>
 </html>
