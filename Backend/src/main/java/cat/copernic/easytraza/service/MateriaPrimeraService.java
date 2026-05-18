@@ -34,6 +34,19 @@ public class MateriaPrimeraService {
     }
 
 
+    // PREPARAR LLISTAT WEB DE MATÈRIES PRIMERES AMB FILTRE OPCIONAL
+    public List<MateriaPrimera> getMateriesPrimeresLlistat(String nomMateria) {
+
+        List<MateriaPrimera> materiesPrimeres = new java.util.ArrayList<>(materiaPrimeraRepository.findAll());
+
+        if (nomMateria != null && !nomMateria.isBlank()) {
+            materiesPrimeres.removeIf(materia -> !conteText(materia.getNomMateria(), nomMateria));
+        }
+
+        return materiesPrimeres;
+    }
+
+
     // CREAR MATÈRIA PRIMERA
     public MateriaPrimera createMateriaPrimera(MateriaPrimera materiaPrimera) {
         validarDadesMateriesPrimeres(materiaPrimera);
@@ -93,5 +106,20 @@ public class MateriaPrimeraService {
         if (materiaPrimera.getDescripcio() != null && materiaPrimera.getDescripcio().length() > 50) {
             throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

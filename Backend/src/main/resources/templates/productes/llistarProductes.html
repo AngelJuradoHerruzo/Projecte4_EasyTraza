@@ -39,24 +39,39 @@
         <!----------------------- CONTENIDOR ----------------------->
         <section class="content-card">
 
-            <!----------------------- TOOLBAR ----------------------->
+            <!----------------------- TOOLBAR I FILTRE ----------------------->
             <div class="content-toolbar">
                 <div class="toolbar-block">
                     <h2 class="content-title">Catàleg de productes</h2>
                     <p class="content-subtitle">
-                        Consulta ràpida dels productes disponibles.
+                        Filtra els productes pel seu nom.
                     </p>
                 </div>
 
-                <div class="toolbar-actions">
+                <form th:action="@{/productes/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+
                     <div class="search-field">
                         <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar producte...">
+                        <input name="nomProducte"
+                               type="text"
+                               th:value="${nomProducte}"
+                               placeholder="Filtrar per nom...">
                     </div>
-                </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/productes/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
-            <!----------------------- TARGETES ----------------------->
+            <!----------------------- TARGETES DE PRODUCTES ----------------------->
             <div class="cards-grid" id="productesContainer">
 
                 <article th:each="producte : ${productes}" class="content-card producte-card">
@@ -70,11 +85,11 @@
 
                         <!-- DESCRIPCIÓ -->
                         <p class="content-subtitle"
-                        th:text="${producte.descripcio != null && !#strings.isEmpty(producte.descripcio) ? producte.descripcio : 'Sense descripció'}">
+                           th:text="${producte.descripcio != null && !#strings.isEmpty(producte.descripcio) ? producte.descripcio : 'Sense descripció'}">
                             Descripció
                         </p>
 
-                        <!-- ACCIONS -->
+                        <!----------------------- ACCIONS ----------------------->
                         <div class="info-card-actions">
 
                             <a th:href="@{/productes/edit/{id}(id=${producte.id})}" class="btn-table btn-soft">
@@ -83,8 +98,8 @@
                             </a>
 
                             <a th:href="@{/productes/delete/{id}(id=${producte.id})}"
-                            class="btn-table btn-delete"
-                            onclick="return confirm('Segur que vols eliminar aquest producte?')">
+                               class="btn-table btn-delete"
+                               onclick="return confirm('Segur que vols eliminar aquest producte?')">
                                 <i class="bi bi-trash3"></i>
                                 <span>Eliminar</span>
                             </a>
@@ -97,7 +112,7 @@
                 <div th:if="${#lists.isEmpty(productes)}" class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-box" style="justify-content: center; width: 100%;">
                         <i class="bi bi-box-seam"></i>
-                        <p>No hi ha productes registrats.</p>
+                        <p>No hi ha productes que coincideixin amb els filtres.</p>
                     </div>
                 </div>
 
@@ -108,21 +123,6 @@
     </main>
 
 </div>
-
-<!----------------------- SCRIPT CERCA ----------------------->
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const cards = document.querySelectorAll('.producte-card');
-
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(filter) ? '' : 'none';
-        });
-    });
-</script>
 
 </body>
 </html>

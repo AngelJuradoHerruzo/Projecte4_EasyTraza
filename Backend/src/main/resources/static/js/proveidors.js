@@ -147,7 +147,6 @@ function validateField(field) {
 form.addEventListener('submit', function (event) {
 
     let valid = true;
-
     const fields = [cifInput, nomInput, adrecaInput, descripcioInput];
 
     fields.forEach(field => {

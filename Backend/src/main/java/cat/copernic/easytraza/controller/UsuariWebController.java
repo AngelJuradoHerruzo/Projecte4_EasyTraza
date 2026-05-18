@@ -1,7 +1,5 @@
 package cat.copernic.easytraza.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +22,18 @@ public class UsuariWebController {
 
     // LLISTAR USUARIS
     @GetMapping("/list")
-    public String llistarUsuaris(Model model, HttpSession session) {
+    public String llistarUsuaris(@RequestParam(required = false) String dni,
+                                @RequestParam(required = false) String nomComplet,
+                                @RequestParam(required = false) String email,
+                                Model model,
+                                HttpSession session) {
 
         Long usuariId = (Long) session.getAttribute("usuariId");
 
-        List<Usuari> usuaris = usuariService.getAllUsuaris()
-                .stream()
-                .filter(usuari -> usuariId == null || !usuari.getId().equals(usuariId))
-                .toList();
-
-        model.addAttribute("usuaris", usuaris);
+        model.addAttribute("usuaris", usuariService.getUsuarisLlistat(dni, nomComplet, email, usuariId));
+        model.addAttribute("dni", dni);
+        model.addAttribute("nomComplet", nomComplet);
+        model.addAttribute("email", email);
 
         return "usuaris/llistarUsuaris";
     }

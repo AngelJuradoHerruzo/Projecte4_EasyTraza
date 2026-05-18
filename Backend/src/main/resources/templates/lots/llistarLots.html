@@ -42,22 +42,64 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Llistat de lots</h2>
                     <p class="content-subtitle">
-                        Els lots es mostren agrupats per matèria primera.
+                        Filtra per matèries, id de lot o dates.
                     </p>
                 </div>
 
-                <div class="toolbar-actions">
-                    <div class="search-field">
-                        <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar lot, matèria o estat...">
+                <form th:action="@{/lots/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+
+                    <div class="search-field" style="width:260px;">
+                        <i class="bi bi-flower1"></i>
+                        <select name="materiaId"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="">Totes les matèries</option>
+                            <option th:each="materia : ${materiesPrimeres}"
+                                    th:value="${materia.id}"
+                                    th:selected="${materiaId != null && materiaId == materia.id}"
+                                    th:text="${materia.nomMateria}">
+                                Matèria
+                            </option>
+                        </select>
                     </div>
-                </div>
+
+                    <div class="search-field" style="width:220px;">
+                        <i class="bi bi-upc-scan"></i>
+                        <input name="identificadorLot" type="text" th:value="${identificadorLot}" placeholder="Identificador lot...">
+                    </div>
+
+                    <div class="search-field" style="width:185px;">
+                        <i class="bi bi-calendar-event"></i>
+                        <input name="dataCaducitat" type="date" th:value="${dataCaducitat}">
+                    </div>
+
+                    <div class="search-field" style="width:185px;">
+                        <i class="bi bi-calendar-plus"></i>
+                        <input name="dataObertura" type="date" th:value="${dataObertura}">
+                    </div>
+
+                    <div class="search-field" style="width:185px;">
+                        <i class="bi bi-calendar-check"></i>
+                        <input name="dataAcabament" type="date" th:value="${dataAcabament}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/lots/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
             <!----------------------- LLISTAT AGRUPAT ----------------------->
             <div class="lots-grouped-list" id="lotsTable">
 
                 <section th:each="materia, iterStat : ${materiesPrimeres}"
+                         th:if="${!#lists.isEmpty(lots.?[materiaPrimera != null and materiaPrimera.id == #vars.materia.id])}"
                          th:with="lotsMateria=${lots.?[materiaPrimera != null and materiaPrimera.id == #vars.materia.id]}"
                          class="lot-group">
 
@@ -86,7 +128,7 @@
                                 <col class="col-accions">
                             </colgroup>
 
-                            <thead th:if="${iterStat.first}">
+                            <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Lot</th>
@@ -113,7 +155,7 @@
                                 </td>
 
                                 <td class="text-center"
-                                    th:text="${lot.quantitat != null ? lot.quantitat : '-'}"
+                                    th:text="${lot.quantitat != null ? lot.quantitat + ' ' + lot.unitats : '-'}">
                                     10 kg
                                 </td>
 
@@ -186,17 +228,6 @@
                                 </td>
 
                             </tr>
-
-                            <tr th:if="${#lists.isEmpty(lotsMateria)}" class="lot-row">
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <div class="empty-box">
-                                            <i class="bi bi-archive"></i>
-                                            <p>No hi ha lots registrats per aquesta matèria primera.</p>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
                             </tbody>
 
                         </table>
@@ -204,11 +235,10 @@
 
                 </section>
 
-                <!----------------------- ESTAT BUIT TOTAL ----------------------->
-                <div th:if="${#lists.isEmpty(materiesPrimeres)}" class="empty-state" style="grid-column: 1 / -1;">
+                <div th:if="${#lists.isEmpty(lots)}" class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-box">
-                        <i class="bi bi-flower1"></i>
-                        <p>No hi ha matèries primeres registrades.</p>
+                        <i class="bi bi-archive"></i>
+                        <p>No hi ha lots que coincideixin amb els filtres.</p>
                     </div>
                 </div>
 

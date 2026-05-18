@@ -56,9 +56,9 @@ function updateCounter() {
     descripcioCounter.textContent = `${length}/50`;
 
     if (length <= 50) {
-        descripcioCounter.style.color = '#198754'; // verd
+        descripcioCounter.style.color = '#198754';
     } else {
-        descripcioCounter.style.color = '#dc3545'; // vermell
+        descripcioCounter.style.color = '#dc3545';
     }
 }
 
@@ -78,10 +78,10 @@ function validateField(field) {
         if (field.value.length <= 50) {
             markValid(field);
         } else {
-            markInvalid(field); // es veu vermell
+            markInvalid(field);
         }
 
-        return true; // 🔥 IMPORTANT → sempre deixa guardar
+        return true;
     }
 
     // VALIDACIÓ NORMAL (com Usuaris)

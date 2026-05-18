@@ -845,6 +845,47 @@ a {
     background: #f9eeee;
 }
 
+/* BOTÓ BLOQUEJAT PER RELACIONS ASSOCIADES */
+.btn-disabled-delete {
+    background-color: #b46b6b85;
+    color: #f3d6d6;
+    border: 1px solid #b46b6b1c;
+    cursor: not-allowed;
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.btn-disabled-delete i,
+.btn-disabled-delete span {
+    color: #9c5257;
+}
+
+/* CAPÇALERES ORDENABLES */
+.sort-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    color: #7a6a5f;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.sort-header:hover {
+    color: #3c2f28;
+    text-decoration: underline;
+}
+
+.sort-header.active {
+    color: #3c2f28;
+    font-weight: 700;
+}
+
+.sort-header i {
+    font-size: 13px;
+}
+
 .empty-state {
     padding: 34px 16px !important;
 }
@@ -909,6 +950,25 @@ a {
 .form-select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(217, 165, 107, 0.15);
+    outline: none;
+}
+
+/* CAMPS BLOQUEJATS / NOMÉS LECTURA */
+.form-input[readonly],
+.form-select[readonly],
+.input-readonly {
+    background-color: #e9e4df;
+    color: #7a6a5f;
+    border-color: #d2c7bd;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.form-input[readonly]:focus,
+.form-select[readonly]:focus,
+.input-readonly:focus {
+    border-color: #d2c7bd;
+    box-shadow: none;
     outline: none;
 }
 

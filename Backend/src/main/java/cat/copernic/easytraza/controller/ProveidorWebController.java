@@ -21,8 +21,14 @@ public class ProveidorWebController {
 
     // LLISTAR PROVEÏDORS
     @GetMapping("/list")
-    public String llistarProveidors(Model model) {
-        model.addAttribute("proveidors", proveidorService.getAllProveidors());
+    public String llistarProveidors(@RequestParam(required = false) String nomProveidor,
+                                    @RequestParam(required = false) String cif,
+                                    Model model) {
+
+        model.addAttribute("proveidors", proveidorService.getProveidorsLlistat(nomProveidor, cif));
+        model.addAttribute("nomProveidor", nomProveidor);
+        model.addAttribute("cif", cif);
+
         return "proveidors/llistarProveidors";
     }
 

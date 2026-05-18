@@ -81,6 +81,7 @@
                                    type="text"
                                    th:field="*{cif}"
                                    class="form-input"
+                                   th:classappend="${client.id != null} ? ' input-readonly' : ''"
                                    required
                                    maxlength="9"
                                    pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"

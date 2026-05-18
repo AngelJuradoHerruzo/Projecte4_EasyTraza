@@ -35,6 +35,9 @@ public class Client {
     @Column(length = 100)
     private String observacions;
 
+    @Transient
+    private boolean teAlbarans;
+
 
     /*********************       .CONSTRUCTORS.       *********************/
     public Client() { }
@@ -79,4 +82,8 @@ public class Client {
     // ───── OBSERVACIONS ─────
     public String getObservacions() { return observacions; }
     public void setObservacions(String observacions) { this.observacions = observacions; }
+
+    // ───── ALBARANS ASSOCIATS ─────
+    public boolean isTeAlbarans() { return teAlbarans; }
+    public void setTeAlbarans(boolean teAlbarans) { this.teAlbarans = teAlbarans; }
 }

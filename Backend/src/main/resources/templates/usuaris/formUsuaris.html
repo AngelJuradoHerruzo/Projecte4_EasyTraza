@@ -89,11 +89,13 @@
                                    type="text"
                                    th:field="*{dni}"
                                    class="form-input"
+                                   th:classappend="${usuari.id != null} ? ' input-readonly' : ''"
                                    required
                                    minlength="9"
                                    maxlength="9"
                                    pattern="^[0-9]{8}[A-Za-z]$"
-                                   title="Introdueix un DNI vàlid amb format 12345678A">
+                                   title="Introdueix un DNI vàlid amb format 12345678A"
+                                   th:readonly="${usuari.id != null}">
                         </div>
 
                         <!----------------------- CAMP NOM COMPLET ----------------------->

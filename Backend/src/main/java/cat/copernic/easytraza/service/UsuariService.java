@@ -36,17 +36,27 @@ public class UsuariService {
         return usuariOpt.orElse(null);
     }
 
+    
+    // PREPARAR LLISTAT WEB D'USUARIS AMB FILTRES OPCIONALS
+    public List<Usuari> getUsuarisLlistat(String dni, String nomComplet, String email, Long usuariId) {
 
-    // OBTENIR USUARI PER EMAIL
-    public Usuari getUsuariByEmail(String email) {
+        List<Usuari> usuaris = new java.util.ArrayList<>(usuariRepository.findAll());
 
-        if (email == null || email.trim().isEmpty()) {
-            return null;
+        usuaris.removeIf(usuari -> usuariId != null && usuari.getId().equals(usuariId));
+
+        if (dni != null && !dni.isBlank()) {
+            usuaris.removeIf(usuari -> !conteText(usuari.getDni(), dni));
         }
 
-        Optional<Usuari> usuariOpt = usuariRepository.findByEmail(email.trim().toLowerCase());
+        if (nomComplet != null && !nomComplet.isBlank()) {
+            usuaris.removeIf(usuari -> !conteText(usuari.getNomComplet(), nomComplet));
+        }
 
-        return usuariOpt.orElse(null);
+        if (email != null && !email.isBlank()) {
+            usuaris.removeIf(usuari -> !conteText(usuari.getEmail(), email));
+        }
+
+        return usuaris;
     }
 
 
@@ -72,12 +82,15 @@ public class UsuariService {
             throw new RuntimeException("Usuari no trobat");
         }
 
-        usuari.setId(id);
-        validarDadesUsuari(usuari, id);
-
         Usuari usuariActual = usuariOpt.get();
 
-        usuariActual.setDni(usuari.getDni().trim().toUpperCase());
+        usuari.setId(id);
+
+        // El DNI no es pot modificar un cop creat l'usuari
+        usuari.setDni(usuariActual.getDni());
+
+        validarDadesUsuari(usuari, id);
+
         usuariActual.setNomComplet(usuari.getNomComplet().trim());
         usuariActual.setRolUsuari(usuari.getRolUsuari());
         usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
@@ -103,11 +116,13 @@ public class UsuariService {
         Usuari usuariActual = usuariOpt.get();
 
         usuari.setId(id);
+
+        // El DNI i el rol no es poden modificar des del perfil
+        usuari.setDni(usuariActual.getDni());
         usuari.setRolUsuari(usuariActual.getRolUsuari());
 
         validarDadesUsuari(usuari, id);
 
-        usuariActual.setDni(usuari.getDni().trim().toUpperCase());
         usuariActual.setNomComplet(usuari.getNomComplet().trim());
         usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
 
@@ -186,5 +201,20 @@ public class UsuariService {
                 && (id == null || !usuariAmbMateixEmail.get().getId().equals(id))) {
             throw new RuntimeException("Correu electrònic ja està en ús");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

@@ -1,25 +1,9 @@
-const searchInput = document.getElementById('searchInput');
-const cards = document.querySelectorAll('.albara-card');
-
 const form = document.getElementById('albaraClientForm');
 
 const dataInput = document.getElementById('dataAlbara');
 const clientInput = document.getElementById('client');
 const liniesContainer = document.getElementById('liniesContainer');
 const addLiniaBtn = document.getElementById('addLiniaBtn');
-
-
-/*----------------------- CERCA -----------------------*/
-if (searchInput) {
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(filter) ? '' : 'none';
-        });
-    });
-}
 
 
 /*----------------------- FUNCIONS ESTAT -----------------------*/

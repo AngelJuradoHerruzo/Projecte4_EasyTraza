@@ -27,6 +27,19 @@ public class ProducteService {
     }
 
 
+    // PREPARAR LLISTAT WEB DE PRODUCTES AMB FILTRE OPCIONAL
+    public List<Producte> getProductesLlistat(String nomProducte) {
+
+        List<Producte> productes = new java.util.ArrayList<>(producteRepository.findAll());
+
+        if (nomProducte != null && !nomProducte.isBlank()) {
+            productes.removeIf(producte -> !conteText(producte.getNomProducte(), nomProducte));
+        }
+
+        return productes;
+    }
+
+
     // OBTENIR PRODUCTE PER ID
     public Producte getProducteById(Long id) {
         Optional<Producte> producte = producteRepository.findById(id);
@@ -95,5 +108,20 @@ public class ProducteService {
         if (producte.getDescripcio() != null && producte.getDescripcio().length() > 50) {
             throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

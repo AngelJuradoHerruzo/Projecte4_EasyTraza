@@ -37,6 +37,23 @@ public class AlbaraClientService {
     }
 
 
+    // PREPARAR LLISTAT WEB D'ALBARANS DE CLIENT AMB FILTRES OPCIONALS
+    public List<AlbaraClient> getAlbaransClientLlistat(Long clientId, String numeroAlbara) {
+
+        List<AlbaraClient> albarans = new java.util.ArrayList<>(albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc());
+
+        if (clientId != null) {
+            albarans.removeIf(albara -> albara.getClient() == null || !clientId.equals(albara.getClient().getId()));
+        }
+
+        if (numeroAlbara != null && !numeroAlbara.isBlank()) {
+            albarans.removeIf(albara -> albara.getId() == null || !String.valueOf(albara.getId()).contains(numeroAlbara.trim()));
+        }
+
+        return albarans;
+    }
+
+
     // OBTENIR ALBARÀ DE CLIENT PER ID
     public AlbaraClient getAlbaraClientById(Long id) {
         Optional<AlbaraClient> albaraClient = albaraClientRepository.findById(id);

@@ -19,7 +19,6 @@ import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 public class LotProveidorService {
 
     // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
-
     private final LotProveidorRepository lotProveidorRepository;
     private final MateriaPrimeraRepository materiaPrimeraRepository;
 
@@ -31,28 +30,57 @@ public class LotProveidorService {
 
 
     // OBTENIR TOTS ELS LOTS DE PROVEÏDOR
-
     public List<LotProveidor> getAllLotsProveidor() {
         return lotProveidorRepository.findAll();
     }
 
 
-    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
+    // PREPARAR LLISTAT WEB DE LOTS AMB FILTRES OPCIONALS
+    public List<LotProveidor> getLotsProveidorLlistat(Long materiaId,
+                                                       String identificadorLot,
+                                                       LocalDate dataCaducitat,
+                                                       LocalDate dataObertura,
+                                                       LocalDate dataAcabament) {
 
+        List<LotProveidor> lots = new java.util.ArrayList<>(lotProveidorRepository.findAll());
+
+        if (materiaId != null) {
+            lots.removeIf(lot -> lot.getMateriaPrimera() == null || !materiaId.equals(lot.getMateriaPrimera().getId()));
+        }
+
+        if (identificadorLot != null && !identificadorLot.isBlank()) {
+            lots.removeIf(lot -> !conteText(lot.getIdentificadorLot(), identificadorLot));
+        }
+
+        if (dataCaducitat != null) {
+            lots.removeIf(lot -> lot.getDataCaducitat() == null || !dataCaducitat.equals(lot.getDataCaducitat()));
+        }
+
+        if (dataObertura != null) {
+            lots.removeIf(lot -> lot.getDataObertura() == null || !dataObertura.equals(lot.getDataObertura()));
+        }
+
+        if (dataAcabament != null) {
+            lots.removeIf(lot -> lot.getDataAcabament() == null || !dataAcabament.equals(lot.getDataAcabament()));
+        }
+
+        return lots;
+    }
+
+
+    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
     public List<MateriaPrimera> getAllMateriesPrimeresOrdenades() {
         return materiaPrimeraRepository.findAll(Sort.by("nomMateria").ascending());
     }
 
 
     // OBTENIR LOT DE PROVEÏDOR PER ID
-
     public LotProveidor getLotProveidorById(Long id) {
         return obtenirLotValidat(id);
     }
 
 
     // COMPROVAR SI EXISTEIX UN LOT OBERT DE LA MATEIXA MATÈRIA PRIMERA
-
     public boolean existeixLotObertMateixaMateria(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -71,7 +99,6 @@ public class LotProveidorService {
 
 
     // INICIAR LOT
-
     public LotProveidor iniciarLot(Long id, boolean confirmarFinalitzacioAnterior) {
 
         LotProveidor lotProveidorActual = obtenirLotValidat(id);
@@ -104,7 +131,6 @@ public class LotProveidorService {
 
 
     // FINALITZAR LOT
-
     public LotProveidor finalitzarLot(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -119,7 +145,6 @@ public class LotProveidorService {
 
 
     // OBTENIR LOT VALIDAT
-
     private LotProveidor obtenirLotValidat(Long id) {
 
         Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
@@ -133,7 +158,6 @@ public class LotProveidorService {
 
 
     // VALIDAR LOT PER INICIAR
-
     private void validarLotPerIniciar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getMateriaPrimera() == null) {
@@ -151,7 +175,6 @@ public class LotProveidorService {
 
 
     // VALIDAR LOT PER FINALITZAR
-
     private void validarLotPerFinalitzar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getEstat() == null) {
@@ -161,5 +184,20 @@ public class LotProveidorService {
         if (lotProveidor.getEstat() != EstatLot.OBERT) {
             throw new RuntimeException("Només es poden finalitzar lots oberts.");
         }
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }

@@ -24,7 +24,7 @@
                 <p class="page-eyebrow">Administració</p>
                 <h1 class="page-heading">Proveïdors</h1>
                 <p class="page-description">
-                    Consulta i gestiona els proveïdors registrats al sistema EasyTraza.
+                    Consulta i gestiona els proveïdors registrats al sistema.
                 </p>
             </div>
 
@@ -42,18 +42,35 @@
             <!----------------------- TOOLBAR ----------------------->
             <div class="content-toolbar">
                 <div class="toolbar-block">
-                    <h2 class="content-title">Directori de proveïdors</h2>
+                    <h2 class="content-title">Llistat de proveïdors</h2>
                     <p class="content-subtitle">
-                        Vista general amb accés directe a les dades principals de cada proveïdor.
+                        Filtra per nom o CIF / DNI.
                     </p>
                 </div>
 
-                <div class="toolbar-actions">
-                    <div class="search-field">
-                        <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar proveïdor...">
+                <form th:action="@{/proveidors/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+
+                    <div class="search-field" style="width:260px;">
+                        <i class="bi bi-building"></i>
+                        <input name="nomProveidor" type="text" th:value="${nomProveidor}" placeholder="Nom proveïdor...">
                     </div>
-                </div>
+
+                    <div class="search-field" style="width:220px;">
+                        <i class="bi bi-upc-scan"></i>
+                        <input name="cif" type="text" th:value="${cif}" placeholder="CIF / DNI...">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/proveidors/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
             <!----------------------- TARGETES ----------------------->
@@ -64,14 +81,11 @@
                     <!----------------------- CAPÇALERA TARGETA ----------------------->
                     <div class="info-card-header">
                         <div class="info-card-icon">
-                            <i class="bi bi-buildings"></i>
+                            <i class="bi bi-truck"></i>
                         </div>
 
                         <div class="info-card-body">
-                            <h3 class="info-card-title" th:text="${proveidor.nomProveidor}">
-                                Nom proveïdor
-                            </h3>
-
+                            <h3 class="info-card-title proveidor-name" th:text="${proveidor.nomProveidor}">Nom proveïdor</h3>
                             <p class="info-card-description"
                                th:text="${proveidor.descripcio != null && !#strings.isEmpty(proveidor.descripcio) ? proveidor.descripcio : 'Sense descripció'}">
                                 Descripció
@@ -85,8 +99,8 @@
                         <div class="info-card-meta-item">
                             <i class="bi bi-upc-scan"></i>
                             <div class="info-card-meta-text">
-                                <span class="info-card-meta-label">CIF</span>
-                                <span class="info-card-meta-value" th:text="${proveidor.cif}">CIF</span>
+                                <span class="info-card-meta-label">CIF / DNI</span>
+                                <span class="info-card-meta-value proveidor-cif" th:text="${proveidor.cif}">CIF</span>
                             </div>
                         </div>
 
@@ -123,8 +137,8 @@
                 <!----------------------- ESTAT BUIT ----------------------->
                 <div th:if="${#lists.isEmpty(proveidors)}" class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-box">
-                        <i class="bi bi-buildings"></i>
-                        <p>No hi ha proveïdors registrats.</p>
+                        <i class="bi bi-truck"></i>
+                        <p>No hi ha proveïdors que coincideixin amb els filtres.</p>
                     </div>
                 </div>
 
@@ -136,20 +150,6 @@
 
 </div>
 
-<!----------------------- SCRIPT DE CERCA ----------------------->
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const cards = document.querySelectorAll('.proveidor-card');
-
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(filter) ? '' : 'none';
-        });
-    });
-</script>
 
 </body>
 </html>

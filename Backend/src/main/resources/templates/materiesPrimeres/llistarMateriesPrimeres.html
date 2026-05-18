@@ -53,22 +53,31 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Catàleg de matèries primeres</h2>
                     <p class="content-subtitle">
-                        Consulta i gestiona les matèries primeres disponibles al sistema.
+                        Filtra les matèries primeres pel seu nom.
                     </p>
                 </div>
 
-                <!-- Cercador -->
-                <div class="toolbar-actions">
+                <form th:action="@{/materies-primeres/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+
                     <div class="search-field">
                         <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar matèria primera...">
+                        <input name="nomMateria" type="text" th:value="${nomMateria}" placeholder="Filtrar per nom...">
                     </div>
-                </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/materies-primeres/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
-            <!----------------------- TAULA DE MATÈRIES PRIMERES ----------------------->
-            <div class="table-container"
-                 style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;">
+            <div class="table-container" style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;">
                 <table class="data-table" id="materiesTable">
 
                     <!-- Capçalera de la taula -->
@@ -88,8 +97,8 @@
                             <td style="vertical-align: top;">
                                 <div class="user-text" style="min-width: 0;">
                                     <span class="materia-name"
-                                        th:text="${materiaPrimera.nomMateria}"
-                                        style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
+                                          th:text="${materiaPrimera.nomMateria}"
+                                          style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
                                         Nom matèria
                                     </span>
                                 </div>
@@ -98,8 +107,8 @@
                             <!-- Descripció -->
                             <td style="vertical-align: top;">
                                 <span class="user-email"
-                                    th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio) ? materiaPrimera.descripcio : 'Sense descripció'}"
-                                    style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
+                                      th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio) ? materiaPrimera.descripcio : 'Sense descripció'}"
+                                      style="display: block; white-space: normal; word-break: break-word; line-height: 1.45;">
                                     Descripció
                                 </span>
                             </td>
@@ -110,15 +119,15 @@
 
                                     <!-- Botó editar -->
                                     <a th:href="@{/materies-primeres/edit/{id}(id=${materiaPrimera.id})}"
-                                    class="btn-table btn-soft">
+                                       class="btn-table btn-soft">
                                         <i class="bi bi-pencil-square"></i>
                                         <span>Editar</span>
                                     </a>
 
                                     <!-- Botó eliminar -->
-                                        <a th:href="@{/materies-primeres/delete/{id}(id=${materiaPrimera.id})}"
-                                    class="btn-table btn-delete"
-                                    onclick="return confirm('Segur que vols eliminar aquesta matèria primera?')">
+                                    <a th:href="@{/materies-primeres/delete/{id}(id=${materiaPrimera.id})}"
+                                       class="btn-table btn-delete"
+                                       onclick="return confirm('Segur que vols eliminar aquesta matèria primera?')">
                                         <i class="bi bi-trash3"></i>
                                         <span>Eliminar</span>
                                     </a>
@@ -133,14 +142,14 @@
                             <td colspan="3" class="empty-state">
                                 <div class="empty-box">
                                     <i class="bi bi-box-seam"></i>
-                                    <p>No hi ha matèries primeres registrades.</p>
+                                    <p>No hi ha matèries primeres que coincideixin amb el filtre.</p>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
 
                 </table>
-                
+
             </div>
 
         </section>
@@ -148,40 +157,6 @@
     </main>
 
 </div>
-
-<!----------------------- SCRIPT DE CERCA ----------------------->
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('materiesTable');
-    const rows = table.querySelectorAll('tbody tr');
-    const emptyRow = document.getElementById('emptyRow');
-
-    // Filtra la taula en temps real segons el nom de la matèria primera
-    searchInput.addEventListener('keyup', function () {
-        const filter = this.value.toLowerCase();
-        let visibles = 0;
-
-        rows.forEach(row => {
-            if (row.id === 'emptyRow') {
-                return;
-            }
-
-            const name = row.querySelector('.materia-name')?.textContent.toLowerCase() || '';
-            const visible = name.includes(filter);
-
-            row.style.display = visible ? '' : 'none';
-
-            if (visible) {
-                visibles++;
-            }
-        });
-
-        // Mostra l'estat buit si no hi ha coincidències
-        if (emptyRow) {
-            emptyRow.style.display = visibles === 0 ? '' : 'none';
-        }
-    });
-</script>
 
 </body>
 </html>
