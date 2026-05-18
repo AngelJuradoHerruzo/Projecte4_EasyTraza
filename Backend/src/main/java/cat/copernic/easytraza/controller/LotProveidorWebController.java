@@ -13,7 +13,6 @@ import cat.copernic.easytraza.service.LotProveidorService;
 public class LotProveidorWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
-
     private final LotProveidorService lotProveidorService;
 
     public LotProveidorWebController(LotProveidorService lotProveidorService) {
@@ -31,11 +30,7 @@ public class LotProveidorWebController {
                               Model model) {
 
         model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(
-                materiaId,
-                identificadorLot,
-                dataCaducitat,
-                dataObertura,
-                dataAcabament
+                materiaId, identificadorLot, dataCaducitat, dataObertura, dataAcabament
         ));
         model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
         model.addAttribute("materiaId", materiaId);
