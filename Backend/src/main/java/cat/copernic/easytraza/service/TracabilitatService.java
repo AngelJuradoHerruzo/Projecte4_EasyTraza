@@ -2,6 +2,7 @@ package cat.copernic.easytraza.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,12 +60,14 @@ public class TracabilitatService {
     }
 
 
-    // LLISTAT DE LOTS AMB FILTRES
+    // LLISTAT DE LOTS AMB FILTRES I ORDENACIÓ
     public List<LotProveidor> getLotsFiltrats(Long materiaId,
                                                Long proveidorId,
                                                EstatLot estat,
                                                String identificadorLot,
-                                               LocalDate dataRecepcio) {
+                                               LocalDate dataRecepcio,
+                                               String sortField,
+                                               String sortDir) {
 
         List<LotProveidor> lots = new ArrayList<>(lotProveidorRepository.findAll());
 
@@ -92,6 +95,8 @@ public class TracabilitatService {
                     || lot.getAlbaraProveidor().getDataRecepcio() == null
                     || !dataRecepcio.equals(lot.getAlbaraProveidor().getDataRecepcio()));
         }
+
+        ordenarLots(lots, sortField, sortDir);
 
         return lots;
     }
@@ -140,6 +145,56 @@ public class TracabilitatService {
     }
 
 
+    // ORDENAR LOTS
+    private void ordenarLots(List<LotProveidor> lots, String sortField, String sortDir) {
+
+        Comparator<LotProveidor> comparator = obtenirComparadorLots(sortField);
+
+        if ("desc".equalsIgnoreCase(sortDir)) {
+            comparator = comparator.reversed();
+        }
+
+        lots.sort(comparator);
+    }
+
+
+    // OBTENIR COMPARADOR SEGONS LA COLUMNA SELECCIONADA
+    private Comparator<LotProveidor> obtenirComparadorLots(String sortField) {
+
+        if ("identificadorLot".equals(sortField)) {
+            return Comparator.comparing(lot -> textSegur(lot.getIdentificadorLot()));
+        }
+
+        if ("quantitat".equals(sortField)) {
+            return Comparator.comparing(lot -> numeroSegur(lot.getQuantitat()));
+        }
+
+        if ("estat".equals(sortField)) {
+            return Comparator.comparing(lot -> lot.getEstat() != null ? lot.getEstat().name() : "");
+        }
+
+        if ("proveidor".equals(sortField)) {
+            return Comparator.comparing(lot -> {
+                if (lot.getAlbaraProveidor() == null || lot.getAlbaraProveidor().getProveidor() == null) {
+                    return "";
+                }
+                return textSegur(lot.getAlbaraProveidor().getProveidor().getNomProveidor());
+            });
+        }
+
+        if ("dataRecepcio".equals(sortField)) {
+            return Comparator.comparing(lot -> {
+                if (lot.getAlbaraProveidor() == null || lot.getAlbaraProveidor().getDataRecepcio() == null) {
+                    return LocalDate.MIN;
+                }
+                return lot.getAlbaraProveidor().getDataRecepcio();
+            });
+        }
+
+        return Comparator.comparing(lot -> lot.getId() != null ? lot.getId() : 0L);
+    }
+
+
     // COMPROVAR SI UN ALBARÀ DE CLIENT TÉ ASSOCIAT EL LOT
     private boolean albaraConteLot(AlbaraClient albaraClient, Long lotId) {
 
@@ -169,5 +224,27 @@ public class TracabilitatService {
         }
 
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
+    }
+
+
+    // RETORNAR TEXT SEGUR PER ORDENAR
+    private String textSegur(String valor) {
+
+        if (valor == null) {
+            return "";
+        }
+
+        return valor.trim().toLowerCase();
+    }
+
+
+    // RETORNAR NÚMERO SEGUR PER ORDENAR
+    private Integer numeroSegur(Integer valor) {
+
+        if (valor == null) {
+            return 0;
+        }
+
+        return valor;
     }
 }
