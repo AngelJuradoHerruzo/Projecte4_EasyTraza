@@ -1,13 +1,15 @@
 package cat.copernic.easytraza.mobile.features.settings
 
-import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,21 +19,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cat.copernic.easytraza.mobile.core.config.IpPreferences
-import cat.copernic.easytraza.mobile.core.network.RetrofitClient
-import cat.copernic.easytraza.mobile.ui.components.EasyPrimaryButton
 import cat.copernic.easytraza.mobile.ui.theme.EasyBeige
 import cat.copernic.easytraza.mobile.ui.theme.EasyBeigeLight
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrown
@@ -40,15 +33,13 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 /**
- * Pantalla de configuració de la IP del servidor.
+ * Menú de configuració de l'app.
  */
 @Composable
-fun IpConfigScreen(
+fun ConfiguracioMenuScreen(
+    onIpClick: () -> Unit,
     onTornarClick: () -> Unit
 ) {
-
-    val context = LocalContext.current
-    var ip by remember { mutableStateOf(IpPreferences.getIp(context)) }
 
     Column(
         modifier = Modifier
@@ -77,14 +68,14 @@ fun IpConfigScreen(
                 modifier = Modifier.padding(start = 6.dp)
             ) {
                 Text(
-                    text = "Servidor",
+                    text = "Configuració",
                     style = MaterialTheme.typography.headlineMedium,
                     color = EasyBrownDark,
                     fontWeight = FontWeight.ExtraBold
                 )
 
                 Text(
-                    text = "Configuració de la IP",
+                    text = "Opcions de l'aplicació",
                     style = MaterialTheme.typography.bodyLarge,
                     color = EasyTextSoft,
                     fontWeight = FontWeight.SemiBold
@@ -93,7 +84,9 @@ fun IpConfigScreen(
         }
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onIpClick() },
             shape = RoundedCornerShape(22.dp),
             colors = CardDefaults.cardColors(
                 containerColor = EasyWhite
@@ -103,54 +96,41 @@ fun IpConfigScreen(
             )
         ) {
 
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Row(
+                modifier = Modifier.padding(18.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Icon(
-                    imageVector = Icons.Default.Dns,
-                    contentDescription = "Servidor",
-                    tint = EasyBrown,
+                Box(
                     modifier = Modifier
-                        .background(EasyBeige, RoundedCornerShape(18.dp))
-                        .padding(12.dp)
-                )
-
-                Text(
-                    text = "IP del backend",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = EasyBrownDark,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "Atenció, canvia aquesta IP només si el servidor utilitza una nova adreça.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = EasyTextSoft
-                )
-
-                OutlinedTextField(
-                    value = ip,
-                    onValueChange = { ip = it },
-                    label = { Text("IP del servidor") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(14.dp)
-                )
-
-                Modifier.EasyPrimaryButton(
-                    text = "Guardar"
+                        .size(58.dp)
+                        .background(EasyBeige, RoundedCornerShape(18.dp)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    IpPreferences.saveIp(context, ip)
-                    RetrofitClient.reset()
-                    ip = IpPreferences.getIp(context)
+                    Icon(
+                        imageVector = Icons.Default.Dns,
+                        contentDescription = "Servidor",
+                        tint = EasyBrown,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
 
-                    Toast.makeText(
-                        context,
-                        "IP guardada correctament",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                Column(
+                    modifier = Modifier.padding(start = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Servidor",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = EasyBrownDark,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "Configurar la IP del backend.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = EasyTextSoft
+                    )
                 }
             }
         }

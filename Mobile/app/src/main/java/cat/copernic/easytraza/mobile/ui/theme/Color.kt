@@ -15,3 +15,18 @@ val EasyTextSoft = Color(0xFF7A6A61)
 
 val EasyError = Color(0xFFB3261E)
 val EasyWhite = Color(0xFFFFFFFF)
+
+val EasyCardBorder = Color(0xFFEADCCB)
+val EasyDisabled = Color(0xFFE9E1D7)
+
+val StatusEstocText = Color(0xFF486B8F)
+val StatusEstocBackground = Color(0xFFF2F8FF)
+val StatusEstocBorder = Color(0xFFD7E7F7)
+
+val StatusObertText = Color(0xFF3F715F)
+val StatusObertBackground = Color(0xFFF1FAF6)
+val StatusObertBorder = Color(0xFFD3EADF)
+
+val StatusAcabatText = Color(0xFF6C7076)
+val StatusAcabatBackground = Color(0xFFF7F7F8)
+val StatusAcabatBorder = Color(0xFFE2E4E7)
