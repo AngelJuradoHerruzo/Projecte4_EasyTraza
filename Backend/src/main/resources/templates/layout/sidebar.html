@@ -26,7 +26,8 @@
             <span>Productes</span>
         </a>
 
-        <a th:href="@{/usuaris/list}"
+        <a th:if="${session.usuariRol != null && session.usuariRol.name() == 'ADMIN'}"
+           th:href="@{/usuaris/list}"
            class="sidebar-link"
            th:classappend="${activePage == 'usuaris'} ? ' active' : ''">
             <i class="bi bi-people sidebar-icon"></i>

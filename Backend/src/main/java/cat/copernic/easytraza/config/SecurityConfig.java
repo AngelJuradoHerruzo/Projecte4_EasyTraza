@@ -4,6 +4,7 @@ import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.repository.UsuariRepository;
 import cat.copernic.easytraza.service.UsuariDetailsService;
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * CONFIGURACIÓ DE SEGURETAT
  *
- * Defineix la configuració d'autenticació, login, logout i codificació de contrasenyes.
- *
- * @author Ángel Jurado
+ * Defineix la configuració d'autenticació, login, logout,
+ * permisos d'accés i codificació de contrasenyes.
  */
 @Configuration
 public class SecurityConfig {
@@ -47,22 +47,32 @@ public class SecurityConfig {
 
             // ---------------------------- AUTORITZACIÓ DE RUTES ----------------------------
             .authorizeHttpRequests(auth -> auth
+
+                // Rutes públiques
                 .requestMatchers(
                     "/",
                     "/login",
                     "/error",
+                    "/error/**",
                     "/api/mobile/auth/identificar",
                     "/api/mobile/auth/usuaris"
                 ).permitAll()
 
+                // Recursos estàtics
                 .requestMatchers(
                     "/css/**",
                     "/js/**",
                     "/img/**",
+                    "/images/**",
                     "/fonts/**",
-                    "/uploads/**"
+                    "/uploads/**",
+                    "/favicon.ico"
                 ).permitAll()
 
+                // Només els administradors poden accedir a la gestió d'usuaris
+                .requestMatchers("/usuaris/**").hasRole("ADMIN")
+
+                // La resta de rutes requereixen autenticació
                 .anyRequest().authenticated()
             )
 
@@ -99,7 +109,14 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
                 .permitAll()
+            )
+
+            // ---------------------------- ERROR ACCÉS DENEGAT ----------------------------
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/error/403")
             )
 
             // ---------------------------- SERVEI D'USUARIS ----------------------------
