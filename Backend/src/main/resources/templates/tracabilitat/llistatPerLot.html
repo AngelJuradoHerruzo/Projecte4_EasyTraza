@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Explotació de dades - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{layout/sidebar :: sidebar('tracabilitat')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow">Explotació de dades</p>
+                <h1 class="page-heading">Traçabilitat per lot</h1>
+                <p class="page-description">
+                    Filtra els lots, ordena el llistat, consulta la producció associada i visualitza el gràfic mensual de productes.
+                </p>
+            </div>
+        </section>
+
+        <!----------------------- ERROR ----------------------->
+        <div th:if="${error}" class="form-error lot-error">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span th:text="${error}">Error</span>
+        </div>
+
+        <!----------------------- CONTENIDOR PRINCIPAL ----------------------->
+        <section class="content-card">
+
+            <!----------------------- TOOLBAR / FILTRES ----------------------->
+            <div class="content-toolbar" style="display:block;">
+                <div class="toolbar-block" style="margin-bottom:16px;">
+                    <h2 class="content-title">Traçabilitat</h2>
+                    <p class="content-subtitle">
+                        Filtra i ordena els lots abans de consultar-ne la producció associada.
+                    </p>
+                </div>
+
+                <form th:action="@{/tracabilitat/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:nowrap; width:100%;">
+
+                    <input type="hidden" name="buscar" value="true">
+
+                    <div class="search-field" style="flex:1; min-width:150px;">
+                        <i class="bi bi-flower1"></i>
+                        <select name="materiaId"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="">Totes les matèries</option>
+                            <option th:each="materia : ${materiesPrimeres}"
+                                    th:value="${materia.id}"
+                                    th:selected="${materiaId != null && materiaId == materia.id}"
+                                    th:text="${materia.nomMateria}">
+                                Matèria
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="search-field" style="flex:1; min-width:150px;">
+                        <i class="bi bi-truck"></i>
+                        <select name="proveidorId"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="">Tots els proveïdors</option>
+                            <option th:each="proveidor : ${proveidors}"
+                                    th:value="${proveidor.id}"
+                                    th:selected="${proveidorId != null && proveidorId == proveidor.id}"
+                                    th:text="${proveidor.nomProveidor}">
+                                Proveïdor
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="search-field" style="flex:1; min-width:130px;">
+                        <i class="bi bi-flag"></i>
+                        <select name="estat"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="">Tots els estats</option>
+                            <option th:each="estatLot : ${estats}"
+                                    th:value="${estatLot}"
+                                    th:selected="${estat != null && estat == estatLot}"
+                                    th:text="${estatLot}">
+                                ESTAT
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="search-field" style="flex:1; min-width:150px;">
+                        <i class="bi bi-upc-scan"></i>
+                        <input name="identificadorLot"
+                               type="text"
+                               th:value="${identificadorLot}"
+                               placeholder="Identificador lot...">
+                    </div>
+
+                    <div class="search-field" style="flex:1; min-width:140px;">
+                        <i class="bi bi-calendar-event"></i>
+                        <input name="dataRecepcio"
+                               type="date"
+                               th:value="${dataRecepcio}">
+                    </div>
+
+                    <div class="search-field" style="flex:1; min-width:150px;">
+                        <i class="bi bi-sort-down"></i>
+                        <select name="sortField"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="id" th:selected="${sortField == 'id'}">Ordenar: ID</option>
+                            <option value="identificadorLot" th:selected="${sortField == 'identificadorLot'}">Ordenar: Lot</option>
+                            <option value="materia" th:selected="${sortField == 'materia'}">Ordenar: Matèria</option>
+                            <option value="quantitat" th:selected="${sortField == 'quantitat'}">Ordenar: Quantitat</option>
+                            <option value="estat" th:selected="${sortField == 'estat'}">Ordenar: Estat</option>
+                            <option value="proveidor" th:selected="${sortField == 'proveidor'}">Ordenar: Proveïdor</option>
+                            <option value="dataRecepcio" th:selected="${sortField == 'dataRecepcio'}">Ordenar: Data</option>
+                        </select>
+                    </div>
+
+                    <div class="search-field" style="flex:1; min-width:130px;">
+                        <i class="bi bi-arrow-down-up"></i>
+                        <select name="sortDir"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Ascendent</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Descendent</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; min-width:46px; padding:0 16px; flex-shrink:0;">
+                        <i class="bi bi-search"></i>
+                    </button>
+
+                    <a th:href="@{/tracabilitat/list}"
+                       class="btn btn-secondary"
+                       style="height:46px; padding:0 16px; flex-shrink:0;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+
+                </form>
+            </div>
+
+            <!----------------------- MISSATGE INICIAL ----------------------->
+            <div th:if="${!buscar}" class="empty-state">
+                <div class="empty-box" style="justify-content:center; width:100%;">
+                    <i class="bi bi-funnel"></i>
+                    <p>Utilitza els filtres i prem la lupa per cercar lots.</p>
+                </div>
+            </div>
+
+            <!----------------------- LOTS TROBATS ----------------------->
+            <div th:if="${buscar && !#lists.isEmpty(lots)}" class="table-container">
+                <table class="data-table lots-table lot-group-table">
+
+                    <colgroup>
+                        <col style="width:6%;">
+                        <col style="width:17%;">
+                        <col style="width:16%;">
+                        <col style="width:11%;">
+                        <col style="width:11%;">
+                        <col style="width:17%;">
+                        <col style="width:12%;">
+                        <col style="width:10%;">
+                    </colgroup>
+
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Lot</th>
+                        <th>Matèria primera</th>
+                        <th class="text-center">Quantitat</th>
+                        <th class="text-center">Estat</th>
+                        <th>Proveïdor</th>
+                        <th class="text-center">Data recepció</th>
+                        <th class="text-center">Accions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="lot : ${lotId == null ? lots : lots.?[id == #vars.lotId]}" class="lot-row">
+
+                        <td class="td-id" th:text="${lot.id}">1</td>
+
+                        <td>
+                            <span class="lot-main-text" th:text="${lot.identificadorLot}">
+                                LOT-001
+                            </span>
+                            <span class="lot-sub-text">
+                                Albarà #
+                                <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">
+                                    1
+                                </span>
+                            </span>
+                        </td>
+
+                        <td th:text="${lot.materiaPrimera != null ? lot.materiaPrimera.nomMateria : '-'}">
+                            Matèria
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${lot.quantitat != null ? lot.quantitat + ' ' + lot.unitats : '-'}">
+                            10 kg
+                        </td>
+
+                        <td class="text-center">
+                            <span class="badge-role operari"
+                                  th:if="${lot.estat != null && lot.estat.name() == 'EN_ESTOC'}">
+                                EN ESTOC
+                            </span>
+
+                            <span class="badge-role admin"
+                                  th:if="${lot.estat != null && lot.estat.name() == 'OBERT'}">
+                                OBERT
+                            </span>
+
+                            <span class="badge-role lot-badge-acabat"
+                                  th:if="${lot.estat != null && lot.estat.name() == 'ACABAT'}">
+                                ACABAT
+                            </span>
+
+                            <span th:if="${lot.estat == null}">-</span>
+                        </td>
+
+                        <td th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null ? lot.albaraProveidor.proveidor.nomProveidor : '-'}">
+                            Proveïdor
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${lot.albaraProveidor != null && lot.albaraProveidor.dataRecepcio != null ? #temporals.format(lot.albaraProveidor.dataRecepcio, 'dd/MM/yyyy') : '-'}">
+                            01/01/2026
+                        </td>
+
+                        <td>
+                            <div class="lot-actions">
+                                <a class="lot-action-btn lot-action-view"
+                                   th:href="@{/tracabilitat/list(
+                                        buscar=true,
+                                        materiaId=${materiaId},
+                                        proveidorId=${proveidorId},
+                                        estat=${estat},
+                                        identificadorLot=${identificadorLot},
+                                        dataRecepcio=${dataRecepcio},
+                                        sortField=${sortField},
+                                        sortDir=${sortDir},
+                                        producteGraficId=${producteGraficId},
+                                        lotId=${lot.id}
+                                   )}">
+                                    <i class="bi bi-clipboard-data"></i>
+                                    <span>Producció</span>
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!----------------------- SENSE RESULTATS ----------------------->
+            <div th:if="${buscar && #lists.isEmpty(lots)}" class="empty-state">
+                <div class="empty-box" style="justify-content:center; width:100%;">
+                    <i class="bi bi-search"></i>
+                    <p>No s'han trobat lots amb els filtres indicats.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!----------------------- PRODUCCIÓ ASSOCIADA ----------------------->
+        <section class="content-card" style="margin-top:20px;">
+
+            <div class="content-toolbar">
+                <div class="toolbar-block">
+                    <h2 class="content-title">Producció associada</h2>
+
+                    <p class="content-subtitle" th:if="${lotSeleccionat == null}">
+                        Selecciona un lot de la taula superior per consultar-ne la producció generada.
+                    </p>
+
+                    <p class="content-subtitle" th:if="${lotSeleccionat != null}">
+                        <strong th:text="${lotSeleccionat.identificadorLot}">LOT-001</strong>
+                        ·
+                        <span th:text="${lotSeleccionat.materiaPrimera != null ? lotSeleccionat.materiaPrimera.nomMateria : '-'}">
+                            Matèria
+                        </span>
+                        ·
+                        <span th:text="${lotSeleccionat.albaraProveidor != null && lotSeleccionat.albaraProveidor.proveidor != null ? lotSeleccionat.albaraProveidor.proveidor.nomProveidor : '-'}">
+                            Proveïdor
+                        </span>
+                        ·
+                        <span th:text="${lotSeleccionat.quantitat != null ? lotSeleccionat.quantitat + ' ' + lotSeleccionat.unitats : '-'}">
+                            Quantitat
+                        </span>
+                        ·
+                        <span th:text="${lotSeleccionat.estat != null ? lotSeleccionat.estat : '-'}">
+                            Estat
+                        </span>
+                    </p>
+                </div>
+
+                <a th:if="${lotSeleccionat != null}"
+                   class="btn btn-secondary"
+                   th:href="@{/tracabilitat/list(
+                        buscar=true,
+                        materiaId=${materiaId},
+                        proveidorId=${proveidorId},
+                        estat=${estat},
+                        identificadorLot=${identificadorLot},
+                        dataRecepcio=${dataRecepcio},
+                        sortField=${sortField},
+                        sortDir=${sortDir},
+                        producteGraficId=${producteGraficId}
+                   )}">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    <span>Tornar als lots</span>
+                </a>
+            </div>
+
+            <!----------------------- SENSE LOT SELECCIONAT ----------------------->
+            <div th:if="${lotSeleccionat == null}" class="empty-state">
+                <div class="empty-box" style="justify-content:center; width:100%;">
+                    <i class="bi bi-clipboard-data"></i>
+                    <p>Encara no has seleccionat cap lot.</p>
+                </div>
+            </div>
+
+            <!----------------------- TAULA PRODUCCIÓ RF20 ----------------------->
+            <div class="table-container" th:if="${lotSeleccionat != null && !#lists.isEmpty(liniesProduccio)}">
+                <table class="data-table">
+
+                    <colgroup>
+                        <col style="width:28%;">
+                        <col style="width:17%;">
+                        <col style="width:25%;">
+                        <col style="width:15%;">
+                        <col style="width:15%;">
+                    </colgroup>
+
+                    <thead>
+                    <tr>
+                        <th>Producte fabricat</th>
+                        <th class="text-center">Quantitat fabricada</th>
+                        <th>Client</th>
+                        <th class="text-center">Número d'albarà</th>
+                        <th class="text-center">Data d'albarà</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="linia : ${liniesProduccio}">
+
+                        <td>
+                            <span class="lot-main-text"
+                                  th:text="${linia.producte != null ? linia.producte.nomProducte : '-'}">
+                                Producte
+                            </span>
+                        </td>
+
+                        <td class="text-center" th:text="${linia.quantitat}">
+                            10
+                        </td>
+
+                        <td th:text="${linia.albaraClient != null && linia.albaraClient.client != null ? linia.albaraClient.client.nomComplet : '-'}">
+                            Client
+                        </td>
+
+                        <td class="text-center">
+                            <span>
+                                #
+                                <span th:text="${linia.albaraClient != null ? linia.albaraClient.id : '-'}">
+                                    1
+                                </span>
+                            </span>
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${linia.albaraClient != null && linia.albaraClient.dataAlbara != null ? #temporals.format(linia.albaraClient.dataAlbara, 'dd/MM/yyyy') : '-'}">
+                            01/01/2026
+                        </td>
+
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!----------------------- LOT SENSE PRODUCCIÓ ----------------------->
+            <div th:if="${lotSeleccionat != null && #lists.isEmpty(liniesProduccio)}" class="empty-state">
+                <div class="empty-box" style="justify-content:center; width:100%;">
+                    <i class="bi bi-clipboard-x"></i>
+                    <p>Aquest lot encara no té producció associada.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!----------------------- GRÀFIC MENSUAL DE PRODUCTES ----------------------->
+        <section class="content-card" style="margin-top:20px;">
+
+            <div class="content-toolbar" style="display:block;">
+                <div class="toolbar-block" style="margin-bottom:16px;">
+                    <h2 class="content-title">Gràfic mensual de productes</h2>
+                    <p class="content-subtitle">
+                        Evolució mensual de la producció total per producte.
+                    </p>
+                </div>
+
+                <form th:action="@{/tracabilitat/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:nowrap; width:100%;">
+
+                    <input type="hidden" name="buscar" th:value="${buscar}">
+                    <input type="hidden" name="materiaId" th:value="${materiaId}">
+                    <input type="hidden" name="proveidorId" th:value="${proveidorId}">
+                    <input type="hidden" name="estat" th:value="${estat}">
+                    <input type="hidden" name="identificadorLot" th:value="${identificadorLot}">
+                    <input type="hidden" name="dataRecepcio" th:value="${dataRecepcio}">
+                    <input type="hidden" name="sortField" th:value="${sortField}">
+                    <input type="hidden" name="sortDir" th:value="${sortDir}">
+                    <input type="hidden" name="lotId" th:value="${lotId}">
+
+                    <div class="search-field" style="flex:1; min-width:220px;">
+                        <i class="bi bi-box-seam"></i>
+                        <select name="producteGraficId"
+                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                            <option value="">Tots els productes</option>
+                            <option th:each="producte : ${productesGrafic}"
+                                    th:value="${producte.id}"
+                                    th:selected="${producteGraficId != null && producteGraficId == producte.id}"
+                                    th:text="${producte.nomProducte}">
+                                Producte
+                            </option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; min-width:46px; padding:0 16px; flex-shrink:0;">
+                        <i class="bi bi-bar-chart"></i>
+                    </button>
+
+                    <a th:href="@{/tracabilitat/list(
+                            buscar=${buscar},
+                            materiaId=${materiaId},
+                            proveidorId=${proveidorId},
+                            estat=${estat},
+                            identificadorLot=${identificadorLot},
+                            dataRecepcio=${dataRecepcio},
+                            sortField=${sortField},
+                            sortDir=${sortDir},
+                            lotId=${lotId}
+                       )}"
+                       class="btn btn-secondary"
+                       style="height:46px; padding:0 16px; flex-shrink:0;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Tots</span>
+                    </a>
+
+                </form>
+            </div>
+
+            <!----------------------- GRÀFIC ----------------------->
+            <div th:if="${graficTeDades}" style="height:380px; padding:10px 0;">
+                <canvas id="graficProductesMensual"
+                        th:attr="data-labels=${graficLabelsJson}, data-datasets=${graficDatasetsJson}">
+                </canvas>
+            </div>
+
+            <!----------------------- SENSE DADES GRÀFIC ----------------------->
+            <div th:if="${!graficTeDades}" class="empty-state">
+                <div class="empty-box" style="justify-content:center; width:100%;">
+                    <i class="bi bi-bar-chart"></i>
+                    <p>No hi ha producció registrada per generar el gràfic mensual.</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script th:if="${graficTeDades}"
+        src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:if="${graficTeDades}"
+        th:src="@{/js/graficProductesMensual.js}"></script>
+
+</body>
+</html>
