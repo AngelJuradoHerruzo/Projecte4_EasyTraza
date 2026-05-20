@@ -6,12 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -20,15 +16,11 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,12 +35,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentificat
 import cat.copernic.easytraza.mobile.features.auth.presentation.viewmodels.IdentificarViewModel
+import cat.copernic.easytraza.mobile.ui.components.EasyCard
+import cat.copernic.easytraza.mobile.ui.components.EasyCardShape
+import cat.copernic.easytraza.mobile.ui.components.EasyHeader
+import cat.copernic.easytraza.mobile.ui.components.EasyMessageCard
+import cat.copernic.easytraza.mobile.ui.components.EasyPrimaryButton
+import cat.copernic.easytraza.mobile.ui.components.EasyScreen
 import cat.copernic.easytraza.mobile.ui.theme.EasyBeige
-import cat.copernic.easytraza.mobile.ui.theme.EasyBeigeLight
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrown
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrownDark
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrownSoft
+import cat.copernic.easytraza.mobile.ui.theme.EasyCardBorder
 import cat.copernic.easytraza.mobile.ui.theme.EasyCream
+import cat.copernic.easytraza.mobile.ui.theme.EasyText
 import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
@@ -58,124 +57,88 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 @Composable
 fun IdentificarScreen(
     onIdentificat: () -> Unit,
-    onConfigurarIpClick: () -> Unit
+    onConfiguracioClick: () -> Unit
 ) {
-
     val context = LocalContext.current
     val viewModel = remember { IdentificarViewModel(context) }
     val uiState by viewModel.uiState.collectAsState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(EasyBeigeLight)
-            .padding(22.dp)
-    ) {
+    EasyScreen {
+        EasyHeader(
+            title = "EasyTraza",
+            subtitle = "Identificació d'operari",
+            showConfig = true,
+            onConfiguracioClick = onConfiguracioClick
+        )
 
-        IconButton(
-            onClick = onConfigurarIpClick,
-            modifier = Modifier.align(Alignment.TopEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Configurar IP",
-                tint = EasyBrownDark
+        EasyCard {
+            Text(
+                text = "Selecciona usuari",
+                style = MaterialTheme.typography.headlineSmall,
+                color = EasyBrownDark,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "Tria el teu perfil per continuar.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = EasyTextSoft
             )
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Spacer(modifier = Modifier.height(34.dp))
-
-            Text(
-                text = "EasyTraza",
-                style = MaterialTheme.typography.headlineMedium,
-                color = EasyBrownDark,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "Qui ets?",
-                style = MaterialTheme.typography.headlineLarge,
-                color = EasyBrown,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 18.dp)
-            )
-
-            Text(
-                text = "Selecciona el teu usuari per continuar",
-                style = MaterialTheme.typography.bodyMedium,
-                color = EasyTextSoft,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 6.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            when {
-                uiState.carregant -> {
-                    CircularProgressIndicator(
-                        color = EasyBrown
-                    )
-                }
-
-                uiState.error != null -> {
-                    Text(
-                        text = uiState.error ?: "",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    Button(
-                        onClick = { viewModel.carregarUsuaris() }
-                    ) {
-                        Text("Reintentar")
-                    }
-                }
-
-                else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(22.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        itemsIndexed(uiState.usuaris) { index, usuari ->
-                            UsuariProfileItem(
-                                usuari = usuari,
-                                index = index,
-                                onClick = {
-                                    viewModel.identificarUsuari(
-                                        usuari = usuari,
-                                        onSuccess = onIdentificat
-                                    )
-                                }
-                            )
-                        }
-                    }
+        when {
+            uiState.carregant -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = EasyBrown)
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            uiState.error != null -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    EasyMessageCard(text = uiState.error ?: "", isError = true)
 
-            OutlinedButton(
-                onClick = onConfigurarIpClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Configurar servidor")
+                    Modifier.padding(top = 16.dp).EasyPrimaryButton(
+                        text = "Reintentar"
+                    ) { viewModel.carregarUsuaris() }
+                }
+            }
+
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    itemsIndexed(uiState.usuaris) { index, usuari ->
+                        UsuariProfileItem(
+                            usuari = usuari,
+                            index = index,
+                            onClick = {
+                                viewModel.identificarUsuari(
+                                    usuari = usuari,
+                                    onSuccess = onIdentificat
+                                )
+                            }
+                        )
+                    }
+                }
             }
         }
     }
 }
-
 
 /**
  * Targeta d'usuari seleccionable.
@@ -186,7 +149,6 @@ fun UsuariProfileItem(
     index: Int,
     onClick: () -> Unit
 ) {
-
     val colors = listOf(
         EasyBrown,
         EasyBrownSoft,
@@ -196,60 +158,56 @@ fun UsuariProfileItem(
 
     val backgroundColor = colors[index % colors.size]
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = EasyCardShape,
+        colors = CardDefaults.cardColors(containerColor = EasyWhite),
+        border = androidx.compose.foundation.BorderStroke(1.dp, EasyCardBorder),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-            shape = RoundedCornerShape(22.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = EasyWhite
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 5.dp
-            )
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(14.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1.05f)
                     .background(
-                        color = backgroundColor,
-                        shape = RoundedCornerShape(18.dp)
+                        color = EasyBeige,
+                        shape = RoundedCornerShape(16.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = usuari.nomComplet,
-                    tint = EasyCream,
-                    modifier = Modifier.size(74.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(78.dp)
+                        .background(
+                            color = backgroundColor,
+                            shape = RoundedCornerShape(16.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = usuari.nomComplet,
+                        tint = EasyCream,
+                        modifier = Modifier.size(52.dp)
+                    )
+                }
             }
+
+            Text(
+                text = usuari.nomComplet,
+                color = EasyText,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-
-        Spacer(modifier = Modifier.height(9.dp))
-
-        Text(
-            text = usuari.nomComplet,
-            color = EasyBrownDark,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
-
-        Text(
-            text = usuari.rolUsuari,
-            color = EasyTextSoft,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
     }
 }

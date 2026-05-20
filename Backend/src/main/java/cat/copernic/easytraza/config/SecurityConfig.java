@@ -55,7 +55,8 @@ public class SecurityConfig {
                     "/error",
                     "/error/**",
                     "/api/mobile/auth/identificar",
-                    "/api/mobile/auth/usuaris"
+                    "/api/mobile/auth/usuaris",
+                    "/api/mobile/lots/**"
                 ).permitAll()
 
                 // Recursos estàtics
