@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,12 +26,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentificat
+import cat.copernic.easytraza.mobile.ui.components.EasyCard
+import cat.copernic.easytraza.mobile.ui.components.EasyCardShape
 import cat.copernic.easytraza.mobile.ui.components.EasyHeader
+import cat.copernic.easytraza.mobile.ui.components.EasyScreen
 import cat.copernic.easytraza.mobile.ui.components.EasySecondaryButton
 import cat.copernic.easytraza.mobile.ui.theme.EasyBeige
-import cat.copernic.easytraza.mobile.ui.theme.EasyBeigeLight
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrown
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrownDark
+import cat.copernic.easytraza.mobile.ui.theme.EasyCardBorder
 import cat.copernic.easytraza.mobile.ui.theme.EasyDisabled
 import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
@@ -48,15 +50,7 @@ fun MainScreen(
     onConfiguracioClick: () -> Unit,
     onSortirClick: () -> Unit
 ) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(EasyBeigeLight)
-            .padding(horizontal = 22.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)
-    ) {
-
+    EasyScreen {
         EasyHeader(
             title = "EasyTraza",
             subtitle = "Menú principal",
@@ -64,38 +58,24 @@ fun MainScreen(
             onConfiguracioClick = onConfiguracioClick
         )
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = EasyWhite
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 3.dp
+        EasyCard {
+            Text(
+                text = "Hola, ${usuari?.nomComplet ?: "usuari"}",
+                color = EasyBrownDark,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
             )
-        ) {
-            Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = "Hola, ${usuari?.nomComplet ?: "usuari"}",
-                    color = EasyBrownDark,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
 
-                Text(
-                    text = "Selecciona l'apartat que vols utilitzar.",
-                    color = EasyTextSoft,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = "Selecciona l'apartat que vols utilitzar.",
+                color = EasyTextSoft,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         MenuOptionCard(
             title = "Gestionar lots",
-            subtitle = "Gestiona, consulta, inicia i finalitza els lots de proveïdor.",
+            subtitle = "Consulta, filtra, inicia i finalitza lots de proveïdor.",
             icon = Icons.Default.Inventory,
             enabled = true,
             onClick = onLotsClick
@@ -103,7 +83,7 @@ fun MainScreen(
 
         MenuOptionCard(
             title = "Processar albarà",
-            subtitle = "Processa i llegeix albarans de proveïdor amb OCR.",
+            subtitle = "Processament OCR pendent per més endavant.",
             icon = Icons.Default.Description,
             enabled = false,
             onClick = onProcessarAlbaraClick
@@ -118,7 +98,6 @@ fun MainScreen(
     }
 }
 
-
 /**
  * Targeta d'opció del menú principal.
  */
@@ -130,31 +109,25 @@ fun MenuOptionCard(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(enabled = enabled) { onClick() },
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = EasyWhite
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+        shape = EasyCardShape,
+        colors = CardDefaults.cardColors(containerColor = EasyWhite),
+        border = androidx.compose.foundation.BorderStroke(1.dp, EasyCardBorder),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-
         Row(
             modifier = Modifier.padding(18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
                     .size(58.dp)
                     .background(
                         color = if (enabled) EasyBeige else EasyDisabled,
-                        shape = RoundedCornerShape(18.dp)
+                        shape = RoundedCornerShape(16.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -172,7 +145,6 @@ fun MenuOptionCard(
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,

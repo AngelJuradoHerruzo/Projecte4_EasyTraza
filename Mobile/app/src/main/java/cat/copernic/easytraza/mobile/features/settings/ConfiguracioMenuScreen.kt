@@ -6,18 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,10 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cat.copernic.easytraza.mobile.ui.components.EasyCardShape
+import cat.copernic.easytraza.mobile.ui.components.EasyHeader
+import cat.copernic.easytraza.mobile.ui.components.EasyScreen
 import cat.copernic.easytraza.mobile.ui.theme.EasyBeige
-import cat.copernic.easytraza.mobile.ui.theme.EasyBeigeLight
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrown
 import cat.copernic.easytraza.mobile.ui.theme.EasyBrownDark
+import cat.copernic.easytraza.mobile.ui.theme.EasyCardBorder
 import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
@@ -40,71 +40,32 @@ fun ConfiguracioMenuScreen(
     onIpClick: () -> Unit,
     onTornarClick: () -> Unit
 ) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(EasyBeigeLight)
-            .padding(horizontal = 22.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)
-    ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 18.dp, bottom = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            IconButton(onClick = onTornarClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Tornar",
-                    tint = EasyBrownDark
-                )
-            }
-
-            Column(
-                modifier = Modifier.padding(start = 6.dp)
-            ) {
-                Text(
-                    text = "Configuració",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = EasyBrownDark,
-                    fontWeight = FontWeight.ExtraBold
-                )
-
-                Text(
-                    text = "Opcions de l'aplicació",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = EasyTextSoft,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
+    EasyScreen {
+        EasyHeader(
+            title = "Configuració",
+            subtitle = "Opcions de l'aplicació",
+            showBack = true,
+            onBackClick = onTornarClick,
+            showConfig = false
+        )
 
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onIpClick() },
-            shape = RoundedCornerShape(22.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = EasyWhite
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            )
+            shape = EasyCardShape,
+            colors = CardDefaults.cardColors(containerColor = EasyWhite),
+            border = androidx.compose.foundation.BorderStroke(1.dp, EasyCardBorder),
+            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
         ) {
-
             Row(
                 modifier = Modifier.padding(18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Box(
                     modifier = Modifier
                         .size(58.dp)
-                        .background(EasyBeige, RoundedCornerShape(18.dp)),
+                        .background(EasyBeige, RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(

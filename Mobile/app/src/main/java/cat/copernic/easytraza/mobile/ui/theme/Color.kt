@@ -9,6 +9,8 @@ val EasyBrownSoft = Color(0xFF9B6234)
 val EasyBeige = Color(0xFFF7EAD8)
 val EasyBeigeLight = Color(0xFFFFFAF2)
 val EasyCream = Color(0xFFFFF7EA)
+val EasyPanel = Color(0xFFFFFDF9)
+val EasyPanelSoft = Color(0xFFFBF7F1)
 
 val EasyText = Color(0xFF2F2520)
 val EasyTextSoft = Color(0xFF7A6A61)
@@ -18,6 +20,10 @@ val EasyWhite = Color(0xFFFFFFFF)
 
 val EasyCardBorder = Color(0xFFEADCCB)
 val EasyDisabled = Color(0xFFE9E1D7)
+
+val EasySuccessText = Color(0xFF3F6B4D)
+val EasySuccessBackground = Color(0xFFF1FAF4)
+val EasySuccessBorder = Color(0xFFD4EADB)
 
 val StatusEstocText = Color(0xFF486B8F)
 val StatusEstocBackground = Color(0xFFF2F8FF)

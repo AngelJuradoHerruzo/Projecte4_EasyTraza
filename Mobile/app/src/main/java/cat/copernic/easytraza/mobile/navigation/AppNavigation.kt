@@ -14,6 +14,7 @@ import cat.copernic.easytraza.mobile.features.lots.presentation.screens.LotListS
 import cat.copernic.easytraza.mobile.features.lots.presentation.viewmodels.LotViewModel
 import cat.copernic.easytraza.mobile.features.settings.ConfiguracioMenuScreen
 import cat.copernic.easytraza.mobile.features.settings.IpConfigScreen
+import cat.copernic.easytraza.mobile.features.splash.SplashScreen
 import cat.copernic.easytraza.mobile.main.screens.MainScreen
 
 /**
@@ -28,18 +29,23 @@ fun AppNavigation() {
     var lotIdSeleccionat by remember { mutableLongStateOf(0L) }
     var pantallaAnteriorConfiguracio by remember { mutableStateOf("main") }
 
-    var screen by remember {
-        mutableStateOf(
-            if (UsuariSessionManager.hiHaUsuariIdentificat(context)) {
-                "main"
-            }
-            else {
-                "identificar"
-            }
-        )
+    val pantallaInicial = remember {
+        if (UsuariSessionManager.hiHaUsuariIdentificat(context)) {
+            "main"
+        } else {
+            "identificar"
+        }
     }
 
+    var screen by remember { mutableStateOf("splash") }
+
     when (screen) {
+
+        "splash" -> SplashScreen(
+            onSplashFinished = {
+                screen = pantallaInicial
+            }
+        )
 
         "identificar" -> IdentificarScreen(
             onIdentificat = {
