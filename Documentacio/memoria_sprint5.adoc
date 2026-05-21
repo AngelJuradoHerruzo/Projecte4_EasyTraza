@@ -1,0 +1,136 @@
+= Memòria del Projecte EasyTraza - Sprint 5
+:toc:
+:toclevels: 3
+
+== 1. Seguiment i Documentació de l'Sprint 5
+
+=== Planificació inicial
+
+image::Board_Inicial_Sprint5.jpg[]
+
+=== Planificació final
+
+image::Board_Final_Sprint5.jpg[]
+
+=== Daily Stand Up
+
+==== Divendres 15/05
+
+[cols="1,3"]
+|===
+| Ahir | Finalització del sistema d'autenticació i documentació del Sprint 4
+| Avui | Correcció general del sprint anterior i organització de les tasques del següent sprint.
+| Problemes | La revisió i reorganització han ocupat pràcticament tot el dia
+| Hores | 8h
+|===
+
+==== Dissabte 16/05
+
+[cols="1,3"]
+|===
+| Ahir | Correcció general d'errors i organització de tasques
+| Avui | Implementació del bloqueig dels camps que no es poden modificar durant l'edició per facilitar l'ús de l'aplicació i evitar errors de l'usuari.
+| Problemes | -
+| Hores | 8h
+|===
+
+==== Diumenge 17/05
+
+[cols="1,3"]
+|===
+| Ahir | Implementació de restriccions en camps d'edició
+| Avui | Continuació de la correcció d'errors i implementació de diverses barres de filtratge i ordenació en diferents apartats del projecte.
+| Problemes | -
+| Hores | 10h
+|===
+
+==== Dilluns 18/05
+
+[cols="1,3"]
+|===
+| Ahir | Implementació de filtres i ordenació en diferents apartats
+| Avui | Finalització de la correcció dels errors del Sprint 4 i inici de l'apartat d'explotació de dades.
+| Problemes | -
+| Hores | 10h
+|===
+
+==== Dimarts 19/05
+
+[cols="1,3"]
+|===
+| Ahir | Inici de l'apartat d'explotació de dades
+| Avui | Finalització de l'apartat d'explotació de dades, creació de vistes per gestionar errors típics de Spring Boot i inici de la gestió de lots a mobile.
+| Problemes | -
+| Hores | 11h
+|===
+
+==== Dimecres 20/05
+
+[cols="1,3"]
+|===
+| Ahir | Implementació inicial de la gestió de lots a mobile
+| Avui | Finalització de la gestió de lots a mobile i revisió del seu correcte funcionament.
+| Problemes | Alguns errors menors sense importància durant les proves
+| Hores | 10h
+|===
+
+==== Dijous 21/05
+
+[cols="1,3"]
+|===
+| Ahir | Finalització de la gestió de lots a mobile
+| Avui | Reinici de la implementació de l'apartat OCR, reprenent la funcionalitat existent i millorant-ne l'estructura general.
+| Problemes | Funcionalitat molt complexa que ha requerit diverses revisions i reinicis de part de la implementació
+| Hores | 12h
+|===
+
+=== Retrospective Meeting
+
+==== Aspectes positius
+
+- La gestió de lots a mobile ha quedat funcional
+- Les eines de filtratge i ordenació milloren molt l'experiència d'usuari
+- L'explotació de dades ha quedat implementada
+
+==== Aspectes a millorar
+
+- L'apartat OCR continua requerint molt més temps del previst
+- Alguns errors han obligat a repetir parts de la implementació
+- La càrrega de treball continua sent elevada
+- Algunes funcionalitats necessiten encara més proves
+
+==== Accions de millora
+
+- Continuar millorant la integració entre backend i mobile
+- Continuar estabilitzant els apartats més crítics
+
+== 2. Incidències i Desviacions
+
+=== Incidències
+
+- L'apartat OCR ha resultat molt més complex del previst
+- La càrrega de treball ha estat elevada durant tot el sprint
+
+=== Desviacions
+
+- Gran part del temps s'ha destinat a correccions i estabilització
+- L'apartat OCR no s'ha pogut completar
+- Diverses funcionalitats han requerit més temps del previst
+- Algunes implementacions s'han hagut de replantejar durant el desenvolupament
+
+== 3. Propostes de Millora
+
+- Finalitzar completament la implementació OCR
+- Continuar millorant l'experiència d'usuari a mobile
+
+== 4. Conclusió
+
+Durant aquest Sprint s'ha avançat principalment en la correcció d'errors acumulats, la implementació de filtres i ordenació, l'explotació de dades i la gestió de lots a mobile.
+
+També s'ha treballat en la revisió general del projecte i en la millora de diverses funcionalitats internes per augmentar l'estabilitat del sistema.
+
+Els objectius principals del sprint s'han complert parcialment, ja que s'han consolidat moltes funcionalitats importants, tot i que l'apartat OCR continua pendent de finalització.
+
+Els principals problemes han estat la complexitat de certes funcionalitats, especialment OCR, i el temps necessari per revisar i estabilitzar diferents apartats del projecte.
+
+Actualment el projecte es troba en un estat bastant estable, amb gran part de les funcionalitats principals operatives tant a web com a mobile.
