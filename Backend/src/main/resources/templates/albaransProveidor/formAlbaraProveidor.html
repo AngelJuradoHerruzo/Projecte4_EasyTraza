@@ -32,7 +32,7 @@
                 </h1>
 
                 <p class="page-description">
-                    Registra la recepció, revisa la imatge de l'albarà i gestiona els lots associats.
+                    Registra la recepció, revisa el document de l'albarà i gestiona els lots associats.
                 </p>
             </div>
 
@@ -52,7 +52,7 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Albarà de proveïdor</h2>
                     <p class="content-subtitle">
-                        Introdueix o modifica les dades de l'albarà i la imatge associada.
+                        Introdueix les dades manualment o escaneja un albarà per emplenar el formulari.
                     </p>
                 </div>
 
@@ -63,13 +63,59 @@
                 </div>
 
                 <!-- Missatge informatiu OCR -->
-                <div th:if="${ocrInfo}" class="form-success">
+                <div th:if="${ocrResultat != null}" class="form-success">
                     <i class="bi bi-check-circle"></i>
-                    <span th:text="${ocrInfo}"></span>
+                    <span>OCR executat. Revisa les dades abans de guardar.</span>
                 </div>
             </div>
 
             <div style="padding:20px 24px;">
+
+                <!----------------------- ESCANEIG OCR ----------------------->
+                <form id="ocrAlbaraForm"
+                      th:action="@{/albarans-proveidor/ocr}"
+                      method="post"
+                      enctype="multipart/form-data"
+                      style="margin-bottom:24px; padding:18px; border:1px solid #f0e6dc; border-radius:18px; background:#fffaf5;">
+
+                    <h2 class="content-title">Escanejar OCR</h2>
+                    <p class="content-subtitle">
+                        Puja una imatge o PDF de l'albarà. L'OCR només emplenarà el formulari; no guardarà cap albarà ni cap lot.
+                    </p>
+
+                    <div style="margin-top:18px; display:grid; grid-template-columns:1fr auto; gap:12px; align-items:end;">
+                        <div class="form-group" style="margin:0;">
+                            <label class="form-label" for="documentOcr">Document per escanejar</label>
+                            <input id="documentOcr"
+                                   type="file"
+                                   name="documentOcr"
+                                   class="form-input"
+                                   accept="image/*,application/pdf"
+                                   required>
+                        </div>
+
+                        <button id="btnEscanejarOcr" type="submit" class="btn btn-primary" formnovalidate>
+                            <i class="bi bi-upc-scan"></i>
+                            Escanejar OCR
+                        </button>
+                    </div>
+
+                    <div th:if="${ocrResultat != null and ocrResultat.teAvisos()}"
+                         style="margin-top:14px; display:flex; flex-direction:column; gap:6px;">
+
+                        <div th:each="avis : ${ocrResultat.avisos}" class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span th:text="${avis}"></span>
+                        </div>
+
+                        <div th:if="${ocrResultat.albaraPendent != null}"
+                             th:each="avis : ${ocrResultat.albaraPendent.avisos}"
+                             class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span th:text="${avis}"></span>
+                        </div>
+                    </div>
+                </form>
 
                 <!----------------------- FORMULARI PRINCIPAL ----------------------->
                 <form id="albaraProveidorForm"
@@ -81,6 +127,12 @@
                     <!-- Identificador de l'albarà quan s'està editant -->
                     <input type="hidden" th:field="*{id}">
 
+                    <!-- Referència lleugera al document OCR temporal. No es conserva mai la imatge en base64. -->
+                    <input type="hidden"
+                           id="ocrDocumentTemporalId"
+                           name="ocrDocumentTemporalId"
+                           th:value="${ocrDocumentTemporalId != null ? ocrDocumentTemporalId : ''}">
+
                     <!-- Fitxers ja guardats de l'albarà -->
                     <div th:each="fitxer, stat : *{fitxers}">
                         <input type="hidden" th:field="*{fitxers[__${stat.index}__]}">
@@ -91,51 +143,46 @@
 
                         <h2 class="content-title">Fitxer de l'albarà</h2>
                         <p class="content-subtitle">
-                            Adjunta la imatge o PDF del document. El fitxer es guardarà només en prémer Guardar.
+                            El document OCR temporal es guardarà com a definitiu només en prémer Guardar. També pots adjuntar manualment una imatge o PDF.
                         </p>
 
                         <div style="margin-top:18px; display:grid; grid-template-columns:1fr; gap:16px; align-items:end;">
-
-                            <!----------------------- FITXER DE L'ALBARÀ ----------------------->
                             <div class="form-group" style="margin:0;">
-                                <label class="form-label">Fitxer de l'albarà</label>
-                                <input id="ocrFile"
+                                <label class="form-label" for="imatgeAlbara">Fitxer manual de l'albarà</label>
+                                <input id="imatgeAlbara"
                                        type="file"
                                        name="imatgeAlbara"
                                        class="form-input"
                                        accept="image/*,application/pdf">
                             </div>
-
                         </div>
 
-                        <!----------------------- VISTA PRÈVIA IMATGE ----------------------->
-                        <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:220px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:white;">
+                        <!----------------------- VISTA PRÈVIA DOCUMENT ----------------------->
+                        <div style="margin-top:18px; border:1px dashed #f0e6dc; border-radius:18px; min-height:260px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:white;">
 
-                            <!-- Estat sense imatge -->
                             <div id="ocrPreviewEmpty"
-                                th:style="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? 'display:none;' : 'text-align:center; padding:30px;'">
+                                 th:style="${(ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)) or (albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty())} ? 'display:none;' : 'text-align:center; padding:30px;'">
                                 <i class="bi bi-file-earmark-image" style="font-size:44px; color:#c9b8a6;"></i>
-                                <h2 class="content-title" style="margin-top:12px;">Cap imatge seleccionada</h2>
+                                <h2 class="content-title" style="margin-top:12px;">Cap document seleccionat</h2>
                                 <p class="content-subtitle">
-                                    La imatge seleccionada es mostrarà aquí abans de guardar l'albarà.
+                                    La vista prèvia es mostrarà aquí sense reenviar el document en base64.
                                 </p>
                             </div>
 
-                            <!-- Imatge seleccionada o ja guardada -->
                             <div id="ocrPreviewContainer"
-                                th:style="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? 'display:block; width:100%; padding:16px; text-align:center;' : 'display:none; width:100%; padding:16px; text-align:center;'">
+                                 th:style="${(ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)) or (albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty())} ? 'display:block; width:100%; padding:16px; text-align:center;' : 'display:none; width:100%; padding:16px; text-align:center;'">
 
                                 <p id="ocrFileName"
-                                class="content-subtitle"
-                                style="margin-bottom:12px; font-weight:600;"
-                                th:text="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : ''">
+                                   class="content-subtitle"
+                                   style="margin-bottom:12px; font-weight:600;"
+                                   th:text="${ocrDocumentNomOriginal != null and !#strings.isEmpty(ocrDocumentNomOriginal)} ? ${ocrDocumentNomOriginal} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : '')">
                                 </p>
 
-                                <img id="ocrPreview"
-                                    th:src="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? @{${albaraProveidor.fitxers[0]}} : ''"
-                                    src=""
-                                    alt="Vista prèvia de l'albarà"
-                                    style="width:100%; max-height:420px; object-fit:contain; border-radius:14px;">
+                                <iframe id="ocrPreviewFrame"
+                                        th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? @{${ocrDocumentUrlTemporal}} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? @{${albaraProveidor.fitxers[0]}} : '')"
+                                        title="Vista prèvia de l'albarà"
+                                        style="width:100%; min-height:460px; border:0; border-radius:14px; background:white;">
+                                </iframe>
                             </div>
 
                         </div>
@@ -154,7 +201,7 @@
 
                             <!----------------------- DATA RECEPCIÓ ----------------------->
                             <div class="form-group">
-                                <label class="form-label">Data recepció *</label>
+                                <label class="form-label" for="dataRecepcio">Data recepció *</label>
                                 <input id="dataRecepcio"
                                        type="date"
                                        name="dataRecepcio"
@@ -173,10 +220,9 @@
                                        placeholder="Es generarà automàticament si queda buit">
                             </div>
 
-
                             <!----------------------- PROVEÏDOR ----------------------->
                             <div class="form-group">
-                                <label class="form-label">Proveïdor *</label>
+                                <label class="form-label" for="proveidor">Proveïdor *</label>
                                 <select id="proveidor"
                                         th:field="*{proveidor.id}"
                                         class="form-select"
@@ -187,6 +233,18 @@
                                             th:text="${p.nomProveidor}">
                                     </option>
                                 </select>
+
+                                <div th:if="${ocrResultat != null
+                                            and ocrResultat.albaraPendent != null
+                                            and !ocrResultat.albaraPendent.proveidorTrobat
+                                            and ocrResultat.albaraPendent.proveidorDetectat != null
+                                            and !#strings.isEmpty(ocrResultat.albaraPendent.proveidorDetectat)}"
+                                     class="form-error"
+                                     style="margin-top:8px;">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    <span>Proveïdor detectat per OCR no trobat. OCR: </span>
+                                    <strong th:text="${ocrResultat.albaraPendent.proveidorDetectat}">ARTIPAS</strong>
+                                </div>
                             </div>
 
                             <!----------------------- USUARI RECEPTOR ----------------------->
@@ -230,6 +288,7 @@
 
                             <!-- Fila de lot -->
                             <div th:each="lot, stat : *{lots}"
+                                 th:with="liniaOcr=${ocrResultat != null and ocrResultat.albaraPendent != null and ocrResultat.albaraPendent.linies != null and #lists.size(ocrResultat.albaraPendent.linies) > stat.index ? ocrResultat.albaraPendent.linies[stat.index] : null}"
                                  class="lot-row"
                                  style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
 
@@ -242,34 +301,67 @@
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Identificador lot *</label>
                                         <input type="text"
-                                            th:field="*{lots[__${stat.index}__].identificadorLot}"
-                                            class="form-input"
-                                            maxlength="80"
-                                            required>
+                                               th:field="*{lots[__${stat.index}__].identificadorLot}"
+                                               class="form-input"
+                                               maxlength="80"
+                                               required>
+
+                                        <div th:if="${liniaOcr != null
+                                                    and liniaOcr.identificadorLot != null
+                                                    and !#strings.isEmpty(liniaOcr.identificadorLot)
+                                                    and liniaOcr.identificadorLot == '-'}"
+                                             class="form-error"
+                                             style="margin-top:8px;">
+                                            <i class="bi bi-exclamation-circle"></i>
+                                            <span>Lot no detectat. Revisa aquesta línia.</span>
+                                        </div>
                                     </div>
 
                                     <!----------------------- MATÈRIA PRIMERA ----------------------->
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Matèria primera *</label>
-                                        <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
-                                                class="form-select"
-                                                required>
-                                            <option value="">-- Selecciona --</option>
-                                            <option th:each="m : ${materiesPrimeres}"
-                                                    th:value="${m.id}"
-                                                    th:text="${m.nomMateria}">
-                                            </option>
-                                        </select>
+
+                                        <div style="display:grid; grid-template-columns:1fr auto; gap:8px;">
+                                            <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
+                                                    class="form-select materia-primera-select"
+                                                    th:attr="data-ocr-materia=${liniaOcr != null ? liniaOcr.materiaPrimeraDetectada : ''}"
+                                                    required>
+                                                <option value="">-- Selecciona --</option>
+                                                <option th:each="m : ${materiesPrimeres}"
+                                                        th:value="${m.id}"
+                                                        th:text="${m.nomMateria}">
+                                                </option>
+                                            </select>
+
+                                            <button type="button"
+                                                    class="btn-table btn-action-edit btn-toggle-materia-primera"
+                                                    title="Crear matèria primera en una pestanya nova"
+                                                    th:attr="data-url=@{/materies-primeres/new}">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+
+                                        <div th:if="${liniaOcr != null
+                                                    and !liniaOcr.materiaPrimeraTrobada
+                                                    and liniaOcr.materiaPrimeraDetectada != null
+                                                    and !#strings.isEmpty(liniaOcr.materiaPrimeraDetectada)}"
+                                             class="form-error ocr-materia-avis"
+                                             th:attr="data-ocr-materia=${liniaOcr.materiaPrimeraDetectada}"
+                                             style="margin-top:8px;">
+                                            <i class="bi bi-exclamation-circle"></i>
+                                            <span>Matèria no trobada. OCR: </span>
+                                            <strong th:text="${liniaOcr.materiaPrimeraDetectada}">Tarrina Nata 500</strong>
+                                        </div>
                                     </div>
 
                                     <!----------------------- QUANTITAT ----------------------->
                                     <div class="form-group" style="margin:0;">
                                         <label class="form-label">Quantitat *</label>
                                         <input type="number"
-                                            th:field="*{lots[__${stat.index}__].quantitat}"
-                                            class="form-input"
-                                            min="1"
-                                            required>
+                                               th:field="*{lots[__${stat.index}__].quantitat}"
+                                               class="form-input"
+                                               min="1"
+                                               required>
                                     </div>
 
                                     <!----------------------- UNITATS I ACCIONS ----------------------->

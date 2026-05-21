@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,16 +35,21 @@ public class AlbaraProveidorService {
     private final AlbaraProveidorRepository albaraProveidorRepository;
     private final UsuariRepository usuariRepository;
     private final UnitatMesuraService unitatMesuraService;
+    private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
 
-    private static final String DIRECTORI_FITXERS = "backend/uploads/albarans-proveidor";
+    @Value("${ocr.documents.final-path:uploads/albarans-proveidor}")
+    private String directoriFitxers;
+
     private static final String URL_FITXERS = "/uploads/albarans-proveidor/";
 
     public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository,
                                   UsuariRepository usuariRepository,
-                                  UnitatMesuraService unitatMesuraService) {
+                                  UnitatMesuraService unitatMesuraService,
+                                  OcrAlbaraProveidorService ocrAlbaraProveidorService) {
         this.albaraProveidorRepository = albaraProveidorRepository;
         this.usuariRepository = usuariRepository;
         this.unitatMesuraService = unitatMesuraService;
+        this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
     }
 
 
@@ -153,6 +160,7 @@ public class AlbaraProveidorService {
     // CREAR ALBARÀ DE PROVEÏDOR
     public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor,
                                                  MultipartFile imatgeAlbara,
+                                                 String ocrDocumentTemporalId,
                                                  HttpSession session) {
 
         albaraProveidor.setUsuariReceptor(obtenirUsuariReceptorSessio(session));
@@ -160,9 +168,17 @@ public class AlbaraProveidorService {
         prepararAlbaraPerGuardar(albaraProveidor);
 
         AlbaraProveidor albaraGuardat = albaraProveidorRepository.save(albaraProveidor);
-        guardarFitxerAlbara(albaraGuardat, imatgeAlbara);
+        guardarFitxerAlbara(albaraGuardat, imatgeAlbara, ocrDocumentTemporalId);
 
         return albaraProveidorRepository.save(albaraGuardat);
+    }
+
+
+    // CREAR ALBARÀ DE PROVEÏDOR SENSE DOCUMENT OCR TEMPORAL
+    public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor,
+                                                 MultipartFile imatgeAlbara,
+                                                 HttpSession session) {
+        return createAlbaraProveidor(albaraProveidor, imatgeAlbara, null, session);
     }
 
 
@@ -170,6 +186,7 @@ public class AlbaraProveidorService {
     public AlbaraProveidor updateAlbaraProveidor(Long id,
                                                  AlbaraProveidor albaraProveidor,
                                                  MultipartFile imatgeAlbara,
+                                                 String ocrDocumentTemporalId,
                                                  HttpSession session) {
 
         AlbaraProveidor albaraActual = albaraProveidorRepository.findById(id)
@@ -189,9 +206,18 @@ public class AlbaraProveidorService {
         substituirLots(albaraActual, albaraProveidor.getLots());
         validarDadesAlbaraProveidor(albaraActual);
 
-        guardarFitxerAlbara(albaraActual, imatgeAlbara);
+        guardarFitxerAlbara(albaraActual, imatgeAlbara, ocrDocumentTemporalId);
 
         return albaraProveidorRepository.save(albaraActual);
+    }
+
+
+    // ACTUALITZAR ALBARÀ DE PROVEÏDOR SENSE DOCUMENT OCR TEMPORAL
+    public AlbaraProveidor updateAlbaraProveidor(Long id,
+                                                 AlbaraProveidor albaraProveidor,
+                                                 MultipartFile imatgeAlbara,
+                                                 HttpSession session) {
+        return updateAlbaraProveidor(id, albaraProveidor, imatgeAlbara, null, session);
     }
 
 
@@ -505,33 +531,91 @@ public class AlbaraProveidorService {
     }
 
 
-    // GUARDAR FITXER PUJAT DES DEL FORMULARI
-    private void guardarFitxerAlbara(AlbaraProveidor albaraProveidor, MultipartFile imatgeAlbara) {
+    // GUARDAR FITXER PUJAT O DOCUMENT OCR TEMPORAL
+    private void guardarFitxerAlbara(AlbaraProveidor albaraProveidor,
+                                     MultipartFile imatgeAlbara,
+                                     String ocrDocumentTemporalId) {
 
-        if (imatgeAlbara == null || imatgeAlbara.isEmpty()) {
+        if (imatgeAlbara != null && !imatgeAlbara.isEmpty()) {
+            guardarFitxerPujatAlbara(albaraProveidor, imatgeAlbara);
             return;
         }
 
+        if (ocrDocumentTemporalId != null && !ocrDocumentTemporalId.isBlank()) {
+            moureDocumentOcrTemporalAlbara(albaraProveidor, ocrDocumentTemporalId);
+        }
+    }
+
+
+    // GUARDAR FITXER PUJAT DES DEL FORMULARI
+    private void guardarFitxerPujatAlbara(AlbaraProveidor albaraProveidor, MultipartFile imatgeAlbara) {
+
         try {
-            Files.createDirectories(Paths.get(DIRECTORI_FITXERS));
+            Path directori = Paths.get(directoriFitxers).toAbsolutePath().normalize();
+            Files.createDirectories(directori);
 
             String extensio = obtenirExtensioFitxer(imatgeAlbara.getOriginalFilename());
-            String data = albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String nomFitxer = "albara_" + albaraProveidor.getId() + "_" + data + "_" + UUID.randomUUID() + extensio;
+            String nomFitxer = generarNomFitxerAlbara(albaraProveidor, extensio);
+            Path rutaFitxer = directori.resolve(nomFitxer).normalize();
 
-            Path rutaFitxer = Paths.get(DIRECTORI_FITXERS, nomFitxer);
-            Files.write(rutaFitxer, imatgeAlbara.getBytes());
-
-            if (albaraProveidor.getFitxers() == null) {
-                albaraProveidor.setFitxers(new ArrayList<>());
+            if (!rutaFitxer.startsWith(directori)) {
+                throw new IOException("Ruta de fitxer no vàlida.");
             }
 
-            albaraProveidor.getFitxers().clear();
-            albaraProveidor.getFitxers().add(URL_FITXERS + nomFitxer);
+            Files.write(rutaFitxer, imatgeAlbara.getBytes());
+            substituirFitxerAssociat(albaraProveidor, nomFitxer);
         }
         catch (IOException e) {
             throw new RuntimeException("No s'ha pogut guardar el fitxer de l'albarà.");
         }
+    }
+
+
+    // MOURE DOCUMENT OCR TEMPORAL A LA CARPETA DEFINITIVA DE L'ALBARÀ
+    private void moureDocumentOcrTemporalAlbara(AlbaraProveidor albaraProveidor, String ocrDocumentTemporalId) {
+
+        try {
+            Path origen = ocrAlbaraProveidorService.obtenirRutaDocumentTemporal(ocrDocumentTemporalId);
+
+            if (!Files.exists(origen)) {
+                throw new IOException("El document OCR temporal no existeix.");
+            }
+
+            Path directori = Paths.get(directoriFitxers).toAbsolutePath().normalize();
+            Files.createDirectories(directori);
+
+            String extensio = obtenirExtensioFitxer(ocrDocumentTemporalId);
+            String nomFitxer = generarNomFitxerAlbara(albaraProveidor, extensio);
+            Path desti = directori.resolve(nomFitxer).normalize();
+
+            if (!desti.startsWith(directori)) {
+                throw new IOException("Ruta de document OCR definitiva no vàlida.");
+            }
+
+            Files.move(origen, desti, StandardCopyOption.REPLACE_EXISTING);
+            substituirFitxerAssociat(albaraProveidor, nomFitxer);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("No s'ha pogut guardar el document OCR de l'albarà.");
+        }
+    }
+
+
+    // GENERAR NOM DEL FITXER DEFINITIU DE L'ALBARÀ
+    private String generarNomFitxerAlbara(AlbaraProveidor albaraProveidor, String extensio) {
+        String data = albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        return "albara_" + albaraProveidor.getId() + "_" + data + "_" + UUID.randomUUID() + extensio;
+    }
+
+
+    // SUBSTITUIR EL FITXER ASSOCIAT A L'ALBARÀ
+    private void substituirFitxerAssociat(AlbaraProveidor albaraProveidor, String nomFitxer) {
+        if (albaraProveidor.getFitxers() == null) {
+            albaraProveidor.setFitxers(new ArrayList<>());
+        }
+
+        albaraProveidor.getFitxers().clear();
+        albaraProveidor.getFitxers().add(URL_FITXERS + nomFitxer);
     }
 
 

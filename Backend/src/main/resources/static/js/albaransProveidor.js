@@ -1,34 +1,52 @@
-const ocrFile = document.getElementById('ocrFile');
+// ---------------------------- ELEMENTS PRINCIPALS ----------------------------
+const documentOcr = document.getElementById('documentOcr');
+const imatgeAlbara = document.getElementById('imatgeAlbara');
 const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
 const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
+const ocrPreviewFrame = document.getElementById('ocrPreviewFrame');
 const ocrFileName = document.getElementById('ocrFileName');
+const btnEscanejarOcr = document.getElementById('btnEscanejarOcr');
 
 const lotsContainer = document.getElementById('lotsContainer');
 const addLotBtn = document.getElementById('addLotBtn');
 
-
-// ---------------------------- IMATGE DE VISTA PRÈVIA ACTUAL ----------------------------
-function obtenirImatgeVistaPrevia() {
-    return document.getElementById('ocrPreview') || document.getElementById('ocrPreviewSaved');
-}
+let previewObjectUrl = null;
 
 
-// ---------------------------- DADES ORIGINALS DE LA IMATGE ----------------------------
-const previewImageInicial = obtenirImatgeVistaPrevia();
-const nomImatgeInicial = ocrFileName ? ocrFileName.textContent : '';
-const srcImatgeInicial = previewImageInicial ? previewImageInicial.getAttribute('src') : '';
+// ---------------------------- DADES ORIGINALS DE LA VISTA PRÈVIA ----------------------------
+const nomDocumentInicial = ocrFileName ? ocrFileName.textContent : '';
+const srcDocumentInicial = ocrPreviewFrame ? ocrPreviewFrame.getAttribute('src') : '';
 
 
-// ---------------------------- VISTA PRÈVIA DE LA IMATGE ----------------------------
-if (ocrFile) {
-    ocrFile.addEventListener('change', function () {
-        mostrarImatgeSeleccionada(this);
+// ---------------------------- VISTA PRÈVIA DEL DOCUMENT OCR ----------------------------
+if (documentOcr) {
+    documentOcr.addEventListener('change', function () {
+        mostrarDocumentSeleccionat(this);
     });
 }
 
 
-// ---------------------------- MOSTRAR IMATGE SELECCIONADA ----------------------------
-function mostrarImatgeSeleccionada(input) {
+// ---------------------------- VISTA PRÈVIA DEL DOCUMENT MANUAL ----------------------------
+if (imatgeAlbara) {
+    imatgeAlbara.addEventListener('change', function () {
+        mostrarDocumentSeleccionat(this);
+    });
+}
+
+
+// ---------------------------- ESTAT VISUAL DEL BOTÓ OCR ----------------------------
+if (btnEscanejarOcr) {
+    btnEscanejarOcr.addEventListener('click', function () {
+        setTimeout(() => {
+            btnEscanejarOcr.disabled = true;
+            btnEscanejarOcr.innerHTML = '<i class="bi bi-hourglass-split"></i> Escanejant...';
+        }, 0);
+    });
+}
+
+
+// ---------------------------- MOSTRAR DOCUMENT SELECCIONAT ----------------------------
+function mostrarDocumentSeleccionat(input) {
 
     const file = input.files[0];
 
@@ -47,8 +65,15 @@ function mostrarImatgeSeleccionada(input) {
         return;
     }
 
+    alliberarObjectUrlPreview();
+    previewObjectUrl = URL.createObjectURL(file);
+
     if (ocrFileName) {
         ocrFileName.textContent = file.name;
+    }
+
+    if (ocrPreviewFrame) {
+        ocrPreviewFrame.src = previewObjectUrl;
     }
 
     if (ocrPreviewContainer) {
@@ -58,46 +83,22 @@ function mostrarImatgeSeleccionada(input) {
     if (ocrPreviewEmpty) {
         ocrPreviewEmpty.style.display = 'none';
     }
-
-    if (esPdf) {
-        const previewImage = obtenirImatgeVistaPrevia();
-
-        if (previewImage) {
-            previewImage.removeAttribute('src');
-            previewImage.alt = 'PDF seleccionat';
-        }
-
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-        const previewImage = obtenirImatgeVistaPrevia();
-
-        if (previewImage) {
-            previewImage.src = event.target.result;
-            previewImage.alt = 'Vista prèvia de l\'albarà';
-        }
-    };
-
-    reader.readAsDataURL(file);
 }
 
 
 // ---------------------------- RESTAURAR VISTA PRÈVIA ORIGINAL ----------------------------
 function restaurarVistaPreviaOriginal() {
 
-    const previewImage = obtenirImatgeVistaPrevia();
+    alliberarObjectUrlPreview();
 
-    if (srcImatgeInicial && srcImatgeInicial.trim() !== '') {
+    if (srcDocumentInicial && srcDocumentInicial.trim() !== '') {
 
-        if (previewImage) {
-            previewImage.src = srcImatgeInicial;
+        if (ocrPreviewFrame) {
+            ocrPreviewFrame.src = srcDocumentInicial;
         }
 
         if (ocrFileName) {
-            ocrFileName.textContent = nomImatgeInicial;
+            ocrFileName.textContent = nomDocumentInicial;
         }
 
         if (ocrPreviewContainer) {
@@ -111,14 +112,12 @@ function restaurarVistaPreviaOriginal() {
         return;
     }
 
-    netejarVistaPreviaImatge();
+    netejarVistaPreviaDocument();
 }
 
 
-// ---------------------------- NETEJAR VISTA PRÈVIA DE LA IMATGE ----------------------------
-function netejarVistaPreviaImatge() {
-
-    const previewImage = obtenirImatgeVistaPrevia();
+// ---------------------------- NETEJAR VISTA PRÈVIA DEL DOCUMENT ----------------------------
+function netejarVistaPreviaDocument() {
 
     if (ocrPreviewContainer) {
         ocrPreviewContainer.style.display = 'none';
@@ -128,13 +127,81 @@ function netejarVistaPreviaImatge() {
         ocrPreviewEmpty.style.display = 'block';
     }
 
-    if (previewImage) {
-        previewImage.src = '';
+    if (ocrPreviewFrame) {
+        ocrPreviewFrame.removeAttribute('src');
     }
 
     if (ocrFileName) {
         ocrFileName.textContent = '';
     }
+}
+
+
+// ---------------------------- ALLIBERAR URL TEMPORAL DE VISTA PRÈVIA ----------------------------
+function alliberarObjectUrlPreview() {
+    if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+    }
+}
+
+
+// ---------------------------- NORMALITZAR TEXT PER COMPARACIÓ VISUAL ----------------------------
+function normalitzarTextVisual(valor) {
+    return (valor || '')
+        .toString()
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+
+// ---------------------------- AJUDA VISUAL D'AVISOS OCR DE MATÈRIA ----------------------------
+function actualitzarAvisosMateriaOcr() {
+    document.querySelectorAll('.lot-row').forEach(row => {
+        const select = row.querySelector('.materia-primera-select');
+        const avis = row.querySelector('.ocr-materia-avis');
+
+        if (!select || !avis) {
+            return;
+        }
+
+        const materiaOcr = normalitzarTextVisual(avis.dataset.ocrMateria);
+        const textSeleccionat = normalitzarTextVisual(select.options[select.selectedIndex]?.text || '');
+
+        if (materiaOcr !== '' && textSeleccionat !== ''
+                && (textSeleccionat.includes(materiaOcr) || materiaOcr.includes(textSeleccionat))) {
+            avis.classList.remove('form-error');
+            avis.classList.add('form-success');
+        }
+        else {
+            avis.classList.remove('form-success');
+            avis.classList.add('form-error');
+        }
+    });
+}
+
+
+document.addEventListener('change', function (event) {
+    if (event.target.classList.contains('materia-primera-select')) {
+        actualitzarAvisosMateriaOcr();
+    }
+});
+
+
+// ---------------------------- BOTÓ VISUAL PER CREAR MATÈRIA PRIMERA ----------------------------
+function inicialitzarBotonsMateriesPrimeres() {
+    document.querySelectorAll('.btn-toggle-materia-primera').forEach(button => {
+        button.onclick = function () {
+            const url = this.dataset.url;
+
+            if (url) {
+                window.open(url, '_blank');
+            }
+        };
+    });
 }
 
 
@@ -179,12 +246,7 @@ function bindRemoveButtons() {
                 this.closest('.lot-row').remove();
 
                 reindexLots();
-
-                if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
-                    inicialitzarBotonsUnitatsMesura();
-                }
-
-                bindRemoveButtons();
+                reinicialitzarAjudaLots();
             }
         };
     });
@@ -210,18 +272,33 @@ if (addLotBtn && lotsContainer) {
             }
         });
 
+        newRow.querySelectorAll('.ocr-materia-avis, .form-error, .form-success').forEach(element => {
+            if (element.classList.contains('ocr-materia-avis')) {
+                element.remove();
+            }
+        });
+
         lotsContainer.appendChild(newRow);
 
         reindexLots();
-
-        if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
-            inicialitzarBotonsUnitatsMesura();
-        }
-
-        bindRemoveButtons();
+        reinicialitzarAjudaLots();
     });
 }
 
 
+// ---------------------------- REINICIALITZAR AJUDA DE LOTS ----------------------------
+function reinicialitzarAjudaLots() {
+    if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
+        inicialitzarBotonsUnitatsMesura();
+    }
+
+    inicialitzarBotonsMateriesPrimeres();
+    bindRemoveButtons();
+    actualitzarAvisosMateriaOcr();
+}
+
+
 // ---------------------------- INICIALITZAR BOTONS ----------------------------
-bindRemoveButtons();
+reinicialitzarAjudaLots();
+
+window.addEventListener('beforeunload', alliberarObjectUrlPreview);
