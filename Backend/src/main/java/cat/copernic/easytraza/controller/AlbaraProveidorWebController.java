@@ -126,6 +126,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("ocrDocumentTemporalId", resultatOcr.getOcrDocumentTemporalId());
             model.addAttribute("ocrDocumentNomOriginal", resultatOcr.getOcrDocumentNomOriginal());
             model.addAttribute("ocrDocumentUrlTemporal", resultatOcr.getOcrDocumentUrlTemporal());
+            model.addAttribute("ocrDocumentContentType", resultatOcr.getOcrDocumentContentType());
             carregarDadesFormulari(model);
 
             return "albaransProveidor/formAlbaraProveidor";
@@ -141,6 +142,23 @@ public class AlbaraProveidorWebController {
 
             return "albaransProveidor/formAlbaraProveidor";
         }
+    }
+
+
+    // RECARREGAR LLISTES DEL FORMULARI SENSE PERDRE LES DADES ESCRITES
+    @PostMapping("/reload-form")
+    public String recarregarFormulari(@ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
+                                      @RequestParam(value = "ocrDocumentTemporalId", required = false) String ocrDocumentTemporalId,
+                                      Model model) {
+        assegurarLotsFormulari(albaraProveidor);
+
+        model.addAttribute("albaraProveidor", albaraProveidor);
+        model.addAttribute("info", "Llistes actualitzades. Ja pots seleccionar els elements creats.");
+        model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
+        afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
+        carregarDadesFormulari(model);
+
+        return "albaransProveidor/formAlbaraProveidor";
     }
 
 
@@ -161,6 +179,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
             model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
+            afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
             carregarDadesFormulari(model);
 
             return "albaransProveidor/formAlbaraProveidor";
@@ -215,6 +234,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
             model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
+            afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
             carregarDadesFormulari(model);
 
             return "albaransProveidor/formAlbaraProveidor";
@@ -245,6 +265,23 @@ public class AlbaraProveidorWebController {
         model.addAttribute("proveidors", proveidorService.getAllProveidors());
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
         model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
+    }
+
+
+    // AFEGIR DADES DE PREVISUALITZACIÓ DEL DOCUMENT OCR TEMPORAL
+    private void afegirDadesDocumentTemporal(Model model, String ocrDocumentTemporalId) {
+        if (ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) {
+            return;
+        }
+
+        try {
+            model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
+            model.addAttribute("ocrDocumentUrlTemporal", ocrAlbaraProveidorService.obtenirUrlDocumentTemporal(ocrDocumentTemporalId));
+            model.addAttribute("ocrDocumentContentType", ocrAlbaraProveidorService.obtenirContentTypeDocumentTemporal(ocrDocumentTemporalId));
+        }
+        catch (RuntimeException ignored) {
+            model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
+        }
     }
 
 

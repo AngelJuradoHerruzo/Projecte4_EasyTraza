@@ -37,7 +37,7 @@ public class AlbaraProveidorService {
     private final UnitatMesuraService unitatMesuraService;
     private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
 
-    @Value("${ocr.documents.final-path:uploads/albarans-proveidor}")
+    @Value("${ocr.documents.final-path:backend/uploads/albarans-proveidor}")
     private String directoriFitxers;
 
     private static final String URL_FITXERS = "/uploads/albarans-proveidor/";

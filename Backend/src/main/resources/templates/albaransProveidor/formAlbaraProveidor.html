@@ -62,6 +62,12 @@
                     <span th:text="${error}"></span>
                 </div>
 
+                <!-- Missatge informatiu general -->
+                <div th:if="${info}" class="form-success">
+                    <i class="bi bi-check-circle"></i>
+                    <span th:text="${info}"></span>
+                </div>
+
                 <!-- Missatge informatiu OCR -->
                 <div th:if="${ocrResultat != null}" class="form-success">
                     <i class="bi bi-check-circle"></i>
@@ -178,10 +184,15 @@
                                    th:text="${ocrDocumentNomOriginal != null and !#strings.isEmpty(ocrDocumentNomOriginal)} ? ${ocrDocumentNomOriginal} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : '')">
                                 </p>
 
+                                <img id="ocrPreviewImage"
+                                     th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? @{${ocrDocumentUrlTemporal}} : ''"
+                                     th:style="${ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')} ? 'display:block; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain;' : 'display:none; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain;'"
+                                     alt="Vista prèvia de l'albarà OCR">
+
                                 <iframe id="ocrPreviewFrame"
                                         th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? @{${ocrDocumentUrlTemporal}} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? @{${albaraProveidor.fitxers[0]}} : '')"
                                         title="Vista prèvia de l'albarà"
-                                        style="width:100%; min-height:460px; border:0; border-radius:14px; background:white;">
+                                        th:style="${ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')} ? 'display:none; width:100%; min-height:460px; border:0; border-radius:14px; background:white;' : 'display:block; width:100%; min-height:460px; border:0; border-radius:14px; background:white;'">
                                 </iframe>
                             </div>
 
@@ -223,16 +234,26 @@
                             <!----------------------- PROVEÏDOR ----------------------->
                             <div class="form-group">
                                 <label class="form-label" for="proveidor">Proveïdor *</label>
-                                <select id="proveidor"
-                                        th:field="*{proveidor.id}"
-                                        class="form-select"
-                                        required>
-                                    <option value="">-- Selecciona --</option>
-                                    <option th:each="p : ${proveidors}"
-                                            th:value="${p.id}"
-                                            th:text="${p.nomProveidor}">
-                                    </option>
-                                </select>
+
+                                <div style="display:grid; grid-template-columns:1fr auto; gap:8px;">
+                                    <select id="proveidor"
+                                            th:field="*{proveidor.id}"
+                                            class="form-select"
+                                            required>
+                                        <option value="">-- Selecciona --</option>
+                                        <option th:each="p : ${proveidors}"
+                                                th:value="${p.id}"
+                                                th:text="${p.nomProveidor}">
+                                        </option>
+                                    </select>
+
+                                    <button type="button"
+                                            class="btn-table btn-action-edit btn-toggle-proveidor"
+                                            title="Crear proveïdor en una pestanya nova"
+                                            th:attr="data-url=@{/proveidors/new}">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
 
                                 <div th:if="${ocrResultat != null
                                             and ocrResultat.albaraPendent != null
@@ -277,10 +298,20 @@
                                 </p>
                             </div>
 
-                            <button type="button" id="addLotBtn" class="btn btn-primary">
-                                <i class="bi bi-plus-lg"></i>
-                                Afegir lot
-                            </button>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                                <button type="submit"
+                                        class="btn btn-secondary"
+                                        th:formaction="@{/albarans-proveidor/reload-form}"
+                                        formnovalidate>
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                    Actualitzar llistes
+                                </button>
+
+                                <button type="button" id="addLotBtn" class="btn btn-primary">
+                                    <i class="bi bi-plus-lg"></i>
+                                    Afegir lot
+                                </button>
+                            </div>
                         </div>
 
                         <!----------------------- CONTENIDOR DE LOTS ----------------------->

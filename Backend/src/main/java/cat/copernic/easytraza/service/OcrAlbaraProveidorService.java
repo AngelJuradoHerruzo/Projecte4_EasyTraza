@@ -51,7 +51,7 @@ public class OcrAlbaraProveidorService {
     @Value("${ocr.tesseract.language:spa}")
     private String tesseractLanguage;
 
-    @Value("${ocr.documents.temp-path:uploads/ocr-temp}")
+    @Value("${ocr.documents.temp-path:backend/uploads/ocr-temp}")
     private String documentsTempPath;
 
     public OcrAlbaraProveidorService(List<OcrParserProveidor> parsers) {
@@ -64,10 +64,25 @@ public class OcrAlbaraProveidorService {
         validarFitxer(fitxer);
 
         DocumentTemporalOcr documentTemporal = guardarDocumentTemporal(fitxer);
+
         String textOcrOriginal = extreureTextOcr(documentTemporal);
+        String textComparacioInicial = OcrUtils.normalitzarPerComparar(textOcrOriginal);
+        OcrProveidorDetectat proveidorDetectat = OcrProveidorDetectat.detectar(textComparacioInicial);
+
+        if (proveidorDetectat == OcrProveidorDetectat.LA_META) {
+            String textZonesLaMeta = extreureTextZonesLaMeta(documentTemporal);
+
+            if (textZonesLaMeta != null && !textZonesLaMeta.isBlank()) {
+                textOcrOriginal = textOcrOriginal + "\n\n" + textZonesLaMeta;
+            }
+        }
+
         String textOcrNormalitzat = OcrUtils.normalitzarText(textOcrOriginal);
         String textComparacio = OcrUtils.normalitzarPerComparar(textOcrNormalitzat);
-        OcrProveidorDetectat proveidorDetectat = OcrProveidorDetectat.detectar(textComparacio);
+
+        if (proveidorDetectat == null) {
+            proveidorDetectat = OcrProveidorDetectat.detectar(textComparacio);
+        }
 
         OcrAlbaraPendent albaraPendent = parsejarAlbara(proveidorDetectat, textOcrOriginal, textOcrNormalitzat);
 
@@ -86,6 +101,28 @@ public class OcrAlbaraProveidorService {
         }
 
         return resultat;
+    }
+
+
+    public String obtenirUrlDocumentTemporal(String ocrDocumentTemporalId) {
+        obtenirRutaDocumentTemporal(ocrDocumentTemporalId);
+        return "/uploads/ocr-temp/" + ocrDocumentTemporalId;
+    }
+
+    public String obtenirContentTypeDocumentTemporal(String ocrDocumentTemporalId) {
+        Path ruta = obtenirRutaDocumentTemporal(ocrDocumentTemporalId);
+
+        try {
+            String contentType = Files.probeContentType(ruta);
+
+            if (contentType != null && !contentType.isBlank()) {
+                return contentType;
+            }
+        } catch (IOException ignored) {
+            // Es fa servir la inferència per extensió.
+        }
+
+        return inferirContentType(ocrDocumentTemporalId);
     }
 
     public Path obtenirRutaDocumentTemporal(String ocrDocumentTemporalId) {
@@ -203,6 +240,77 @@ public class OcrAlbaraProveidorService {
             LOGGER.error("Error en executar Tesseract sobre un PDF d'albarà.", ex);
             throw new IllegalStateException("Error executant Tesseract OCR sobre el PDF.", ex);
         }
+    }
+
+    private String extreureTextZonesLaMeta(DocumentTemporalOcr documentTemporal) {
+        try {
+            BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
+
+            if (imatge == null) {
+                return "";
+            }
+
+            String info = executarOcrZona(imatge, 0.035, 0.315, 0.425, 0.075);
+            String materies = executarOcrZona(imatge, 0.145, 0.415, 0.380, 0.115);
+            String lots = executarOcrZona(imatge, 0.600, 0.395, 0.140, 0.145);
+            String sacos = executarOcrZona(imatge, 0.765, 0.395, 0.100, 0.145);
+
+            return """
+                    [[LA_META_INFO]]
+                    %s
+                    [[LA_META_MATERIES]]
+                    %s
+                    [[LA_META_LOTS]]
+                    %s
+                    [[LA_META_SACOS]]
+                    %s
+                    [[FI_LA_META]]
+                    """.formatted(info, materies, lots, sacos);
+
+        } catch (Exception ex) {
+            LOGGER.warn("No s'ha pogut executar l'OCR per zones de LA META. Es farà servir el text OCR general.", ex);
+            return "";
+        }
+    }
+
+    private BufferedImage llegirPrimeraImatgeDocument(DocumentTemporalOcr documentTemporal) throws IOException {
+        String nom = documentTemporal.nomGuardat().toLowerCase(Locale.ROOT);
+
+        if (nom.endsWith(".pdf")) {
+            try (PDDocument document = Loader.loadPDF(documentTemporal.ruta().toFile())) {
+                if (document.getNumberOfPages() == 0) {
+                    return null;
+                }
+
+                PDFRenderer renderer = new PDFRenderer(document);
+                return renderer.renderImageWithDPI(0, 300, ImageType.RGB);
+            }
+        }
+
+        return ImageIO.read(documentTemporal.ruta().toFile());
+    }
+
+    private String executarOcrZona(BufferedImage imatge, double x, double y, double amplada, double alcada)
+            throws TesseractException {
+
+        BufferedImage zona = retallarZona(imatge, x, y, amplada, alcada);
+        return crearTesseract().doOCR(prepararImatgePerOcr(zona));
+    }
+
+    private BufferedImage retallarZona(BufferedImage imatge, double x, double y, double amplada, double alcada) {
+        int imageWidth = imatge.getWidth();
+        int imageHeight = imatge.getHeight();
+
+        int cropX = limitar((int) Math.round(imageWidth * x), 0, imageWidth - 1);
+        int cropY = limitar((int) Math.round(imageHeight * y), 0, imageHeight - 1);
+        int cropWidth = limitar((int) Math.round(imageWidth * amplada), 1, imageWidth - cropX);
+        int cropHeight = limitar((int) Math.round(imageHeight * alcada), 1, imageHeight - cropY);
+
+        return imatge.getSubimage(cropX, cropY, cropWidth, cropHeight);
+    }
+
+    private int limitar(int valor, int minim, int maxim) {
+        return Math.max(minim, Math.min(valor, maxim));
     }
 
     private BufferedImage prepararImatgePerOcr(BufferedImage original) {

@@ -3,6 +3,7 @@ const documentOcr = document.getElementById('documentOcr');
 const imatgeAlbara = document.getElementById('imatgeAlbara');
 const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
 const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
+const ocrPreviewImage = document.getElementById('ocrPreviewImage');
 const ocrPreviewFrame = document.getElementById('ocrPreviewFrame');
 const ocrFileName = document.getElementById('ocrFileName');
 const btnEscanejarOcr = document.getElementById('btnEscanejarOcr');
@@ -16,6 +17,9 @@ let previewObjectUrl = null;
 // ---------------------------- DADES ORIGINALS DE LA VISTA PRÈVIA ----------------------------
 const nomDocumentInicial = ocrFileName ? ocrFileName.textContent : '';
 const srcDocumentInicial = ocrPreviewFrame ? ocrPreviewFrame.getAttribute('src') : '';
+const srcImatgeInicial = ocrPreviewImage ? ocrPreviewImage.getAttribute('src') : '';
+const displayImatgeInicial = ocrPreviewImage ? ocrPreviewImage.style.display : '';
+const displayFrameInicial = ocrPreviewFrame ? ocrPreviewFrame.style.display : '';
 
 
 // ---------------------------- VISTA PRÈVIA DEL DOCUMENT OCR ----------------------------
@@ -72,8 +76,27 @@ function mostrarDocumentSeleccionat(input) {
         ocrFileName.textContent = file.name;
     }
 
-    if (ocrPreviewFrame) {
-        ocrPreviewFrame.src = previewObjectUrl;
+    if (esImatge) {
+        if (ocrPreviewImage) {
+            ocrPreviewImage.src = previewObjectUrl;
+            ocrPreviewImage.style.display = 'block';
+        }
+
+        if (ocrPreviewFrame) {
+            ocrPreviewFrame.removeAttribute('src');
+            ocrPreviewFrame.style.display = 'none';
+        }
+    }
+    else {
+        if (ocrPreviewFrame) {
+            ocrPreviewFrame.src = previewObjectUrl;
+            ocrPreviewFrame.style.display = 'block';
+        }
+
+        if (ocrPreviewImage) {
+            ocrPreviewImage.removeAttribute('src');
+            ocrPreviewImage.style.display = 'none';
+        }
     }
 
     if (ocrPreviewContainer) {
@@ -95,6 +118,16 @@ function restaurarVistaPreviaOriginal() {
 
         if (ocrPreviewFrame) {
             ocrPreviewFrame.src = srcDocumentInicial;
+            ocrPreviewFrame.style.display = displayFrameInicial || 'block';
+        }
+
+        if (ocrPreviewImage && srcImatgeInicial) {
+            ocrPreviewImage.src = srcImatgeInicial;
+            ocrPreviewImage.style.display = displayImatgeInicial || 'block';
+        }
+        else if (ocrPreviewImage) {
+            ocrPreviewImage.removeAttribute('src');
+            ocrPreviewImage.style.display = 'none';
         }
 
         if (ocrFileName) {
@@ -129,6 +162,11 @@ function netejarVistaPreviaDocument() {
 
     if (ocrPreviewFrame) {
         ocrPreviewFrame.removeAttribute('src');
+    }
+
+    if (ocrPreviewImage) {
+        ocrPreviewImage.removeAttribute('src');
+        ocrPreviewImage.style.display = 'none';
     }
 
     if (ocrFileName) {
@@ -189,6 +227,20 @@ document.addEventListener('change', function (event) {
         actualitzarAvisosMateriaOcr();
     }
 });
+
+
+// ---------------------------- BOTÓ VISUAL PER CREAR PROVEÏDOR ----------------------------
+function inicialitzarBotonsProveidors() {
+    document.querySelectorAll('.btn-toggle-proveidor').forEach(button => {
+        button.onclick = function () {
+            const url = this.dataset.url;
+
+            if (url) {
+                window.open(url, '_blank');
+            }
+        };
+    });
+}
 
 
 // ---------------------------- BOTÓ VISUAL PER CREAR MATÈRIA PRIMERA ----------------------------
@@ -292,6 +344,7 @@ function reinicialitzarAjudaLots() {
         inicialitzarBotonsUnitatsMesura();
     }
 
+    inicialitzarBotonsProveidors();
     inicialitzarBotonsMateriesPrimeres();
     bindRemoveButtons();
     actualitzarAvisosMateriaOcr();

@@ -3,6 +3,8 @@ package cat.copernic.easytraza.service.ocr;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +61,46 @@ public final class OcrUtils {
                 .replace("\t", " ")
                 .trim()
                 .replaceAll("\\s{2,}", " ");
+    }
+
+    public static List<String> obtenirLiniesNoBuides(String text) {
+        List<String> linies = new ArrayList<>();
+
+        if (text == null || text.isBlank()) {
+            return linies;
+        }
+
+        for (String part : text.split("\\R")) {
+            String linia = netejarValor(part);
+
+            if (linia != null && !linia.isBlank()) {
+                linies.add(linia);
+            }
+        }
+
+        return linies;
+    }
+
+    public static String extreureBlocEntreMarcadors(String text, String marcadorInici, String marcadorFi) {
+        if (text == null || marcadorInici == null || marcadorFi == null) {
+            return "";
+        }
+
+        int inici = text.indexOf(marcadorInici);
+
+        if (inici < 0) {
+            return "";
+        }
+
+        inici += marcadorInici.length();
+
+        int fi = text.indexOf(marcadorFi, inici);
+
+        if (fi < 0) {
+            return text.substring(inici).trim();
+        }
+
+        return text.substring(inici, fi).trim();
     }
 
     public static boolean conteAlguna(String text, String... valors) {
