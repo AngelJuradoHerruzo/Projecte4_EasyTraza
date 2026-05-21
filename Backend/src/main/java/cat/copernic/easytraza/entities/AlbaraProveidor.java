@@ -24,6 +24,9 @@ public class AlbaraProveidor {
     @Column(nullable = false)
     private LocalDate dataRecepcio;
 
+    @Column(name = "numero_albara", nullable = false)
+    private String numeroAlbara;
+
     @ManyToOne
     @JoinColumn(name = "proveidor_id", nullable = false)
     private Proveidor proveidor;
@@ -61,6 +64,10 @@ public class AlbaraProveidor {
     // ─────── DATA RECEPCIÓ ───────
     public LocalDate getDataRecepcio() { return dataRecepcio; }
     public void setDataRecepcio(LocalDate dataRecepcio) { this.dataRecepcio = dataRecepcio; }
+
+    // ─────── NÚMERO ALBARÀ ───────
+    public String getNumeroAlbara() { return numeroAlbara; }
+    public void setNumeroAlbara(String numeroAlbara) { this.numeroAlbara = numeroAlbara; }
 
     // ───────── PROVEÏDOR ─────────
     public Proveidor getProveidor() { return proveidor; }

@@ -81,40 +81,30 @@
                     <!-- Identificador de l'albarà quan s'està editant -->
                     <input type="hidden" th:field="*{id}">
 
-                    <!-- Imatge OCR pendent de guardar definitivament, si ve d'un processat anterior -->
-                    <input type="hidden" name="ocrImageBase64" th:value="${ocrImageBase64}">
-                    <input type="hidden" name="ocrImageOriginalName" th:value="${ocrImageOriginalName}">
-
                     <!-- Fitxers ja guardats de l'albarà -->
                     <div th:each="fitxer, stat : *{fitxers}">
                         <input type="hidden" th:field="*{fitxers[__${stat.index}__]}">
                     </div>
 
-                    <!----------------------- ENTRADA OCR / IMATGE ALBARÀ ----------------------->
+                    <!----------------------- FITXER DE L'ALBARÀ ----------------------->
                     <div style="margin-bottom:24px; padding:18px; border:1px solid #f0e6dc; border-radius:18px; background:#fffaf5;">
 
-                        <h2 class="content-title">Entrada OCR</h2>
+                        <h2 class="content-title">Fitxer de l'albarà</h2>
                         <p class="content-subtitle">
-                            Selecciona la imatge de l'albarà. En editar, si ja hi ha una imatge guardada, es mostra a la vista prèvia.
+                            Adjunta la imatge o PDF del document. El fitxer es guardarà només en prémer Guardar.
                         </p>
 
-                        <div style="margin-top:18px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end;">
+                        <div style="margin-top:18px; display:grid; grid-template-columns:1fr; gap:16px; align-items:end;">
 
-                            <!----------------------- IMATGE DE L'ALBARÀ ----------------------->
+                            <!----------------------- FITXER DE L'ALBARÀ ----------------------->
                             <div class="form-group" style="margin:0;">
-                                <label class="form-label">Imatge de l'albarà</label>
+                                <label class="form-label">Fitxer de l'albarà</label>
                                 <input id="ocrFile"
                                        type="file"
                                        name="imatgeAlbara"
                                        class="form-input"
-                                       accept="image/*">
+                                       accept="image/*,application/pdf">
                             </div>
-
-                            <!----------------------- BOTÓ OCR SENSE ACCIÓ ----------------------->
-                            <button type="button" class="btn btn-soft">
-                                <i class="bi bi-camera"></i>
-                                Processar OCR
-                            </button>
 
                         </div>
 
@@ -160,7 +150,7 @@
                             Informació principal de la recepció.
                         </p>
 
-                        <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px;">
+                        <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px;">
 
                             <!----------------------- DATA RECEPCIÓ ----------------------->
                             <div class="form-group">
@@ -172,6 +162,17 @@
                                        class="form-input"
                                        required>
                             </div>
+
+                            <!----------------------- NÚMERO ALBARÀ ----------------------->
+                            <div class="form-group">
+                                <label class="form-label">Número albarà</label>
+                                <input type="text"
+                                       th:field="*{numeroAlbara}"
+                                       class="form-input"
+                                       maxlength="80"
+                                       placeholder="Es generarà automàticament si queda buit">
+                            </div>
+
 
                             <!----------------------- PROVEÏDOR ----------------------->
                             <div class="form-group">
@@ -190,17 +191,16 @@
 
                             <!----------------------- USUARI RECEPTOR ----------------------->
                             <div class="form-group">
-                                <label class="form-label">Usuari receptor *</label>
-                                <select id="usuariReceptor"
-                                        th:field="*{usuariReceptor.id}"
-                                        class="form-select"
-                                        required>
-                                    <option value="">-- Selecciona --</option>
-                                    <option th:each="u : ${usuaris}"
-                                            th:value="${u.id}"
-                                            th:text="${u.nomComplet}">
-                                    </option>
-                                </select>
+                                <label class="form-label">Usuari receptor</label>
+                                <div class="form-input" style="display:flex; align-items:center; min-height:42px; color:#7a5c3f; background:#fffaf5;">
+                                    <span th:if="${albaraProveidor.usuariReceptor != null}"
+                                          th:text="${albaraProveidor.usuariReceptor.nomComplet}">
+                                        Usuari receptor
+                                    </span>
+                                    <span th:if="${albaraProveidor.usuariReceptor == null}">
+                                        S'assignarà automàticament des de la sessió
+                                    </span>
+                                </div>
                             </div>
 
                         </div>
@@ -240,11 +240,12 @@
 
                                     <!----------------------- IDENTIFICADOR DEL LOT ----------------------->
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">Identificador lot</label>
+                                        <label class="form-label">Identificador lot *</label>
                                         <input type="text"
+                                            th:field="*{lots[__${stat.index}__].identificadorLot}"
                                             class="form-input"
-                                            th:value="${lot.identificadorLot}"
-                                            readonly>
+                                            maxlength="80"
+                                            required>
                                     </div>
 
                                     <!----------------------- MATÈRIA PRIMERA ----------------------->

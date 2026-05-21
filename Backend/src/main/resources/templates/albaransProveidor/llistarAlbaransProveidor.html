@@ -49,16 +49,43 @@
                 <div class="toolbar-block">
                     <h2 class="content-title">Llistat d'albarans</h2>
                     <p class="content-subtitle">
-                        Els albarans es mostren agrupats per proveïdor.
+                        Filtra per proveïdor, número, lot o usuari receptor.
                     </p>
                 </div>
 
-                <div class="toolbar-actions">
-                    <div class="search-field">
-                        <i class="bi bi-search"></i>
-                        <input id="searchInput" type="text" placeholder="Cercar número, data o proveïdor...">
+                <form th:action="@{/albarans-proveidor/list}"
+                      method="get"
+                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; flex:1; min-width:0;">
+
+                    <div class="search-field" style="width:165px;">
+                        <i class="bi bi-building"></i>
+                        <input name="proveidor" type="text" th:value="${proveidor}" placeholder="Proveïdor...">
                     </div>
-                </div>
+
+                    <div class="search-field" style="width:135px;">
+                        <i class="bi bi-receipt"></i>
+                        <input name="numeroAlbara" type="text" th:value="${numeroAlbara}" placeholder="Número...">
+                    </div>
+
+                    <div class="search-field" style="width:145px;">
+                        <i class="bi bi-upc-scan"></i>
+                        <input name="identificadorLot" type="text" th:value="${identificadorLot}" placeholder="Lot...">
+                    </div>
+
+                    <div class="search-field" style="width:160px;">
+                        <i class="bi bi-person"></i>
+                        <input name="receptor" type="text" th:value="${receptor}" placeholder="Receptor...">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+
+                    <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Neteja</span>
+                    </a>
+                </form>
             </div>
 
             <!----------------------- LLISTAT AGRUPAT ----------------------->
@@ -71,9 +98,6 @@
                     <div class="lot-group-header">
                         <div>
                             <h3 th:text="${grup.key}">Proveïdor</h3>
-                            <p>
-                                Albarans ordenats per número d'identificador.
-                            </p>
                         </div>
                     </div>
 
@@ -88,9 +112,10 @@
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
 
                                 <div>
-                                    <h3 class="info-card-title" style="margin-bottom:4px;">
-                                        <span>Albarà #</span>
-                                        <span th:text="${albara.id}">1</span>
+                                    <h3 class="info-card-title"
+                                        style="margin-bottom:4px;"
+                                        th:text="${albaraProveidorService.obtenirNumeroAlbaraVisible(albara)}">
+                                        1
                                     </h3>
 
                                     <p class="info-card-description"
@@ -111,7 +136,7 @@
                                 <div style="display:grid; grid-template-columns:90px 1fr; gap:10px; align-items:center;">
                                     <span class="info-card-meta-label">Proveïdor</span>
                                     <span class="info-card-meta-value"
-                                          th:text="${albara.proveidor.nomProveidor}">
+                                          th:text="${albara.proveidor != null ? albara.proveidor.nomProveidor : '-'}">
                                         Proveïdor
                                     </span>
                                 </div>
@@ -119,7 +144,7 @@
                                 <div style="display:grid; grid-template-columns:90px 1fr; gap:10px; align-items:center;">
                                     <span class="info-card-meta-label">Receptor</span>
                                     <span class="info-card-meta-value"
-                                          th:text="${albara.usuariReceptor.nomComplet}">
+                                          th:text="${albara.usuariReceptor != null ? albara.usuariReceptor.nomComplet : '-'}">
                                         Usuari
                                     </span>
                                 </div>
@@ -180,7 +205,8 @@
                             </div>
 
                             <!----------------------- ACCIONS ----------------------->
-                            <div style="margin-top:auto; padding-top:14px; border-top:1px solid #f0e6dc; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                            <div th:if="${albaraProveidorService.esModificable(albara)}"
+                                 style="margin-top:auto; padding-top:14px; border-top:1px solid #f0e6dc; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
 
                                 <a th:href="@{/albarans-proveidor/detail/{id}(id=${albara.id})}"
                                    class="btn-table btn-action-view"
@@ -189,24 +215,39 @@
                                     <span>Veure</span>
                                 </a>
 
-                                <a th:if="${albaraProveidorService.esModificable(albara)}"
-                                   th:href="@{/albarans-proveidor/edit/{id}(id=${albara.id})}"
+                                <a th:href="@{/albarans-proveidor/edit/{id}(id=${albara.id})}"
                                    class="btn-table btn-action-edit"
                                    style="justify-content:center;">
                                     <i class="bi bi-pencil-square"></i>
                                     <span>Editar</span>
                                 </a>
 
-                                <span th:if="${!albaraProveidorService.esModificable(albara)}"></span>
-
-                                <a th:if="${albaraProveidorService.esModificable(albara)}"
-                                   th:href="@{/albarans-proveidor/delete/{id}(id=${albara.id})}"
+                                <a th:href="@{/albarans-proveidor/delete/{id}(id=${albara.id})}"
                                    class="btn-table btn-action-delete"
                                    style="justify-content:center;"
                                    onclick="return confirm('Segur que vols eliminar aquest albarà?')">
                                     <i class="bi bi-trash3"></i>
                                     <span>Eliminar</span>
                                 </a>
+
+                            </div>
+
+                            <div th:if="${!albaraProveidorService.esModificable(albara)}"
+                                 style="margin-top:auto; padding-top:14px; border-top:1px solid #f0e6dc; display:grid; grid-template-columns:1fr 2fr; gap:8px;">
+
+                                <a th:href="@{/albarans-proveidor/detail/{id}(id=${albara.id})}"
+                                   class="btn-table btn-action-view"
+                                   style="justify-content:center;">
+                                    <i class="bi bi-eye"></i>
+                                    <span>Veure</span>
+                                </a>
+
+                                <span class="btn-table btn-disabled-delete"
+                                      style="justify-content:center; width:100%;"
+                                      title="Aquest albarà no es pot modificar ni eliminar perquè té algun lot iniciat o acabat">
+                                    <i class="bi bi-lock-fill"></i>
+                                    <span>Lot iniciat</span>
+                                </span>
 
                             </div>
 
@@ -220,7 +261,7 @@
                 <div th:if="${#maps.isEmpty(albaransPerProveidor)}" class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-box">
                         <i class="bi bi-receipt"></i>
-                        <p>No hi ha albarans de proveïdor registrats.</p>
+                        <p>No hi ha albarans de proveïdor que coincideixin amb els filtres.</p>
                     </div>
                 </div>
 

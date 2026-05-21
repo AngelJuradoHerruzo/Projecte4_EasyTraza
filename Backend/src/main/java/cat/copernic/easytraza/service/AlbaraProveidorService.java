@@ -6,12 +6,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cat.copernic.easytraza.entities.AlbaraProveidor;
 import cat.copernic.easytraza.entities.LotProveidor;
+import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.AlbaraProveidorRepository;
+import cat.copernic.easytraza.repository.UsuariRepository;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 @Transactional
@@ -28,13 +31,17 @@ public class AlbaraProveidorService {
 
     // ---------------------------- REPOSITORIS, SERVICES I CONFIGURACIÓ ----------------------------
     private final AlbaraProveidorRepository albaraProveidorRepository;
+    private final UsuariRepository usuariRepository;
     private final UnitatMesuraService unitatMesuraService;
 
-    private static final String DIRECTORI_FITXERS = "Backend/uploads/albarans-proveidor";
+    private static final String DIRECTORI_FITXERS = "backend/uploads/albarans-proveidor";
+    private static final String URL_FITXERS = "/uploads/albarans-proveidor/";
 
     public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository,
+                                  UsuariRepository usuariRepository,
                                   UnitatMesuraService unitatMesuraService) {
         this.albaraProveidorRepository = albaraProveidorRepository;
+        this.usuariRepository = usuariRepository;
         this.unitatMesuraService = unitatMesuraService;
     }
 
@@ -63,10 +70,34 @@ public class AlbaraProveidorService {
 
     // OBTENIR ALBARANS AGRUPATS PER PROVEÏDOR
     public Map<String, List<AlbaraProveidor>> getAlbaransAgrupatsPerProveidor() {
+        return agruparAlbaransPerProveidor(getAllAlbaransProveidor());
+    }
+
+
+    // OBTENIR ALBARANS AGRUPATS PER PROVEÏDOR AMB FILTRES
+    public Map<String, List<AlbaraProveidor>> getAlbaransAgrupatsPerProveidor(String proveidor,
+                                                                              String numeroAlbara,
+                                                                              String identificadorLot,
+                                                                              String dataRecepcio,
+                                                                              String receptor) {
+        List<AlbaraProveidor> albaransFiltrats = getAllAlbaransProveidor().stream()
+                .filter(albara -> coincideixProveidor(albara, proveidor))
+                .filter(albara -> coincideixNumeroAlbara(albara, numeroAlbara))
+                .filter(albara -> coincideixIdentificadorLot(albara, identificadorLot))
+                .filter(albara -> coincideixDataRecepcio(albara, dataRecepcio))
+                .filter(albara -> coincideixReceptor(albara, receptor))
+                .toList();
+
+        return agruparAlbaransPerProveidor(albaransFiltrats);
+    }
+
+
+    // AGRUPAR ALBARANS PER NOM DE PROVEÏDOR
+    private Map<String, List<AlbaraProveidor>> agruparAlbaransPerProveidor(List<AlbaraProveidor> albarans) {
 
         Map<String, List<AlbaraProveidor>> albaransPerProveidor = new LinkedHashMap<>();
 
-        for (AlbaraProveidor albara : getAllAlbaransProveidor()) {
+        for (AlbaraProveidor albara : albarans) {
 
             String nomProveidor = "Sense proveïdor";
 
@@ -101,7 +132,6 @@ public class AlbaraProveidorService {
 
         AlbaraProveidor albaraProveidor = albaraProveidorOpt.get();
 
-        // Força la càrrega dels lots per poder mostrar-los al formulari i al detall
         if (albaraProveidor.getLots() != null) {
             albaraProveidor.getLots().size();
 
@@ -112,7 +142,6 @@ public class AlbaraProveidorService {
             }
         }
 
-        // Força la càrrega de la imatge guardada
         if (albaraProveidor.getFitxers() != null) {
             albaraProveidor.getFitxers().size();
         }
@@ -123,30 +152,15 @@ public class AlbaraProveidorService {
 
     // CREAR ALBARÀ DE PROVEÏDOR
     public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor,
-                                                 String ocrImageBase64,
-                                                 String ocrImageOriginalName,
-                                                 MultipartFile imatgeAlbara) {
+                                                 MultipartFile imatgeAlbara,
+                                                 HttpSession session) {
 
-        validarDadesAlbaraProveidor(albaraProveidor);
-
-        int index = 1;
-
-        for (LotProveidor lot : albaraProveidor.getLots()) {
-            validarDadesLotProveidor(lot);
-
-            lot.setIdentificadorLot(generarIdentificadorLot(albaraProveidor, index));
-            lot.setUnitats(unitatMesuraService.normalitzarNom(lot.getUnitats()));
-            lot.setEstat(EstatLot.EN_ESTOC);
-            lot.setDataObertura(null);
-            lot.setAlbaraProveidor(albaraProveidor);
-
-            index++;
-        }
+        albaraProveidor.setUsuariReceptor(obtenirUsuariReceptorSessio(session));
+        prepararNumeroAlbara(albaraProveidor);
+        prepararAlbaraPerGuardar(albaraProveidor);
 
         AlbaraProveidor albaraGuardat = albaraProveidorRepository.save(albaraProveidor);
-
-        guardarImatgeFitxer(albaraGuardat, imatgeAlbara);
-        guardarImatgeOcrDefinitiva(albaraGuardat, ocrImageBase64, ocrImageOriginalName);
+        guardarFitxerAlbara(albaraGuardat, imatgeAlbara);
 
         return albaraProveidorRepository.save(albaraGuardat);
     }
@@ -154,30 +168,30 @@ public class AlbaraProveidorService {
 
     // ACTUALITZAR ALBARÀ DE PROVEÏDOR
     public AlbaraProveidor updateAlbaraProveidor(Long id,
-                                                AlbaraProveidor albaraProveidor,
-                                                String ocrImageBase64,
-                                                String ocrImageOriginalName,
-                                                MultipartFile imatgeAlbara) {
+                                                 AlbaraProveidor albaraProveidor,
+                                                 MultipartFile imatgeAlbara,
+                                                 HttpSession session) {
 
-        Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
+        AlbaraProveidor albaraActual = albaraProveidorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Albarà de proveïdor no trobat."));
 
-        if (albaraProveidorOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de proveïdor no trobat.");
+        validarAlbaraModificable(albaraActual);
+
+        albaraActual.setDataRecepcio(albaraProveidor.getDataRecepcio());
+        albaraActual.setNumeroAlbara(albaraProveidor.getNumeroAlbara());
+        albaraActual.setProveidor(albaraProveidor.getProveidor());
+
+        if (albaraActual.getUsuariReceptor() == null) {
+            albaraActual.setUsuariReceptor(obtenirUsuariReceptorSessio(session));
         }
 
-        AlbaraProveidor albaraProveidorActual = albaraProveidorOpt.get();
+        prepararNumeroAlbara(albaraActual);
+        substituirLots(albaraActual, albaraProveidor.getLots());
+        validarDadesAlbaraProveidor(albaraActual);
 
-        validarAlbaraModificable(albaraProveidorActual);
-        validarDadesAlbaraProveidor(albaraProveidor);
+        guardarFitxerAlbara(albaraActual, imatgeAlbara);
 
-        albaraProveidorActual.setDataRecepcio(albaraProveidor.getDataRecepcio());
-        albaraProveidorActual.setProveidor(albaraProveidor.getProveidor());
-        albaraProveidorActual.setUsuariReceptor(albaraProveidor.getUsuariReceptor());
-
-        guardarImatgeFitxer(albaraProveidorActual, imatgeAlbara);
-        guardarImatgeOcrDefinitiva(albaraProveidorActual, ocrImageBase64, ocrImageOriginalName);
-
-        return albaraProveidorRepository.save(albaraProveidorActual);
+        return albaraProveidorRepository.save(albaraActual);
     }
 
 
@@ -210,6 +224,231 @@ public class AlbaraProveidorService {
     }
 
 
+    // OBTENIR NÚMERO D'ALBARÀ PER MOSTRAR A LA WEB
+    public String obtenirNumeroAlbaraVisible(AlbaraProveidor albaraProveidor) {
+
+        if (albaraProveidor == null) {
+            return "-";
+        }
+
+        String numero = albaraProveidor.getNumeroAlbara();
+
+        if (numero == null || numero.isBlank()) {
+            return albaraProveidor.getId() != null ? albaraProveidor.getId().toString() : "-";
+        }
+
+        return numero.trim()
+                .replaceFirst("(?i)^MANUAL-", "")
+                .replaceFirst("(?i)^ALBAR[AÀ]-", "")
+                .replaceFirst("(?i)^ALBARA-", "")
+                .trim();
+    }
+
+
+    // VALIDAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
+    public void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
+
+        if (!esModificable(albaraProveidor)) {
+            throw new RuntimeException("No es pot modificar o eliminar aquest albarà perquè té algun lot que no està en estoc.");
+        }
+    }
+
+
+    // COMPROVAR FILTRE PER PROVEÏDOR
+    private boolean coincideixProveidor(AlbaraProveidor albaraProveidor, String proveidor) {
+
+        if (filtreBuit(proveidor)) {
+            return true;
+        }
+
+        String nomProveidor = albaraProveidor.getProveidor() != null
+                ? albaraProveidor.getProveidor().getNomProveidor()
+                : null;
+
+        return conteText(nomProveidor, proveidor);
+    }
+
+
+    // COMPROVAR FILTRE PER NÚMERO D'ALBARÀ
+    private boolean coincideixNumeroAlbara(AlbaraProveidor albaraProveidor, String numeroAlbara) {
+
+        if (filtreBuit(numeroAlbara)) {
+            return true;
+        }
+
+        return conteText(albaraProveidor.getNumeroAlbara(), numeroAlbara)
+                || conteText(obtenirNumeroAlbaraVisible(albaraProveidor), numeroAlbara);
+    }
+
+
+    // COMPROVAR FILTRE PER IDENTIFICADOR DE LOT
+    private boolean coincideixIdentificadorLot(AlbaraProveidor albaraProveidor, String identificadorLot) {
+
+        if (filtreBuit(identificadorLot)) {
+            return true;
+        }
+
+        if (albaraProveidor.getLots() == null) {
+            return false;
+        }
+
+        for (LotProveidor lot : albaraProveidor.getLots()) {
+            if (conteText(lot.getIdentificadorLot(), identificadorLot)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    // COMPROVAR FILTRE PER DATA DE RECEPCIÓ
+    private boolean coincideixDataRecepcio(AlbaraProveidor albaraProveidor, String dataRecepcio) {
+
+        if (filtreBuit(dataRecepcio)) {
+            return true;
+        }
+
+        if (albaraProveidor.getDataRecepcio() == null) {
+            return false;
+        }
+
+        String dataIso = albaraProveidor.getDataRecepcio().toString();
+        String dataFormatada = albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        return conteText(dataIso, dataRecepcio) || conteText(dataFormatada, dataRecepcio);
+    }
+
+
+    // COMPROVAR FILTRE PER USUARI RECEPTOR
+    private boolean coincideixReceptor(AlbaraProveidor albaraProveidor, String receptor) {
+
+        if (filtreBuit(receptor)) {
+            return true;
+        }
+
+        if (albaraProveidor.getUsuariReceptor() == null) {
+            return false;
+        }
+
+        Usuari usuari = albaraProveidor.getUsuariReceptor();
+
+        return conteText(usuari.getNomComplet(), receptor)
+                || conteText(usuari.getEmail(), receptor)
+                || conteText(usuari.getDni(), receptor);
+    }
+
+
+    // COMPROVAR SI UN FILTRE ESTÀ BUIT
+    private boolean filtreBuit(String valor) {
+        return valor == null || valor.isBlank();
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE
+    private boolean conteText(String text, String filtre) {
+
+        if (text == null || filtreBuit(filtre)) {
+            return false;
+        }
+
+        return text.toLowerCase().contains(filtre.trim().toLowerCase());
+    }
+
+
+    // PREPARAR NÚMERO D'ALBARÀ ABANS DE VALIDAR I GUARDAR
+    private void prepararNumeroAlbara(AlbaraProveidor albaraProveidor) {
+
+        if (albaraProveidor.getNumeroAlbara() != null && !albaraProveidor.getNumeroAlbara().isBlank()) {
+            albaraProveidor.setNumeroAlbara(albaraProveidor.getNumeroAlbara().trim());
+            return;
+        }
+
+        String data = albaraProveidor.getDataRecepcio() != null
+                ? albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                : "SENSE-DATA";
+
+        albaraProveidor.setNumeroAlbara("MANUAL-" + data + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+    }
+
+
+    // PREPARAR ALBARÀ I LOTS ABANS DE GUARDAR
+    private void prepararAlbaraPerGuardar(AlbaraProveidor albaraProveidor) {
+        validarDadesAlbaraProveidor(albaraProveidor);
+
+        List<LotProveidor> lotsPreparats = new ArrayList<>();
+
+        for (LotProveidor lotFormulari : albaraProveidor.getLots()) {
+            LotProveidor lotNou = crearLotNouDesDeFormulari(lotFormulari);
+            prepararLotPerGuardar(albaraProveidor, lotNou);
+            lotsPreparats.add(lotNou);
+        }
+
+        albaraProveidor.setLots(lotsPreparats);
+    }
+
+
+    // SUBSTITUIR LOTS D'UN ALBARÀ MODIFICABLE
+    private void substituirLots(AlbaraProveidor albaraActual, List<LotProveidor> lotsFormulari) {
+
+        if (albaraActual.getLots() == null) {
+            albaraActual.setLots(new ArrayList<>());
+        }
+
+        albaraActual.getLots().clear();
+
+        if (lotsFormulari != null) {
+            for (LotProveidor lotFormulari : lotsFormulari) {
+                LotProveidor lotNou = crearLotNouDesDeFormulari(lotFormulari);
+                prepararLotPerGuardar(albaraActual, lotNou);
+                albaraActual.getLots().add(lotNou);
+            }
+        }
+    }
+
+
+    // CREAR UN LOT NOU A PARTIR DE LES DADES DEL FORMULARI
+    private LotProveidor crearLotNouDesDeFormulari(LotProveidor lotFormulari) {
+
+        LotProveidor lotNou = new LotProveidor();
+
+        lotNou.setIdentificadorLot(lotFormulari.getIdentificadorLot());
+        lotNou.setQuantitat(lotFormulari.getQuantitat());
+        lotNou.setUnitats(lotFormulari.getUnitats());
+        lotNou.setMateriaPrimera(lotFormulari.getMateriaPrimera());
+        lotNou.setDataCaducitat(lotFormulari.getDataCaducitat());
+
+        return lotNou;
+    }
+
+
+    // PREPARAR LOT ABANS DE GUARDAR
+    private void prepararLotPerGuardar(AlbaraProveidor albaraProveidor, LotProveidor lot) {
+        validarDadesLotProveidor(lot);
+
+        lot.setIdentificadorLot(lot.getIdentificadorLot().trim());
+        lot.setUnitats(unitatMesuraService.normalitzarNom(lot.getUnitats()));
+        lot.setEstat(EstatLot.EN_ESTOC);
+        lot.setDataObertura(null);
+        lot.setDataAcabament(null);
+        lot.setAlbaraProveidor(albaraProveidor);
+    }
+
+
+    // OBTENIR USUARI RECEPTOR DES DE LA SESSIÓ
+    private Usuari obtenirUsuariReceptorSessio(HttpSession session) {
+
+        Long usuariId = session == null ? null : (Long) session.getAttribute("usuariId");
+
+        if (usuariId == null) {
+            throw new RuntimeException("No s'ha trobat cap usuari autenticat a la sessió.");
+        }
+
+        return usuariRepository.findById(usuariId)
+                .orElseThrow(() -> new RuntimeException("L'usuari receptor de la sessió no existeix."));
+    }
+
+
     // VALIDAR DADES DE L'ALBARÀ DE PROVEÏDOR
     private void validarDadesAlbaraProveidor(AlbaraProveidor albaraProveidor) {
 
@@ -217,12 +456,16 @@ public class AlbaraProveidorService {
             throw new RuntimeException("La data de recepció és obligatòria.");
         }
 
+        if (albaraProveidor.getNumeroAlbara() == null || albaraProveidor.getNumeroAlbara().isBlank()) {
+            throw new RuntimeException("El número d'albarà és obligatori.");
+        }
+
         if (albaraProveidor.getProveidor() == null || albaraProveidor.getProveidor().getId() == null) {
             throw new RuntimeException("El proveïdor és obligatori.");
         }
 
         if (albaraProveidor.getUsuariReceptor() == null || albaraProveidor.getUsuariReceptor().getId() == null) {
-            throw new RuntimeException("L'usuari receptor és obligatori.");
+            throw new RuntimeException("L'usuari receptor no s'ha pogut assignar des de la sessió.");
         }
 
         if (albaraProveidor.getLots() == null || albaraProveidor.getLots().isEmpty()) {
@@ -233,6 +476,10 @@ public class AlbaraProveidorService {
 
     // VALIDAR DADES DEL LOT DE PROVEÏDOR
     private void validarDadesLotProveidor(LotProveidor lotProveidor) {
+
+        if (lotProveidor.getIdentificadorLot() == null || lotProveidor.getIdentificadorLot().isBlank()) {
+            throw new RuntimeException("L'identificador del lot és obligatori.");
+        }
 
         if (lotProveidor.getMateriaPrimera() == null || lotProveidor.getMateriaPrimera().getId() == null) {
             throw new RuntimeException("La matèria primera és obligatòria.");
@@ -258,19 +505,8 @@ public class AlbaraProveidorService {
     }
 
 
-    // GENERAR IDENTIFICADOR DEL LOT SEGONS LA DATA DE RECEPCIÓ I LA POSICIÓ DEL LOT
-    private String generarIdentificadorLot(AlbaraProveidor albaraProveidor, int index) {
-
-        String dia = String.format("%02d", albaraProveidor.getDataRecepcio().getDayOfMonth());
-        String mes = String.format("%02d", albaraProveidor.getDataRecepcio().getMonthValue());
-        String any = String.valueOf(albaraProveidor.getDataRecepcio().getYear());
-
-        return dia + "_" + mes + "_" + any + "_lot" + index;
-    }
-
-
-    // GUARDAR IMATGE DES D'UN FITXER PUJAT AL FORMULARI
-    private void guardarImatgeFitxer(AlbaraProveidor albaraProveidor, MultipartFile imatgeAlbara) {
+    // GUARDAR FITXER PUJAT DES DEL FORMULARI
+    private void guardarFitxerAlbara(AlbaraProveidor albaraProveidor, MultipartFile imatgeAlbara) {
 
         if (imatgeAlbara == null || imatgeAlbara.isEmpty()) {
             return;
@@ -281,52 +517,20 @@ public class AlbaraProveidorService {
 
             String extensio = obtenirExtensioFitxer(imatgeAlbara.getOriginalFilename());
             String data = albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String nomFitxer = "albara_" + albaraProveidor.getId() + "_" + data + extensio;
+            String nomFitxer = "albara_" + albaraProveidor.getId() + "_" + data + "_" + UUID.randomUUID() + extensio;
 
             Path rutaFitxer = Paths.get(DIRECTORI_FITXERS, nomFitxer);
             Files.write(rutaFitxer, imatgeAlbara.getBytes());
 
-            albaraProveidor.getFitxers().clear();
-            albaraProveidor.getFitxers().add("/uploads/albarans-proveidor/" + nomFitxer);
-        }
-        catch (IOException e) {
-            throw new RuntimeException("No s'ha pogut guardar la imatge de l'albarà.");
-        }
-    }
-
-
-    // GUARDAR DEFINITIVAMENT LA IMATGE OCR NOMÉS QUAN ES GUARDA L'ALBARÀ
-    private void guardarImatgeOcrDefinitiva(AlbaraProveidor albaraProveidor,
-                                            String ocrImageBase64,
-                                            String ocrImageOriginalName) {
-
-        if (ocrImageBase64 == null || ocrImageBase64.isBlank()) {
-            return;
-        }
-
-        try {
-            Files.createDirectories(Paths.get(DIRECTORI_FITXERS));
-
-            String extensio = obtenirExtensioFitxer(ocrImageOriginalName);
-            String data = albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String nomFitxer = "albara_" + albaraProveidor.getId() + "_" + data + extensio;
-
-            String base64Net = ocrImageBase64;
-
-            if (base64Net.contains(",")) {
-                base64Net = base64Net.substring(base64Net.indexOf(",") + 1);
+            if (albaraProveidor.getFitxers() == null) {
+                albaraProveidor.setFitxers(new ArrayList<>());
             }
 
-            byte[] bytes = Base64.getDecoder().decode(base64Net);
-
-            Path rutaFitxer = Paths.get(DIRECTORI_FITXERS, nomFitxer);
-            Files.write(rutaFitxer, bytes);
-
             albaraProveidor.getFitxers().clear();
-            albaraProveidor.getFitxers().add("/uploads/albarans-proveidor/" + nomFitxer);
+            albaraProveidor.getFitxers().add(URL_FITXERS + nomFitxer);
         }
         catch (IOException e) {
-            throw new RuntimeException("No s'ha pogut guardar la imatge de l'albarà.");
+            throw new RuntimeException("No s'ha pogut guardar el fitxer de l'albarà.");
         }
     }
 
@@ -335,18 +539,15 @@ public class AlbaraProveidorService {
     private String obtenirExtensioFitxer(String nomOriginal) {
 
         if (nomOriginal == null || !nomOriginal.contains(".")) {
-            return ".png";
+            return ".bin";
         }
 
-        return nomOriginal.substring(nomOriginal.lastIndexOf("."));
-    }
+        String extensio = nomOriginal.substring(nomOriginal.lastIndexOf(".")).toLowerCase();
 
-
-    // VALIDAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
-    private void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
-
-        if (!esModificable(albaraProveidor)) {
-            throw new RuntimeException("No es pot modificar o eliminar aquest albarà perquè té algun lot que no està en estoc.");
+        if (!extensio.matches("\\.[a-z0-9]{1,8}")) {
+            return ".bin";
         }
+
+        return extensio;
     }
 }

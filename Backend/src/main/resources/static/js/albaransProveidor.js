@@ -1,6 +1,3 @@
-const searchInput = document.getElementById('searchInput');
-const albaraCards = document.querySelectorAll('.albara-card');
-
 const ocrFile = document.getElementById('ocrFile');
 const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
 const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
@@ -22,27 +19,6 @@ const nomImatgeInicial = ocrFileName ? ocrFileName.textContent : '';
 const srcImatgeInicial = previewImageInicial ? previewImageInicial.getAttribute('src') : '';
 
 
-// ---------------------------- CERCA LLISTAT ----------------------------
-if (searchInput) {
-    searchInput.addEventListener('keyup', function () {
-        filtrarAlbarans(this.value);
-    });
-}
-
-
-// ---------------------------- FILTRAR ALBARANS ----------------------------
-function filtrarAlbarans(text) {
-
-    const filter = text.toLowerCase().trim();
-
-    albaraCards.forEach(card => {
-        const cardText = card.textContent.toLowerCase();
-
-        card.style.display = cardText.includes(filter) ? '' : 'none';
-    });
-}
-
-
 // ---------------------------- VISTA PRÈVIA DE LA IMATGE ----------------------------
 if (ocrFile) {
     ocrFile.addEventListener('change', function () {
@@ -61,10 +37,36 @@ function mostrarImatgeSeleccionada(input) {
         return;
     }
 
-    if (!file.type.startsWith('image/')) {
+    const esImatge = file.type.startsWith('image/');
+    const esPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+    if (!esImatge && !esPdf) {
         input.value = '';
-        alert('El fitxer seleccionat ha de ser una imatge.');
+        alert('El fitxer seleccionat ha de ser una imatge o un PDF.');
         restaurarVistaPreviaOriginal();
+        return;
+    }
+
+    if (ocrFileName) {
+        ocrFileName.textContent = file.name;
+    }
+
+    if (ocrPreviewContainer) {
+        ocrPreviewContainer.style.display = 'block';
+    }
+
+    if (ocrPreviewEmpty) {
+        ocrPreviewEmpty.style.display = 'none';
+    }
+
+    if (esPdf) {
+        const previewImage = obtenirImatgeVistaPrevia();
+
+        if (previewImage) {
+            previewImage.removeAttribute('src');
+            previewImage.alt = 'PDF seleccionat';
+        }
+
         return;
     }
 
@@ -75,18 +77,7 @@ function mostrarImatgeSeleccionada(input) {
 
         if (previewImage) {
             previewImage.src = event.target.result;
-        }
-
-        if (ocrFileName) {
-            ocrFileName.textContent = file.name;
-        }
-
-        if (ocrPreviewContainer) {
-            ocrPreviewContainer.style.display = 'block';
-        }
-
-        if (ocrPreviewEmpty) {
-            ocrPreviewEmpty.style.display = 'none';
+            previewImage.alt = 'Vista prèvia de l\'albarà';
         }
     };
 

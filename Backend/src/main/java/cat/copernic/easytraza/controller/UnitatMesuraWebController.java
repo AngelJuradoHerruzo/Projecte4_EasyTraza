@@ -13,7 +13,6 @@ import cat.copernic.easytraza.entities.UnitatMesura;
 import cat.copernic.easytraza.service.MateriaPrimeraService;
 import cat.copernic.easytraza.service.ProveidorService;
 import cat.copernic.easytraza.service.UnitatMesuraService;
-import cat.copernic.easytraza.service.UsuariService;
 
 @Controller
 @RequestMapping("/unitats-mesura")
@@ -22,16 +21,13 @@ public class UnitatMesuraWebController {
     // ---------------------------- SERVICES I CONSTRUCTOR ----------------------------
     private final UnitatMesuraService unitatMesuraService;
     private final ProveidorService proveidorService;
-    private final UsuariService usuariService;
     private final MateriaPrimeraService materiaPrimeraService;
 
     public UnitatMesuraWebController(UnitatMesuraService unitatMesuraService,
                                      ProveidorService proveidorService,
-                                     UsuariService usuariService,
                                      MateriaPrimeraService materiaPrimeraService) {
         this.unitatMesuraService = unitatMesuraService;
         this.proveidorService = proveidorService;
-        this.usuariService = usuariService;
         this.materiaPrimeraService = materiaPrimeraService;
     }
 
@@ -42,8 +38,6 @@ public class UnitatMesuraWebController {
             @ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
             @RequestParam(value = "novaUnitatMesura", required = false) String novaUnitatMesura,
             @RequestParam(value = "indexUnitatMesura", required = false) Integer indexUnitatMesura,
-            @RequestParam(value = "ocrImageBase64", required = false) String ocrImageBase64,
-            @RequestParam(value = "ocrImageOriginalName", required = false) String ocrImageOriginalName,
             Model model) {
 
         // Assegura que el formulari sempre tingui almenys un lot
@@ -74,10 +68,7 @@ public class UnitatMesuraWebController {
         model.addAttribute("unitatMesuraPanelIndex", indexUnitatMesura);
 
         model.addAttribute("albaraProveidor", albaraProveidor);
-        model.addAttribute("ocrImageBase64", ocrImageBase64);
-        model.addAttribute("ocrImageOriginalName", ocrImageOriginalName);
         model.addAttribute("proveidors", proveidorService.getAllProveidors());
-        model.addAttribute("usuaris", usuariService.getAllUsuaris());
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
         model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
