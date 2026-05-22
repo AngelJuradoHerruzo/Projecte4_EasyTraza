@@ -149,7 +149,7 @@
 
                         <h2 class="content-title">Fitxer de l'albarà</h2>
                         <p class="content-subtitle">
-                            El document OCR temporal es guardarà com a definitiu només en prémer Guardar. També pots adjuntar manualment una imatge o PDF.
+                            Adjuntar manualment una imatge o PDF. Es guardarà com a definitiu només en prémer Guardar.
                         </p>
 
                         <div style="margin-top:18px; display:grid; grid-template-columns:1fr; gap:16px; align-items:end;">
@@ -189,11 +189,33 @@
                                      th:style="${ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')} ? 'display:block; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain;' : 'display:none; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain;'"
                                      alt="Vista prèvia de l'albarà OCR">
 
-                                <iframe id="ocrPreviewFrame"
-                                        th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? @{${ocrDocumentUrlTemporal}} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? @{${albaraProveidor.fitxers[0]}} : '')"
-                                        title="Vista prèvia de l'albarà"
-                                        th:style="${ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')} ? 'display:none; width:100%; min-height:460px; border:0; border-radius:14px; background:white;' : 'display:block; width:100%; min-height:460px; border:0; border-radius:14px; background:white;'">
+                                <!----------------------- PREVIEW IMATGE OCR TEMPORAL ----------------------->
+                                <img id="ocrPreviewImage"
+                                    th:if="${ocrDocumentUrlTemporal != null
+                                            and !#strings.isEmpty(ocrDocumentUrlTemporal)
+                                            and ocrDocumentContentType != null
+                                            and #strings.startsWith(ocrDocumentContentType, 'image/')}"
+                                    th:src="${ocrDocumentUrlTemporal}"
+                                    alt="Vista prèvia de l'albarà escanejat"
+                                    style="display:block; width:100%; max-height:620px; object-fit:contain; border-radius:14px; background:white;">
+
+                                <!----------------------- PREVIEW PDF OCR TEMPORAL ----------------------->
+                                <iframe id="ocrPreviewPdf"
+                                        th:if="${ocrDocumentUrlTemporal != null
+                                                and !#strings.isEmpty(ocrDocumentUrlTemporal)
+                                                and ocrDocumentContentType == 'application/pdf'}"
+                                        th:src="${ocrDocumentUrlTemporal}"
+                                        title="Vista prèvia del PDF de l'albarà"
+                                        style="width:100%; min-height:620px; border:0; border-radius:14px; background:white;">
                                 </iframe>
+
+                                <!----------------------- PREVIEW FITXER DEFINITIU EXISTENT ----------------------->
+                                <img th:if="${(ocrDocumentUrlTemporal == null or #strings.isEmpty(ocrDocumentUrlTemporal))
+                                            and albaraProveidor.fitxers != null
+                                            and !albaraProveidor.fitxers.isEmpty()}"
+                                    th:src="@{${albaraProveidor.fitxers[0]}}"
+                                    alt="Document guardat de l'albarà"
+                                    style="display:block; width:100%; max-height:620px; object-fit:contain; border-radius:14px; background:white;">
                             </div>
 
                         </div>

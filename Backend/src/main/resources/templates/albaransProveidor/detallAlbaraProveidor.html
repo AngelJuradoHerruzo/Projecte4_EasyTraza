@@ -158,11 +158,6 @@
                             <i class="bi bi-box-arrow-up-right"></i>
                             Obrir fitxer
                         </a>
-
-                        <iframe th:src="@{${albaraProveidor.fitxers[0]}}"
-                                title="Vista prèvia del document de l'albarà"
-                                style="width:100%; min-height:520px; border:0; border-radius:14px; background:white;">
-                        </iframe>
                     </div>
 
                     <div th:if="${albaraProveidor.fitxers == null or albaraProveidor.fitxers.isEmpty()}"
