@@ -114,7 +114,7 @@ function restaurarVistaPreviaOriginal() {
 
     alliberarObjectUrlPreview();
 
-    if (srcDocumentInicial && srcDocumentInicial.trim() !== '') {
+    if ((srcDocumentInicial && srcDocumentInicial.trim() !== '') || (srcImatgeInicial && srcImatgeInicial.trim() !== '')) {
 
         if (ocrPreviewFrame) {
             ocrPreviewFrame.src = srcDocumentInicial;

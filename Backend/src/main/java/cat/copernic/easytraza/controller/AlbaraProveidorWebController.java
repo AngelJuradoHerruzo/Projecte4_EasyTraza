@@ -35,6 +35,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/albarans-proveidor")
 public class AlbaraProveidorWebController {
 
+    private static final String SESSION_OCR_RESULTAT = "ocrResultatAlbaraProveidor";
+
     // ---------------------------- SERVICES I CONSTRUCTOR ----------------------------
     private final AlbaraProveidorService albaraProveidorService;
     private final ProveidorService proveidorService;
@@ -99,7 +101,9 @@ public class AlbaraProveidorWebController {
 
     // FORMULARI CREAR ALBARÀ DE PROVEÏDOR
     @GetMapping("/new")
-    public String formCrearAlbaraProveidor(Model model) {
+    public String formCrearAlbaraProveidor(Model model, HttpSession session) {
+        session.removeAttribute(SESSION_OCR_RESULTAT);
+
         AlbaraProveidor albaraProveidor = new AlbaraProveidor();
         albaraProveidor.setDataRecepcio(LocalDate.now());
         albaraProveidor.setLots(new ArrayList<>(List.of(new LotProveidor())));
@@ -114,10 +118,12 @@ public class AlbaraProveidorWebController {
     // ESCANEJAR OCR I RETORNAR EL MATEIX FORMULARI PREOMPLERT
     @PostMapping("/ocr")
     public String escanejarOcr(@RequestParam(value = "documentOcr", required = false) MultipartFile documentOcr,
+                               HttpSession session,
                                Model model) {
         try {
             OcrResultatAlbaraProveidorDto resultatOcr = ocrAlbaraProveidorService.processarDocument(documentOcr);
             completarAssociacionsOcr(resultatOcr);
+            session.setAttribute(SESSION_OCR_RESULTAT, resultatOcr);
 
             AlbaraProveidor albaraProveidor = convertirResultatOcrAFormulari(resultatOcr);
 
@@ -149,11 +155,22 @@ public class AlbaraProveidorWebController {
     @PostMapping("/reload-form")
     public String recarregarFormulari(@ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
                                       @RequestParam(value = "ocrDocumentTemporalId", required = false) String ocrDocumentTemporalId,
+                                      HttpSession session,
                                       Model model) {
         assegurarLotsFormulari(albaraProveidor);
 
+        OcrResultatAlbaraProveidorDto resultatOcr = obtenirResultatOcrSessio(session);
+
+        if (resultatOcr != null) {
+            netejarAvisosAssociacioOcr(resultatOcr);
+            completarAssociacionsOcr(resultatOcr);
+            aplicarAssociacionsOcrAlFormulari(albaraProveidor, resultatOcr);
+            model.addAttribute("ocrResultat", resultatOcr);
+            ocrDocumentTemporalId = obtenirDocumentTemporalId(ocrDocumentTemporalId, resultatOcr);
+        }
+
         model.addAttribute("albaraProveidor", albaraProveidor);
-        model.addAttribute("info", "Llistes actualitzades. Ja pots seleccionar els elements creats.");
+        model.addAttribute("info", "Llistes actualitzades. Els elements creats s'han associat si coincideixen amb les dades OCR.");
         model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
         afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
         carregarDadesFormulari(model);
@@ -171,6 +188,7 @@ public class AlbaraProveidorWebController {
                                          Model model) {
         try {
             albaraProveidorService.createAlbaraProveidor(albaraProveidor, imatgeAlbara, ocrDocumentTemporalId, session);
+            session.removeAttribute(SESSION_OCR_RESULTAT);
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
@@ -178,6 +196,7 @@ public class AlbaraProveidorWebController {
 
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
+            model.addAttribute("ocrResultat", obtenirResultatOcrSessio(session));
             model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
             afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
             carregarDadesFormulari(model);
@@ -189,7 +208,9 @@ public class AlbaraProveidorWebController {
 
     // FORMULARI EDITAR ALBARÀ DE PROVEÏDOR
     @GetMapping("/edit/{id}")
-    public String formEditarAlbaraProveidor(@PathVariable Long id, Model model) {
+    public String formEditarAlbaraProveidor(@PathVariable Long id, Model model, HttpSession session) {
+        session.removeAttribute(SESSION_OCR_RESULTAT);
+
         AlbaraProveidor albaraProveidor = albaraProveidorService.getAlbaraProveidorDetallById(id);
 
         if (albaraProveidor == null) {
@@ -225,6 +246,7 @@ public class AlbaraProveidorWebController {
                                         Model model) {
         try {
             albaraProveidorService.updateAlbaraProveidor(id, albaraProveidor, imatgeAlbara, ocrDocumentTemporalId, session);
+            session.removeAttribute(SESSION_OCR_RESULTAT);
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
@@ -233,6 +255,7 @@ public class AlbaraProveidorWebController {
 
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraProveidor", albaraProveidor);
+            model.addAttribute("ocrResultat", obtenirResultatOcrSessio(session));
             model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
             afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
             carregarDadesFormulari(model);
@@ -281,6 +304,74 @@ public class AlbaraProveidorWebController {
         }
         catch (RuntimeException ignored) {
             model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
+        }
+    }
+
+
+    // OBTENIR RESULTAT OCR TEMPORAL CONSERVAT A LA SESSIÓ
+    private OcrResultatAlbaraProveidorDto obtenirResultatOcrSessio(HttpSession session) {
+        Object resultat = session.getAttribute(SESSION_OCR_RESULTAT);
+        return resultat instanceof OcrResultatAlbaraProveidorDto
+                ? (OcrResultatAlbaraProveidorDto) resultat
+                : null;
+    }
+
+
+    // RECUPERAR LA REFERÈNCIA LLEUGERA AL DOCUMENT OCR QUAN ES RECARREGA EL FORMULARI
+    private String obtenirDocumentTemporalId(String ocrDocumentTemporalId, OcrResultatAlbaraProveidorDto resultatOcr) {
+        if (ocrDocumentTemporalId != null && !ocrDocumentTemporalId.isBlank()) {
+            return ocrDocumentTemporalId;
+        }
+
+        return resultatOcr != null ? resultatOcr.getOcrDocumentTemporalId() : null;
+    }
+
+
+    // ELIMINAR AVISOS D'ASSOCIACIÓ ANTICS ABANS DE TORNAR A CONSULTAR LA BASE DE DADES
+    private void netejarAvisosAssociacioOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
+        if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
+            return;
+        }
+
+        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
+        pendent.getAvisos().removeIf(avis -> avis != null
+                && avis.startsWith("Proveïdor detectat per OCR no trobat"));
+
+        if (pendent.getLinies() != null) {
+            for (OcrLiniaDto linia : pendent.getLinies()) {
+                linia.getAvisos().removeIf(avis -> avis != null
+                        && avis.startsWith("Matèria primera no trobada"));
+            }
+        }
+    }
+
+
+    // APLICAR ASSOCIACIONS NOVES SENSE SOBREESCRIURE CANVIS MANUALS DE L'USUARI
+    private void aplicarAssociacionsOcrAlFormulari(AlbaraProveidor albaraProveidor,
+                                                    OcrResultatAlbaraProveidorDto resultatOcr) {
+        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
+
+        if ((albaraProveidor.getProveidor() == null || albaraProveidor.getProveidor().getId() == null)
+                && pendent.getProveidorId() != null) {
+            albaraProveidor.setProveidor(proveidorService.getProveidorById(pendent.getProveidorId()));
+        }
+
+        if (albaraProveidor.getLots() == null || pendent.getLinies() == null) {
+            return;
+        }
+
+        int numeroLinies = Math.min(albaraProveidor.getLots().size(), pendent.getLinies().size());
+
+        for (int index = 0; index < numeroLinies; index++) {
+            LotProveidor lotFormulari = albaraProveidor.getLots().get(index);
+            OcrLiniaDto liniaOcr = pendent.getLinies().get(index);
+
+            if ((lotFormulari.getMateriaPrimera() == null || lotFormulari.getMateriaPrimera().getId() == null)
+                    && liniaOcr.getMateriaPrimeraId() != null) {
+                lotFormulari.setMateriaPrimera(
+                        materiaPrimeraService.getMateriaPrimeraById(liniaOcr.getMateriaPrimeraId())
+                );
+            }
         }
     }
 
@@ -413,7 +504,10 @@ public class AlbaraProveidorWebController {
         for (Proveidor proveidor : proveidorService.getAllProveidors()) {
             String nomBd = OcrUtils.normalitzarPerComparar(proveidor.getNomProveidor());
 
-            if (nomBd.equals(nomOcr) || nomBd.contains(nomOcr) || nomOcr.contains(nomBd)) {
+            if (nomBd.equals(nomOcr)
+                    || nomBd.contains(nomOcr)
+                    || nomOcr.contains(nomBd)
+                    || OcrUtils.coincideixNomFlexible(nomDetectat, proveidor.getNomProveidor())) {
                 return proveidor;
             }
         }
@@ -433,7 +527,10 @@ public class AlbaraProveidorWebController {
         for (MateriaPrimera materiaPrimera : materiaPrimeraService.getAllMateriesPrimeres()) {
             String materiaBd = OcrUtils.normalitzarPerComparar(materiaPrimera.getNomMateria());
 
-            if (materiaBd.equals(materiaOcr) || materiaBd.contains(materiaOcr) || materiaOcr.contains(materiaBd)) {
+            if (materiaBd.equals(materiaOcr)
+                    || materiaBd.contains(materiaOcr)
+                    || materiaOcr.contains(materiaBd)
+                    || OcrUtils.coincideixNomFlexible(materiaDetectada, materiaPrimera.getNomMateria())) {
                 return materiaPrimera;
             }
         }

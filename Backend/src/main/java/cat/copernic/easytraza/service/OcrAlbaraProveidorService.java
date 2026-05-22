@@ -77,6 +77,14 @@ public class OcrAlbaraProveidorService {
             }
         }
 
+        if (proveidorDetectat == OcrProveidorDetectat.ARTIPAS) {
+            String textZonesArtipas = extreureTextZonesArtipas(documentTemporal);
+
+            if (textZonesArtipas != null && !textZonesArtipas.isBlank()) {
+                textOcrOriginal = textOcrOriginal + "\n\n" + textZonesArtipas;
+            }
+        }
+
         String textOcrNormalitzat = OcrUtils.normalitzarText(textOcrOriginal);
         String textComparacio = OcrUtils.normalitzarPerComparar(textOcrNormalitzat);
 
@@ -102,7 +110,6 @@ public class OcrAlbaraProveidorService {
 
         return resultat;
     }
-
 
     public String obtenirUrlDocumentTemporal(String ocrDocumentTemporalId) {
         obtenirRutaDocumentTemporal(ocrDocumentTemporalId);
@@ -242,6 +249,10 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+    /**
+     * Executa OCR per zones del model LA META, mantenint separades les columnes
+     * que el text complet tendeix a barrejar.
+     */
     private String extreureTextZonesLaMeta(DocumentTemporalOcr documentTemporal) {
         try {
             BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
@@ -251,9 +262,9 @@ public class OcrAlbaraProveidorService {
             }
 
             String info = executarOcrZona(imatge, 0.035, 0.315, 0.425, 0.075);
-            String materies = executarOcrZona(imatge, 0.145, 0.415, 0.380, 0.115);
-            String lots = executarOcrZona(imatge, 0.600, 0.395, 0.140, 0.145);
-            String sacos = executarOcrZona(imatge, 0.765, 0.395, 0.100, 0.145);
+            String materies = executarOcrZona(imatge, 0.145, 0.415, 0.345, 0.115);
+            String lots = executarOcrZona(imatge, 0.598, 0.395, 0.130, 0.145);
+            String sacos = executarOcrZona(imatge, 0.800, 0.395, 0.080, 0.145);
 
             return """
                     [[LA_META_INFO]]
@@ -269,6 +280,54 @@ public class OcrAlbaraProveidorService {
 
         } catch (Exception ex) {
             LOGGER.warn("No s'ha pogut executar l'OCR per zones de LA META. Es farà servir el text OCR general.", ex);
+            return "";
+        }
+    }
+
+    /**
+     * Executa OCR sobre les zones pròpies d'ARTIPAS. La taula es manté en un
+     * sol retall perquè, en aquest document, les files queden alineades i el
+     * Codi HS forma part de la mateixa línia que el producte rebut.
+     */
+    private String extreureTextZonesArtipas(DocumentTemporalOcr documentTemporal) {
+        try {
+            BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
+
+            if (imatge == null) {
+                return "";
+            }
+
+            String info = executarOcrZona(imatge, 0.040, 0.285, 0.480, 0.135, 6);
+
+            /*
+            * Primera fila real de producte.
+            *
+            * La fila [N7K] queda just sota la capçalera de la taula. La zona anterior
+            * començava massa avall i capturava la fila següent.
+            */
+            String primeraLinia = executarOcrZona(imatge, 0.030, 0.438, 0.850, 0.035, 7);
+
+            /*
+            * Taula principal completa.
+            *
+            * Es puja l'inici de la zona perquè inclogui la capçalera i sobretot la
+            * primera fila [N7K]. La zona anterior començava aproximadament a l'altura
+            * de la primera fila i Tesseract l'ometia.
+            */
+            String taula = executarOcrZona(imatge, 0.030, 0.415, 0.850, 0.225, 6);
+
+            return """
+                    [[ARTIPAS_INFO]]
+                    %s
+                    [[ARTIPAS_PRIMERA_LINIA]]
+                    %s
+                    [[ARTIPAS_TAULA]]
+                    %s
+                    [[FI_ARTIPAS]]
+                    """.formatted(info, primeraLinia, taula);
+
+        } catch (Exception ex) {
+            LOGGER.warn("No s'ha pogut executar l'OCR per zones d'ARTIPAS. Es farà servir el text OCR general.", ex);
             return "";
         }
     }
@@ -292,9 +351,24 @@ public class OcrAlbaraProveidorService {
 
     private String executarOcrZona(BufferedImage imatge, double x, double y, double amplada, double alcada)
             throws TesseractException {
+        return executarOcrZona(imatge, x, y, amplada, alcada, null);
+    }
+
+    private String executarOcrZona(BufferedImage imatge,
+                                   double x,
+                                   double y,
+                                   double amplada,
+                                   double alcada,
+                                   Integer pageSegMode) throws TesseractException {
 
         BufferedImage zona = retallarZona(imatge, x, y, amplada, alcada);
-        return crearTesseract().doOCR(prepararImatgePerOcr(zona));
+        Tesseract tesseract = crearTesseract();
+
+        if (pageSegMode != null) {
+            tesseract.setPageSegMode(pageSegMode);
+        }
+
+        return tesseract.doOCR(prepararImatgePerOcr(zona));
     }
 
     private BufferedImage retallarZona(BufferedImage imatge, double x, double y, double amplada, double alcada) {

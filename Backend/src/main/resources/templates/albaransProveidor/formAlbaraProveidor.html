@@ -184,38 +184,18 @@
                                    th:text="${ocrDocumentNomOriginal != null and !#strings.isEmpty(ocrDocumentNomOriginal)} ? ${ocrDocumentNomOriginal} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : '')">
                                 </p>
 
+                                <!----------------------- PREVIEW IMATGE OCR TEMPORAL O FITXER EXISTENT ----------------------->
                                 <img id="ocrPreviewImage"
-                                     th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? @{${ocrDocumentUrlTemporal}} : ''"
-                                     th:style="${ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')} ? 'display:block; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain;' : 'display:none; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain;'"
-                                     alt="Vista prèvia de l'albarà OCR">
-
-                                <!----------------------- PREVIEW IMATGE OCR TEMPORAL ----------------------->
-                                <img id="ocrPreviewImage"
-                                    th:if="${ocrDocumentUrlTemporal != null
-                                            and !#strings.isEmpty(ocrDocumentUrlTemporal)
-                                            and ocrDocumentContentType != null
-                                            and #strings.startsWith(ocrDocumentContentType, 'image/')}"
-                                    th:src="${ocrDocumentUrlTemporal}"
-                                    alt="Vista prèvia de l'albarà escanejat"
-                                    style="display:block; width:100%; max-height:620px; object-fit:contain; border-radius:14px; background:white;">
+                                     th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? ${ocrDocumentUrlTemporal} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : '')"
+                                     th:style="${(ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')) or ((ocrDocumentUrlTemporal == null or #strings.isEmpty(ocrDocumentUrlTemporal)) and albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty())} ? 'display:block; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain; background:white;' : 'display:none; max-width:100%; max-height:620px; margin:0 auto; border-radius:14px; object-fit:contain; background:white;'"
+                                     alt="Vista prèvia de l'albarà">
 
                                 <!----------------------- PREVIEW PDF OCR TEMPORAL ----------------------->
-                                <iframe id="ocrPreviewPdf"
-                                        th:if="${ocrDocumentUrlTemporal != null
-                                                and !#strings.isEmpty(ocrDocumentUrlTemporal)
-                                                and ocrDocumentContentType == 'application/pdf'}"
-                                        th:src="${ocrDocumentUrlTemporal}"
-                                        title="Vista prèvia del PDF de l'albarà"
-                                        style="width:100%; min-height:620px; border:0; border-radius:14px; background:white;">
+                                <iframe id="ocrPreviewFrame"
+                                        th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal) and ocrDocumentContentType == 'application/pdf'} ? ${ocrDocumentUrlTemporal} : ''"
+                                        th:style="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal) and ocrDocumentContentType == 'application/pdf'} ? 'display:block; width:100%; min-height:620px; border:0; border-radius:14px; background:white;' : 'display:none; width:100%; min-height:620px; border:0; border-radius:14px; background:white;'"
+                                        title="Vista prèvia del PDF de l'albarà">
                                 </iframe>
-
-                                <!----------------------- PREVIEW FITXER DEFINITIU EXISTENT ----------------------->
-                                <img th:if="${(ocrDocumentUrlTemporal == null or #strings.isEmpty(ocrDocumentUrlTemporal))
-                                            and albaraProveidor.fitxers != null
-                                            and !albaraProveidor.fitxers.isEmpty()}"
-                                    th:src="@{${albaraProveidor.fitxers[0]}}"
-                                    alt="Document guardat de l'albarà"
-                                    style="display:block; width:100%; max-height:620px; object-fit:contain; border-radius:14px; background:white;">
                             </div>
 
                         </div>
