@@ -85,6 +85,14 @@ public class OcrAlbaraProveidorService {
             }
         }
 
+        if (proveidorDetectat == OcrProveidorDetectat.AVICOLA_LLEONART) {
+            String textZonesAvicola = extreureTextZonesAvicolaLleonart(documentTemporal);
+
+            if (textZonesAvicola != null && !textZonesAvicola.isBlank()) {
+                textOcrOriginal = textOcrOriginal + "\n\n" + textZonesAvicola;
+            }
+        }
+
         String textOcrNormalitzat = OcrUtils.normalitzarText(textOcrOriginal);
         String textComparacio = OcrUtils.normalitzarPerComparar(textOcrNormalitzat);
 
@@ -328,6 +336,45 @@ public class OcrAlbaraProveidorService {
 
         } catch (Exception ex) {
             LOGGER.warn("No s'ha pogut executar l'OCR per zones d'ARTIPAS. Es farà servir el text OCR general.", ex);
+            return "";
+        }
+    }
+
+    /**
+     * Executa OCR sobre les zones pròpies d'AVÍCOLA LLEONART. Aquest model
+     * conté una única línia de recepció, amb el lot situat a la línia
+     * immediatament inferior a la descripció.
+     */
+    private String extreureTextZonesAvicolaLleonart(DocumentTemporalOcr documentTemporal) {
+        try {
+            BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
+
+            if (imatge == null) {
+                return "";
+            }
+
+            /*
+             * Informació d'albarà: NUM. ALBARAN i FECHA ALBARAN.
+             */
+            String info = executarOcrZona(imatge, 0.100, 0.320, 0.425, 0.095, 6);
+
+            /*
+             * Línia de producte, quantitat i lot. Es manté en un sol retall
+             * perquè la quantitat 60 està alineada amb la descripció i el lot
+             * apareix just sota la mateixa línia.
+             */
+            String taula = executarOcrZona(imatge, 0.080, 0.402, 0.760, 0.115, 6);
+
+            return """
+                    [[AVICOLA_INFO]]
+                    %s
+                    [[AVICOLA_TAULA]]
+                    %s
+                    [[FI_AVICOLA]]
+                    """.formatted(info, taula);
+
+        } catch (Exception ex) {
+            LOGGER.warn("No s'ha pogut executar l'OCR per zones d'AVÍCOLA LLEONART. Es farà servir el text OCR general.", ex);
             return "";
         }
     }
