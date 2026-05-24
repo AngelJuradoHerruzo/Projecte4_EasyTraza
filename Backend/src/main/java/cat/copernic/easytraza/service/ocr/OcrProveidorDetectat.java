@@ -26,12 +26,7 @@ public enum OcrProveidorDetectat {
                     "PASTISSA",
                     "PASTISA",
                     "PASTISART",
-                    "N ALBARA",
-                    "N ALBARA F",
-                    "ALBARA F",
-                    "PRODUCTES AUXILIARS",
-                    "C CLIENT",
-                    "FORMA DE PAGAMENT"
+                    "PRODUCTES AUXILIARS"
             )
     ),
 
@@ -48,9 +43,18 @@ public enum OcrProveidorDetectat {
     ),
 
     JOSE_NOVAU(
-            "JOSE NOVAU",
+            "JOSE NOVAU DIL",
             "47183180Z",
-            List.of("JOSE NOVAU", "NOVAU DIL", "NOVAU DIT", "47183180")
+            List.of(
+                    "JOSE NOVAU",
+                    "NOVAU DIL",
+                    "NOVAU DIT",
+                    "JOSENOVAUDIL",
+                    "JOSENOVAUDIT",
+                    "WWW JOSENOVAUDIL",
+                    "WWW JOSENOVAUDIT",
+                    "47183180"
+            )
     );
 
     private final String nomVisible;
@@ -78,28 +82,51 @@ public enum OcrProveidorDetectat {
     /**
      * Detecta el proveïdor a partir del text OCR normalitzat.
      *
-     * Primer prova marques directes del proveïdor. Després aplica combinacions
-     * de camps estructurals per als documents on el logotip no es llegeix bé.
+     * JOSE NOVAU es comprova abans que PASTISSA perquè comparteixen camps
+     * genèrics d'albarà i pagament, però JOSE NOVAU disposa de marques
+     * pròpies prou identificatives.
+     *
+     * @param textNormalitzat text OCR normalitzat per comparar.
+     * @return proveïdor detectat o null si no s'ha pogut identificar.
      */
     public static OcrProveidorDetectat detectar(String textNormalitzat) {
         String text = textNormalitzat == null ? "" : textNormalitzat;
 
-        for (OcrProveidorDetectat proveidor : values()) {
-            if (proveidor.clausDeteccio.stream().anyMatch(text::contains)) {
-                return proveidor;
-            }
+        if (conteAlgunaClau(JOSE_NOVAU, text)) {
+            return JOSE_NOVAU;
         }
 
-        /*
-         * PASTISSA: el logotip és poc fiable en OCR, però el document té
-         * l'estructura "Nº ALBARA", "C.CLIENT" i "FORMA DE PAGAMENT".
-         */
-        if ((text.contains("ALBARA") || text.contains("ALBARAN"))
-                && text.contains("CLIENT")
-                && (text.contains("PAGAMENT") || text.contains("TRANSPORT"))) {
+        if (conteAlgunaClau(LA_META, text)) {
+            return LA_META;
+        }
+
+        if (conteAlgunaClau(ARTIPAS, text)) {
+            return ARTIPAS;
+        }
+
+        if (conteAlgunaClau(AVICOLA_LLEONART, text)) {
+            return AVICOLA_LLEONART;
+        }
+
+        if (conteAlgunaClau(TAL_COM_PINTA, text)) {
+            return TAL_COM_PINTA;
+        }
+
+        if (conteAlgunaClau(PASTISSA, text)) {
             return PASTISSA;
         }
 
         return null;
+    }
+
+    /**
+     * Comprova si el text OCR conté alguna de les claus del proveïdor.
+     *
+     * @param proveidor proveïdor a comprovar.
+     * @param text text OCR normalitzat.
+     * @return true si existeix alguna coincidència.
+     */
+    private static boolean conteAlgunaClau(OcrProveidorDetectat proveidor, String text) {
+        return proveidor.clausDeteccio.stream().anyMatch(text::contains);
     }
 }

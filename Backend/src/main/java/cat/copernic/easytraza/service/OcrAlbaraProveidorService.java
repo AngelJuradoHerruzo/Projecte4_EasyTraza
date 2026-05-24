@@ -109,6 +109,20 @@ public class OcrAlbaraProveidorService {
             }
         }
 
+        /*
+         * JOSE NOVAU es llegeix millor amb la pàgina completa i PSM 6:
+         * Tesseract conserva les quatre files com a línies completes.
+         * No es força una separació per columnes, que en aquest model és
+         * menys estable per l'amplada estreta d'ARTICLE i QUANTITAT.
+         */
+        if (proveidorDetectat == OcrProveidorDetectat.JOSE_NOVAU) {
+            String textJoseNovau = extreureTextJoseNovauPaginaCompleta(documentTemporal);
+
+            if (textJoseNovau != null && !textJoseNovau.isBlank()) {
+                textOcrOriginal = textOcrOriginal + "\n\n" + textJoseNovau;
+            }
+        }
+
         String textOcrNormalitzat = OcrUtils.normalitzarText(textOcrOriginal);
         String textComparacio = OcrUtils.normalitzarPerComparar(textOcrNormalitzat);
 
@@ -462,9 +476,9 @@ public class OcrAlbaraProveidorService {
     /**
      * Executa OCR per zones del model TAL COM PINTA.
      *
-     * El número d'albarà correspon al camp N. Entrega. La zona de línies
-     * cobreix tot l'espai disponible abans del bloc de totals perquè el
-     * document real pugui incorporar més files que l'exemple facilitat.
+     * El model pot tenir més línies que l'exemple actual. Per això la zona de
+     * taula s'estén fins abans del bloc de totals i el parser filtra la part
+     * realment útil.
      */
     private String extreureTextZonesTalComPinta(DocumentTemporalOcr documentTemporal) {
         try {
@@ -475,67 +489,64 @@ public class OcrAlbaraProveidorService {
             }
 
             /*
-             * Número d'entrega i data en retalls independents.
+             * Capçalera amb número d'entrega i dates.
              */
-            String numeroEntrega = executarOcrZona(imatge, 0.055, 0.200, 0.115, 0.042, 7);
-            String dataEntrega = executarOcrZona(imatge, 0.385, 0.200, 0.135, 0.042, 7);
+            String info = executarOcrZona(imatge, 0.045, 0.155, 0.470, 0.120, 6);
 
             /*
-             * Columna de descripció. Inclou també les sublínies on apareixen
-             * lot i caducitat; el parser només considerarà com a matèries les
-             * línies de descripció reals.
+             * Taula de línies. Es deixa prou alta per suportar albarans amb
+             * més línies, però sense arribar al bloc inferior de totals.
              */
-            String descripcions = executarOcrZona(imatge, 0.105, 0.242, 0.410, 0.395, 6);
+            String taula = executarOcrZona(imatge, 0.045, 0.245, 0.830, 0.345, 6);
 
-            /*
-             * Columna Quantitat.
-             */
-            String quantitats = executarOcrZona(imatge, 0.510, 0.242, 0.095, 0.395, 6);
-
-            /*
-             * Zona exclusiva de les sublínies amb lot i data.
-             *
-             * Coordenades revisades sobre el document real:
-             * - inclou valors com "1,00 L602248 07/01/2027";
-             * - evita capturar la major part de la descripció;
-             * - manté altura fins abans dels totals per admetre més línies.
-             *
-             * Es conserva la quantitat inicial en la zona perquè ajuda a
-             * Tesseract a mantenir cada sublínia completa; el parser extreu
-             * només el token situat just abans de la data.
-             */
-            String lots = executarOcrZona(imatge, 0.350, 0.242, 0.190, 0.395, 6);
-
-            /*
-             * Lectura completa de suport i diagnòstic.
-             */
-            String taula = executarOcrZona(imatge, 0.045, 0.242, 0.830, 0.395, 6);
-
-            LOGGER.info("=== OCR TAL COM PINTA - NUMERO ENTREGA ==={}", numeroEntrega);
-            LOGGER.info("=== OCR TAL COM PINTA - DATA ENTREGA ==={}", dataEntrega);
-            LOGGER.info("=== OCR TAL COM PINTA - DESCRIPCIONS ==={}", descripcions);
-            LOGGER.info("=== OCR TAL COM PINTA - QUANTITATS ==={}", quantitats);
-            LOGGER.info("=== OCR TAL COM PINTA - LOTS ==={}", lots);
-            LOGGER.info("=== OCR TAL COM PINTA - TAULA ==={}", taula);
+            LOGGER.info("=== OCR TAL COM PINTA - INFO ===\n{}", info);
+            LOGGER.info("=== OCR TAL COM PINTA - TAULA ===\n{}", taula);
 
             return """
-                    [[TAL_COM_PINTA_NUMERO_ENTREGA]]    
-                    %s
-                    [[TAL_COM_PINTA_DATA_ENTREGA]]
-                    %s
-                    [[TAL_COM_PINTA_DESCRIPCIONS]]
-                    %s
-                    [[TAL_COM_PINTA_QUANTITATS]]
-                    %s
-                    [[TAL_COM_PINTA_LOTS]]
+                    [[TAL_COM_PINTA_INFO]]
                     %s
                     [[TAL_COM_PINTA_TAULA]]
                     %s
                     [[FI_TAL_COM_PINTA]]
-                    """.formatted(numeroEntrega, dataEntrega, descripcions, quantitats, lots, taula);
+                    """.formatted(info, taula);
 
         } catch (Exception ex) {
             LOGGER.warn("No s'ha pogut executar l'OCR per zones de TAL COM PINTA. Es farà servir el text OCR general.", ex);
+            return "";
+        }
+    }
+
+
+    /**
+     * Executa OCR de JOSE NOVAU sobre la pàgina completa amb PSM 6.
+     *
+     * En aquest model, la lectura global conserva millor cada fila completa:
+     * ARTICLE + DESCRIPCIÓ + QUANTITAT. Això és més fiable que separar
+     * columnes petites per zones.
+     */
+    private String extreureTextJoseNovauPaginaCompleta(DocumentTemporalOcr documentTemporal) {
+        try {
+            BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
+
+            if (imatge == null) {
+                return "";
+            }
+
+            Tesseract tesseract = crearTesseract();
+            tesseract.setPageSegMode(6);
+
+            String text = tesseract.doOCR(prepararImatgePerOcr(imatge));
+
+            LOGGER.info("=== OCR JOSE NOVAU - PAGINA COMPLETA PSM6 ===\n{}", text);
+
+            return """
+                    [[JOSE_NOVAU_TEXT]]
+                    %s
+                    [[FI_JOSE_NOVAU]]
+                    """.formatted(text);
+
+        } catch (Exception ex) {
+            LOGGER.warn("No s'ha pogut executar l'OCR PSM6 de JOSE NOVAU. Es farà servir el text OCR general.", ex);
             return "";
         }
     }

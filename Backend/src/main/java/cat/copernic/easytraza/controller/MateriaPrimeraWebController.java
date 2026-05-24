@@ -22,7 +22,7 @@ public class MateriaPrimeraWebController {
     // LLISTAR MATÈRIES PRIMERES
     @GetMapping("/list")
     public String llistarMateriesPrimeres(@RequestParam(required = false) String nomMateria,
-                                        Model model) {
+                                          Model model) {
 
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getMateriesPrimeresLlistat(nomMateria));
         model.addAttribute("nomMateria", nomMateria);
@@ -33,22 +33,33 @@ public class MateriaPrimeraWebController {
 
     // FORMULARI CREAR MATÈRIA PRIMERA
     @GetMapping("/new")
-    public String formCrearMateriaPrimera(Model model) {
+    public String formCrearMateriaPrimera(@RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                          Model model) {
         model.addAttribute("materiaPrimera", new MateriaPrimera());
+        model.addAttribute("popup", popup);
         return "materiesPrimeres/formMateriesPrimeres";
     }
 
 
     // GUARDAR MATÈRIA PRIMERA
     @PostMapping("/save")
-    public String guardarMateriaPrimera(@ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera, Model model) {
+    public String guardarMateriaPrimera(@ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
+                                        @RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                        Model model) {
         try {
             materiaPrimeraService.createMateriaPrimera(materiaPrimera);
+
+            if (popup) {
+                model.addAttribute("missatge", "Matèria primera creada correctament.");
+                return "layout/tancarFinestra";
+            }
+
             return "redirect:/materies-primeres/list";
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("materiaPrimera", materiaPrimera);
+            model.addAttribute("popup", popup);
             return "materiesPrimeres/formMateriesPrimeres";
         }
     }
@@ -56,7 +67,9 @@ public class MateriaPrimeraWebController {
 
     // FORMULARI EDITAR MATÈRIA PRIMERA
     @GetMapping("/edit/{id}")
-    public String formEditarMateriaPrimera(@PathVariable Long id, Model model) {
+    public String formEditarMateriaPrimera(@PathVariable Long id,
+                                           @RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                           Model model) {
         MateriaPrimera materiaPrimera = materiaPrimeraService.getMateriaPrimeraById(id);
 
         if (materiaPrimera == null) {
@@ -64,6 +77,7 @@ public class MateriaPrimeraWebController {
         }
 
         model.addAttribute("materiaPrimera", materiaPrimera);
+        model.addAttribute("popup", popup);
         return "materiesPrimeres/formMateriesPrimeres";
     }
 
@@ -71,15 +85,23 @@ public class MateriaPrimeraWebController {
     // ACTUALITZAR MATÈRIA PRIMERA
     @PostMapping("/update/{id}")
     public String updateMateriaPrimera(@PathVariable Long id,
-                                     @ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
-                                     Model model) {
+                                       @ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
+                                       @RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                       Model model) {
         try {
             materiaPrimeraService.updateMateriaPrimera(id, materiaPrimera);
+
+            if (popup) {
+                model.addAttribute("missatge", "Matèria primera actualitzada correctament.");
+                return "layout/tancarFinestra";
+            }
+
             return "redirect:/materies-primeres/list";
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("materiaPrimera", materiaPrimera);
+            model.addAttribute("popup", popup);
             return "materiesPrimeres/formMateriesPrimeres";
         }
     }

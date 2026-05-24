@@ -35,22 +35,33 @@ public class ProveidorWebController {
 
     // FORMULARI CREAR PROVEÏDOR
     @GetMapping("/new")
-    public String formCrearProveidor(Model model) {
+    public String formCrearProveidor(@RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                     Model model) {
         model.addAttribute("proveidor", new Proveidor());
+        model.addAttribute("popup", popup);
         return "proveidors/formProveidors";
     }
 
 
     // GUARDAR PROVEÏDOR
     @PostMapping("/save")
-    public String guardarProveidor(@ModelAttribute("proveidor") Proveidor proveidor, Model model) {
+    public String guardarProveidor(@ModelAttribute("proveidor") Proveidor proveidor,
+                                   @RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                   Model model) {
         try {
             proveidorService.createProveidor(proveidor);
+
+            if (popup) {
+                model.addAttribute("missatge", "Proveïdor creat correctament.");
+                return "layout/tancarFinestra";
+            }
+
             return "redirect:/proveidors/list";
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("proveidor", proveidor);
+            model.addAttribute("popup", popup);
             return "proveidors/formProveidors";
         }
     }
@@ -58,7 +69,9 @@ public class ProveidorWebController {
 
     // FORMULARI EDITAR PROVEÏDOR
     @GetMapping("/edit/{id}")
-    public String formEditarProveidor(@PathVariable Long id, Model model) {
+    public String formEditarProveidor(@PathVariable Long id,
+                                      @RequestParam(value = "popup", defaultValue = "false") boolean popup,
+                                      Model model) {
         Proveidor proveidor = proveidorService.getProveidorById(id);
 
         if (proveidor == null) {
@@ -66,6 +79,7 @@ public class ProveidorWebController {
         }
 
         model.addAttribute("proveidor", proveidor);
+        model.addAttribute("popup", popup);
         return "proveidors/formProveidors";
     }
 
@@ -74,14 +88,22 @@ public class ProveidorWebController {
     @PostMapping("/update/{id}")
     public String updateProveidor(@PathVariable Long id,
                                   @ModelAttribute("proveidor") Proveidor proveidor,
+                                  @RequestParam(value = "popup", defaultValue = "false") boolean popup,
                                   Model model) {
         try {
             proveidorService.updateProveidor(id, proveidor);
+
+            if (popup) {
+                model.addAttribute("missatge", "Proveïdor actualitzat correctament.");
+                return "layout/tancarFinestra";
+            }
+
             return "redirect:/proveidors/list";
         }
         catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("proveidor", proveidor);
+            model.addAttribute("popup", popup);
             return "proveidors/formProveidors";
         }
     }

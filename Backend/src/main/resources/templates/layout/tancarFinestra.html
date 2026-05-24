@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Element guardat - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <main style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+        <section class="content-card" style="max-width:480px; padding:28px; text-align:center;">
+            <h1 class="content-title">Guardat correctament</h1>
+            <p class="content-subtitle" th:text="${missatge}">Element creat correctament.</p>
+            <p class="content-subtitle">Tancant aquesta pestanya...</p>
+
+            <button type="button" class="btn btn-primary" onclick="window.close();">
+                Tancar
+            </button>
+        </section>
+    </main>
+
+    <script>
+        if (window.opener && !window.opener.closed) {
+            window.opener.focus();
+        }
+
+        window.setTimeout(function () {
+            window.close();
+        }, 250);
+    </script>
+</body>
+</html>
