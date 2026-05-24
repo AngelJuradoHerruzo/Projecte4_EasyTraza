@@ -101,6 +101,14 @@ public class OcrAlbaraProveidorService {
             }
         }
 
+        if (proveidorDetectat == OcrProveidorDetectat.TAL_COM_PINTA) {
+            String textZonesTalComPinta = extreureTextZonesTalComPinta(documentTemporal);
+
+            if (textZonesTalComPinta != null && !textZonesTalComPinta.isBlank()) {
+                textOcrOriginal = textOcrOriginal + "\n\n" + textZonesTalComPinta;
+            }
+        }
+
         String textOcrNormalitzat = OcrUtils.normalitzarText(textOcrOriginal);
         String textComparacio = OcrUtils.normalitzarPerComparar(textOcrNormalitzat);
 
@@ -447,6 +455,87 @@ public class OcrAlbaraProveidorService {
 
         } catch (Exception ex) {
             LOGGER.warn("No s'ha pogut executar l'OCR per zones de PASTISSA. Es farà servir el text OCR general.", ex);
+            return "";
+        }
+    }
+
+    /**
+     * Executa OCR per zones del model TAL COM PINTA.
+     *
+     * El número d'albarà correspon al camp N. Entrega. La zona de línies
+     * cobreix tot l'espai disponible abans del bloc de totals perquè el
+     * document real pugui incorporar més files que l'exemple facilitat.
+     */
+    private String extreureTextZonesTalComPinta(DocumentTemporalOcr documentTemporal) {
+        try {
+            BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
+
+            if (imatge == null) {
+                return "";
+            }
+
+            /*
+             * Número d'entrega i data en retalls independents.
+             */
+            String numeroEntrega = executarOcrZona(imatge, 0.055, 0.200, 0.115, 0.042, 7);
+            String dataEntrega = executarOcrZona(imatge, 0.385, 0.200, 0.135, 0.042, 7);
+
+            /*
+             * Columna de descripció. Inclou també les sublínies on apareixen
+             * lot i caducitat; el parser només considerarà com a matèries les
+             * línies de descripció reals.
+             */
+            String descripcions = executarOcrZona(imatge, 0.105, 0.242, 0.410, 0.395, 6);
+
+            /*
+             * Columna Quantitat.
+             */
+            String quantitats = executarOcrZona(imatge, 0.510, 0.242, 0.095, 0.395, 6);
+
+            /*
+             * Zona exclusiva de les sublínies amb lot i data.
+             *
+             * Coordenades revisades sobre el document real:
+             * - inclou valors com "1,00 L602248 07/01/2027";
+             * - evita capturar la major part de la descripció;
+             * - manté altura fins abans dels totals per admetre més línies.
+             *
+             * Es conserva la quantitat inicial en la zona perquè ajuda a
+             * Tesseract a mantenir cada sublínia completa; el parser extreu
+             * només el token situat just abans de la data.
+             */
+            String lots = executarOcrZona(imatge, 0.350, 0.242, 0.190, 0.395, 6);
+
+            /*
+             * Lectura completa de suport i diagnòstic.
+             */
+            String taula = executarOcrZona(imatge, 0.045, 0.242, 0.830, 0.395, 6);
+
+            LOGGER.info("=== OCR TAL COM PINTA - NUMERO ENTREGA ==={}", numeroEntrega);
+            LOGGER.info("=== OCR TAL COM PINTA - DATA ENTREGA ==={}", dataEntrega);
+            LOGGER.info("=== OCR TAL COM PINTA - DESCRIPCIONS ==={}", descripcions);
+            LOGGER.info("=== OCR TAL COM PINTA - QUANTITATS ==={}", quantitats);
+            LOGGER.info("=== OCR TAL COM PINTA - LOTS ==={}", lots);
+            LOGGER.info("=== OCR TAL COM PINTA - TAULA ==={}", taula);
+
+            return """
+                    [[TAL_COM_PINTA_NUMERO_ENTREGA]]    
+                    %s
+                    [[TAL_COM_PINTA_DATA_ENTREGA]]
+                    %s
+                    [[TAL_COM_PINTA_DESCRIPCIONS]]
+                    %s
+                    [[TAL_COM_PINTA_QUANTITATS]]
+                    %s
+                    [[TAL_COM_PINTA_LOTS]]
+                    %s
+                    [[TAL_COM_PINTA_TAULA]]
+                    %s
+                    [[FI_TAL_COM_PINTA]]
+                    """.formatted(numeroEntrega, dataEntrega, descripcions, quantitats, lots, taula);
+
+        } catch (Exception ex) {
+            LOGGER.warn("No s'ha pogut executar l'OCR per zones de TAL COM PINTA. Es farà servir el text OCR general.", ex);
             return "";
         }
     }
