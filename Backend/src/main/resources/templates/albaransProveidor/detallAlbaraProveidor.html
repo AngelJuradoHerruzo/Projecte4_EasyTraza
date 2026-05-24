@@ -67,7 +67,7 @@
                         Dades principals de l'albarà de proveïdor.
                     </p>
 
-                    <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+                    <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px;">
 
                         <!----------------------- DATA RECEPCIÓ ----------------------->
                         <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
@@ -83,6 +83,22 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!----------------------- NÚMERO ALBARÀ ----------------------->
+                        <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
+                            <div class="info-card-meta-item">
+                                <i class="bi bi-receipt"></i>
+
+                                <div class="info-card-meta-text">
+                                    <span class="info-card-meta-label">Número albarà</span>
+                                    <span class="info-card-meta-value"
+                                        th:text="${albaraProveidor.numeroAlbara != null and !albaraProveidor.numeroAlbara.isBlank() ? albaraProveidor.numeroAlbara : '-'}">
+                                        -
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <!----------------------- PROVEÏDOR ----------------------->
                         <div style="padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5;">
@@ -135,9 +151,13 @@
                             /uploads/albarans-proveidor/imatge.png
                         </p>
 
-                        <img th:src="@{${albaraProveidor.fitxers[0]}}"
-                             alt="Imatge de l'albarà"
-                             style="width:100%; max-height:460px; object-fit:contain; border-radius:14px;">
+                        <a th:href="@{${albaraProveidor.fitxers[0]}}"
+                           target="_blank"
+                           class="btn btn-secondary"
+                           style="margin-bottom:14px;">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                            Obrir fitxer
+                        </a>
                     </div>
 
                     <div th:if="${albaraProveidor.fitxers == null or albaraProveidor.fitxers.isEmpty()}"

@@ -1,58 +1,56 @@
-const searchInput = document.getElementById('searchInput');
-const albaraCards = document.querySelectorAll('.albara-card');
-
-const ocrFile = document.getElementById('ocrFile');
+// ---------------------------- ELEMENTS PRINCIPALS ----------------------------
+const documentOcr = document.getElementById('documentOcr');
+const imatgeAlbara = document.getElementById('imatgeAlbara');
 const ocrPreviewEmpty = document.getElementById('ocrPreviewEmpty');
 const ocrPreviewContainer = document.getElementById('ocrPreviewContainer');
+const ocrPreviewImage = document.getElementById('ocrPreviewImage');
+const ocrPreviewFrame = document.getElementById('ocrPreviewFrame');
 const ocrFileName = document.getElementById('ocrFileName');
+const btnEscanejarOcr = document.getElementById('btnEscanejarOcr');
 
 const lotsContainer = document.getElementById('lotsContainer');
 const addLotBtn = document.getElementById('addLotBtn');
 
-
-// ---------------------------- IMATGE DE VISTA PRÈVIA ACTUAL ----------------------------
-function obtenirImatgeVistaPrevia() {
-    return document.getElementById('ocrPreview') || document.getElementById('ocrPreviewSaved');
-}
+let previewObjectUrl = null;
 
 
-// ---------------------------- DADES ORIGINALS DE LA IMATGE ----------------------------
-const previewImageInicial = obtenirImatgeVistaPrevia();
-const nomImatgeInicial = ocrFileName ? ocrFileName.textContent : '';
-const srcImatgeInicial = previewImageInicial ? previewImageInicial.getAttribute('src') : '';
+// ---------------------------- DADES ORIGINALS DE LA VISTA PRÈVIA ----------------------------
+const nomDocumentInicial = ocrFileName ? ocrFileName.textContent : '';
+const srcDocumentInicial = ocrPreviewFrame ? ocrPreviewFrame.getAttribute('src') : '';
+const srcImatgeInicial = ocrPreviewImage ? ocrPreviewImage.getAttribute('src') : '';
+const displayImatgeInicial = ocrPreviewImage ? ocrPreviewImage.style.display : '';
+const displayFrameInicial = ocrPreviewFrame ? ocrPreviewFrame.style.display : '';
 
 
-// ---------------------------- CERCA LLISTAT ----------------------------
-if (searchInput) {
-    searchInput.addEventListener('keyup', function () {
-        filtrarAlbarans(this.value);
+// ---------------------------- VISTA PRÈVIA DEL DOCUMENT OCR ----------------------------
+if (documentOcr) {
+    documentOcr.addEventListener('change', function () {
+        mostrarDocumentSeleccionat(this);
     });
 }
 
 
-// ---------------------------- FILTRAR ALBARANS ----------------------------
-function filtrarAlbarans(text) {
-
-    const filter = text.toLowerCase().trim();
-
-    albaraCards.forEach(card => {
-        const cardText = card.textContent.toLowerCase();
-
-        card.style.display = cardText.includes(filter) ? '' : 'none';
+// ---------------------------- VISTA PRÈVIA DEL DOCUMENT MANUAL ----------------------------
+if (imatgeAlbara) {
+    imatgeAlbara.addEventListener('change', function () {
+        mostrarDocumentSeleccionat(this);
     });
 }
 
 
-// ---------------------------- VISTA PRÈVIA DE LA IMATGE ----------------------------
-if (ocrFile) {
-    ocrFile.addEventListener('change', function () {
-        mostrarImatgeSeleccionada(this);
+// ---------------------------- ESTAT VISUAL DEL BOTÓ OCR ----------------------------
+if (btnEscanejarOcr) {
+    btnEscanejarOcr.addEventListener('click', function () {
+        setTimeout(() => {
+            btnEscanejarOcr.disabled = true;
+            btnEscanejarOcr.innerHTML = '<i class="bi bi-hourglass-split"></i> Escanejant...';
+        }, 0);
     });
 }
 
 
-// ---------------------------- MOSTRAR IMATGE SELECCIONADA ----------------------------
-function mostrarImatgeSeleccionada(input) {
+// ---------------------------- MOSTRAR DOCUMENT SELECCIONAT ----------------------------
+function mostrarDocumentSeleccionat(input) {
 
     const file = input.files[0];
 
@@ -61,52 +59,79 @@ function mostrarImatgeSeleccionada(input) {
         return;
     }
 
-    if (!file.type.startsWith('image/')) {
+    const esImatge = file.type.startsWith('image/');
+    const esPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+    if (!esImatge && !esPdf) {
         input.value = '';
-        alert('El fitxer seleccionat ha de ser una imatge.');
+        alert('El fitxer seleccionat ha de ser una imatge o un PDF.');
         restaurarVistaPreviaOriginal();
         return;
     }
 
-    const reader = new FileReader();
+    alliberarObjectUrlPreview();
+    previewObjectUrl = URL.createObjectURL(file);
 
-    reader.onload = function (event) {
-        const previewImage = obtenirImatgeVistaPrevia();
+    if (ocrFileName) {
+        ocrFileName.textContent = file.name;
+    }
 
-        if (previewImage) {
-            previewImage.src = event.target.result;
+    if (esImatge) {
+        if (ocrPreviewImage) {
+            ocrPreviewImage.src = previewObjectUrl;
+            ocrPreviewImage.style.display = 'block';
         }
 
-        if (ocrFileName) {
-            ocrFileName.textContent = file.name;
+        if (ocrPreviewFrame) {
+            ocrPreviewFrame.removeAttribute('src');
+            ocrPreviewFrame.style.display = 'none';
+        }
+    }
+    else {
+        if (ocrPreviewFrame) {
+            ocrPreviewFrame.src = previewObjectUrl;
+            ocrPreviewFrame.style.display = 'block';
         }
 
-        if (ocrPreviewContainer) {
-            ocrPreviewContainer.style.display = 'block';
+        if (ocrPreviewImage) {
+            ocrPreviewImage.removeAttribute('src');
+            ocrPreviewImage.style.display = 'none';
         }
+    }
 
-        if (ocrPreviewEmpty) {
-            ocrPreviewEmpty.style.display = 'none';
-        }
-    };
+    if (ocrPreviewContainer) {
+        ocrPreviewContainer.style.display = 'block';
+    }
 
-    reader.readAsDataURL(file);
+    if (ocrPreviewEmpty) {
+        ocrPreviewEmpty.style.display = 'none';
+    }
 }
 
 
 // ---------------------------- RESTAURAR VISTA PRÈVIA ORIGINAL ----------------------------
 function restaurarVistaPreviaOriginal() {
 
-    const previewImage = obtenirImatgeVistaPrevia();
+    alliberarObjectUrlPreview();
 
-    if (srcImatgeInicial && srcImatgeInicial.trim() !== '') {
+    if ((srcDocumentInicial && srcDocumentInicial.trim() !== '') || (srcImatgeInicial && srcImatgeInicial.trim() !== '')) {
 
-        if (previewImage) {
-            previewImage.src = srcImatgeInicial;
+        if (ocrPreviewFrame) {
+            ocrPreviewFrame.src = srcDocumentInicial;
+            ocrPreviewFrame.style.display = displayFrameInicial || 'block';
+        }
+
+        if (ocrPreviewImage && srcImatgeInicial) {
+            ocrPreviewImage.src = srcImatgeInicial;
+            ocrPreviewImage.style.display = displayImatgeInicial || 'block';
+        }
+        else if (ocrPreviewImage) {
+            ocrPreviewImage.removeAttribute('src');
+            ocrPreviewImage.style.display = 'none';
         }
 
         if (ocrFileName) {
-            ocrFileName.textContent = nomImatgeInicial;
+            ocrFileName.textContent = nomDocumentInicial;
         }
 
         if (ocrPreviewContainer) {
@@ -120,14 +145,12 @@ function restaurarVistaPreviaOriginal() {
         return;
     }
 
-    netejarVistaPreviaImatge();
+    netejarVistaPreviaDocument();
 }
 
 
-// ---------------------------- NETEJAR VISTA PRÈVIA DE LA IMATGE ----------------------------
-function netejarVistaPreviaImatge() {
-
-    const previewImage = obtenirImatgeVistaPrevia();
+// ---------------------------- NETEJAR VISTA PRÈVIA DEL DOCUMENT ----------------------------
+function netejarVistaPreviaDocument() {
 
     if (ocrPreviewContainer) {
         ocrPreviewContainer.style.display = 'none';
@@ -137,13 +160,100 @@ function netejarVistaPreviaImatge() {
         ocrPreviewEmpty.style.display = 'block';
     }
 
-    if (previewImage) {
-        previewImage.src = '';
+    if (ocrPreviewFrame) {
+        ocrPreviewFrame.removeAttribute('src');
+    }
+
+    if (ocrPreviewImage) {
+        ocrPreviewImage.removeAttribute('src');
+        ocrPreviewImage.style.display = 'none';
     }
 
     if (ocrFileName) {
         ocrFileName.textContent = '';
     }
+}
+
+
+// ---------------------------- ALLIBERAR URL TEMPORAL DE VISTA PRÈVIA ----------------------------
+function alliberarObjectUrlPreview() {
+    if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+    }
+}
+
+
+// ---------------------------- NORMALITZAR TEXT PER COMPARACIÓ VISUAL ----------------------------
+function normalitzarTextVisual(valor) {
+    return (valor || '')
+        .toString()
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+
+// ---------------------------- AJUDA VISUAL D'AVISOS OCR DE MATÈRIA ----------------------------
+function actualitzarAvisosMateriaOcr() {
+    document.querySelectorAll('.lot-row').forEach(row => {
+        const select = row.querySelector('.materia-primera-select');
+        const avis = row.querySelector('.ocr-materia-avis');
+
+        if (!select || !avis) {
+            return;
+        }
+
+        const materiaOcr = normalitzarTextVisual(avis.dataset.ocrMateria);
+        const textSeleccionat = normalitzarTextVisual(select.options[select.selectedIndex]?.text || '');
+
+        if (materiaOcr !== '' && textSeleccionat !== ''
+                && (textSeleccionat.includes(materiaOcr) || materiaOcr.includes(textSeleccionat))) {
+            avis.classList.remove('form-error');
+            avis.classList.add('form-success');
+        }
+        else {
+            avis.classList.remove('form-success');
+            avis.classList.add('form-error');
+        }
+    });
+}
+
+
+document.addEventListener('change', function (event) {
+    if (event.target.classList.contains('materia-primera-select')) {
+        actualitzarAvisosMateriaOcr();
+    }
+});
+
+
+// ---------------------------- BOTÓ VISUAL PER CREAR PROVEÏDOR ----------------------------
+function inicialitzarBotonsProveidors() {
+    document.querySelectorAll('.btn-toggle-proveidor').forEach(button => {
+        button.onclick = function () {
+            const url = this.dataset.url;
+
+            if (url) {
+                window.open(url, '_blank');
+            }
+        };
+    });
+}
+
+
+// ---------------------------- BOTÓ VISUAL PER CREAR MATÈRIA PRIMERA ----------------------------
+function inicialitzarBotonsMateriesPrimeres() {
+    document.querySelectorAll('.btn-toggle-materia-primera').forEach(button => {
+        button.onclick = function () {
+            const url = this.dataset.url;
+
+            if (url) {
+                window.open(url, '_blank');
+            }
+        };
+    });
 }
 
 
@@ -188,12 +298,7 @@ function bindRemoveButtons() {
                 this.closest('.lot-row').remove();
 
                 reindexLots();
-
-                if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
-                    inicialitzarBotonsUnitatsMesura();
-                }
-
-                bindRemoveButtons();
+                reinicialitzarAjudaLots();
             }
         };
     });
@@ -219,18 +324,34 @@ if (addLotBtn && lotsContainer) {
             }
         });
 
+        newRow.querySelectorAll('.ocr-materia-avis, .form-error, .form-success').forEach(element => {
+            if (element.classList.contains('ocr-materia-avis')) {
+                element.remove();
+            }
+        });
+
         lotsContainer.appendChild(newRow);
 
         reindexLots();
-
-        if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
-            inicialitzarBotonsUnitatsMesura();
-        }
-
-        bindRemoveButtons();
+        reinicialitzarAjudaLots();
     });
 }
 
 
+// ---------------------------- REINICIALITZAR AJUDA DE LOTS ----------------------------
+function reinicialitzarAjudaLots() {
+    if (typeof inicialitzarBotonsUnitatsMesura === 'function') {
+        inicialitzarBotonsUnitatsMesura();
+    }
+
+    inicialitzarBotonsProveidors();
+    inicialitzarBotonsMateriesPrimeres();
+    bindRemoveButtons();
+    actualitzarAvisosMateriaOcr();
+}
+
+
 // ---------------------------- INICIALITZAR BOTONS ----------------------------
-bindRemoveButtons();
+reinicialitzarAjudaLots();
+
+window.addEventListener('beforeunload', alliberarObjectUrlPreview);

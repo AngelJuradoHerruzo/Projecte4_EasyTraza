@@ -34,10 +34,14 @@
             </div>
 
             <div class="page-top-actions">
-                <a th:href="@{/proveidors/list}" class="btn btn-primary">
+                <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-primary">
                     <i class="bi bi-arrow-left"></i>
                     <span>Tornar</span>
                 </a>
+                <button th:if="${popup}" type="button" class="btn btn-primary" onclick="window.close();">
+                    <i class="bi bi-x-lg"></i>
+                    <span>Tancar</span>
+                </button>
             </div>
         </section>
 
@@ -68,6 +72,8 @@
                       th:action="${proveidor.id != null} ? @{/proveidors/update/{id}(id=${proveidor.id})} : @{/proveidors/save}"
                       th:object="${proveidor}"
                       method="post">
+
+                    <input type="hidden" name="popup" th:value="${popup != null and popup}">
 
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
 
@@ -135,9 +141,13 @@
                             <span>Guardar</span>
                         </button>
 
-                        <a th:href="@{/proveidors/list}" class="btn btn-secondary">
+                        <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-secondary">
                             Cancel·lar
                         </a>
+
+                        <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
+                            Cancel·lar
+                        </button>
 
                     </div>
 

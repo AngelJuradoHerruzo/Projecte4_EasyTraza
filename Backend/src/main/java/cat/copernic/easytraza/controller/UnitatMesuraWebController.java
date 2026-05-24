@@ -5,34 +5,41 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import cat.copernic.easytraza.dto.OcrResultatAlbaraProveidorDto;
 import cat.copernic.easytraza.entities.AlbaraProveidor;
 import cat.copernic.easytraza.entities.LotProveidor;
 import cat.copernic.easytraza.entities.UnitatMesura;
 import cat.copernic.easytraza.service.MateriaPrimeraService;
+import cat.copernic.easytraza.service.OcrAlbaraProveidorService;
 import cat.copernic.easytraza.service.ProveidorService;
 import cat.copernic.easytraza.service.UnitatMesuraService;
-import cat.copernic.easytraza.service.UsuariService;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/unitats-mesura")
 public class UnitatMesuraWebController {
 
+    private static final String SESSION_OCR_RESULTAT = "ocrResultatAlbaraProveidor";
+
     // ---------------------------- SERVICES I CONSTRUCTOR ----------------------------
     private final UnitatMesuraService unitatMesuraService;
     private final ProveidorService proveidorService;
-    private final UsuariService usuariService;
     private final MateriaPrimeraService materiaPrimeraService;
+    private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
 
     public UnitatMesuraWebController(UnitatMesuraService unitatMesuraService,
                                      ProveidorService proveidorService,
-                                     UsuariService usuariService,
-                                     MateriaPrimeraService materiaPrimeraService) {
+                                     MateriaPrimeraService materiaPrimeraService,
+                                     OcrAlbaraProveidorService ocrAlbaraProveidorService) {
         this.unitatMesuraService = unitatMesuraService;
         this.proveidorService = proveidorService;
-        this.usuariService = usuariService;
         this.materiaPrimeraService = materiaPrimeraService;
+        this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
     }
 
 
@@ -42,8 +49,8 @@ public class UnitatMesuraWebController {
             @ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
             @RequestParam(value = "novaUnitatMesura", required = false) String novaUnitatMesura,
             @RequestParam(value = "indexUnitatMesura", required = false) Integer indexUnitatMesura,
-            @RequestParam(value = "ocrImageBase64", required = false) String ocrImageBase64,
-            @RequestParam(value = "ocrImageOriginalName", required = false) String ocrImageOriginalName,
+            @RequestParam(value = "ocrDocumentTemporalId", required = false) String ocrDocumentTemporalId,
+            HttpSession session,
             Model model) {
 
         // Assegura que el formulari sempre tingui almenys un lot
@@ -70,17 +77,48 @@ public class UnitatMesuraWebController {
             model.addAttribute("novaUnitatMesuraValor", novaUnitatMesura);
         }
 
+        OcrResultatAlbaraProveidorDto resultatOcr = obtenirResultatOcrSessio(session);
+
+        if ((ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) && resultatOcr != null) {
+            ocrDocumentTemporalId = resultatOcr.getOcrDocumentTemporalId();
+        }
+
         model.addAttribute("unitatMesuraPanelObert", true);
         model.addAttribute("unitatMesuraPanelIndex", indexUnitatMesura);
-
         model.addAttribute("albaraProveidor", albaraProveidor);
-        model.addAttribute("ocrImageBase64", ocrImageBase64);
-        model.addAttribute("ocrImageOriginalName", ocrImageOriginalName);
+        model.addAttribute("ocrResultat", resultatOcr);
+        model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
+        afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
         model.addAttribute("proveidors", proveidorService.getAllProveidors());
-        model.addAttribute("usuaris", usuariService.getAllUsuaris());
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
         model.addAttribute("unitatsMesura", unitatMesuraService.getAllUnitatsMesura());
 
         return "albaransProveidor/formAlbaraProveidor";
+    }
+
+
+    // OBTENIR RESULTAT OCR TEMPORAL CONSERVAT A LA SESSIÓ
+    private OcrResultatAlbaraProveidorDto obtenirResultatOcrSessio(HttpSession session) {
+        Object resultat = session.getAttribute(SESSION_OCR_RESULTAT);
+        return resultat instanceof OcrResultatAlbaraProveidorDto
+                ? (OcrResultatAlbaraProveidorDto) resultat
+                : null;
+    }
+
+
+    // RECUPERAR VISTA PRÈVIA DEL DOCUMENT OCR SENSE REENVIAR LA IMATGE
+    private void afegirDadesDocumentTemporal(Model model, String ocrDocumentTemporalId) {
+        if (ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) {
+            return;
+        }
+
+        try {
+            model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
+            model.addAttribute("ocrDocumentUrlTemporal", ocrAlbaraProveidorService.obtenirUrlDocumentTemporal(ocrDocumentTemporalId));
+            model.addAttribute("ocrDocumentContentType", ocrAlbaraProveidorService.obtenirContentTypeDocumentTemporal(ocrDocumentTemporalId));
+        }
+        catch (RuntimeException ignored) {
+            model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
+        }
     }
 }

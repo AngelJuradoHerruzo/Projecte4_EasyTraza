@@ -39,10 +39,14 @@
 
             <!-- Botó tornar -->
             <div class="page-top-actions">
-                <a th:href="@{/materies-primeres/list}" class="btn btn-primary">
+                <a th:if="${!popup}" th:href="@{/materies-primeres/list}" class="btn btn-primary">
                     <i class="bi bi-arrow-left"></i>
                     <span>Tornar</span>
                 </a>
+                <button th:if="${popup}" type="button" class="btn btn-primary" onclick="window.close();">
+                    <i class="bi bi-x-lg"></i>
+                    <span>Tancar</span>
+                </button>
             </div>
         </section>
 
@@ -74,6 +78,8 @@
                       th:action="${materiaPrimera.id != null} ? @{/materies-primeres/update/{id}(id=${materiaPrimera.id})} : @{/materies-primeres/save}"
                       th:object="${materiaPrimera}"
                       method="post">
+
+                    <input type="hidden" name="popup" th:value="${popup != null and popup}">
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
 
@@ -114,9 +120,13 @@
                         </button>
 
                         <!-- Cancel·lar -->
-                        <a th:href="@{/materies-primeres/list}" class="btn btn-secondary">
+                        <a th:if="${!popup}" th:href="@{/materies-primeres/list}" class="btn btn-secondary">
                             Cancel·lar
                         </a>
+
+                        <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
+                            Cancel·lar
+                        </button>
 
                     </div>
 

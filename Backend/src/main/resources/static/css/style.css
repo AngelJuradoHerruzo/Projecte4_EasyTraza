@@ -847,7 +847,7 @@ a {
 
 /* BOTÓ BLOQUEJAT PER RELACIONS ASSOCIADES */
 .btn-disabled-delete {
-    background-color: #b46b6b85;
+    background-color: #bd7b7b72;
     color: #f3d6d6;
     border: 1px solid #b46b6b1c;
     cursor: not-allowed;
@@ -857,7 +857,7 @@ a {
 
 .btn-disabled-delete i,
 .btn-disabled-delete span {
-    color: #9c5257;
+    color: #a65359;
 }
 
 /* CAPÇALERES ORDENABLES */
