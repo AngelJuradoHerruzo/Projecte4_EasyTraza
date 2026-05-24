@@ -93,6 +93,14 @@ public class OcrAlbaraProveidorService {
             }
         }
 
+        if (proveidorDetectat == OcrProveidorDetectat.PASTISSA) {
+            String textZonesPastissa = extreureTextZonesPastissa(documentTemporal);
+
+            if (textZonesPastissa != null && !textZonesPastissa.isBlank()) {
+                textOcrOriginal = textOcrOriginal + "\n\n" + textZonesPastissa;
+            }
+        }
+
         String textOcrNormalitzat = OcrUtils.normalitzarText(textOcrOriginal);
         String textComparacio = OcrUtils.normalitzarPerComparar(textOcrNormalitzat);
 
@@ -100,7 +108,11 @@ public class OcrAlbaraProveidorService {
             proveidorDetectat = OcrProveidorDetectat.detectar(textComparacio);
         }
 
-        OcrAlbaraPendent albaraPendent = parsejarAlbara(proveidorDetectat, textOcrOriginal, textOcrNormalitzat);
+        OcrAlbaraPendent albaraPendent = parsejarAlbara(
+                proveidorDetectat,
+                textOcrOriginal,
+                textOcrNormalitzat
+        );
 
         OcrResultatAlbaraProveidorDto resultat = new OcrResultatAlbaraProveidorDto();
         resultat.setProveidorDetectat(proveidorDetectat);
@@ -196,7 +208,12 @@ public class OcrAlbaraProveidorService {
                     .filter(valor -> !valor.isBlank())
                     .orElse(inferirContentType(nomOriginal));
 
-            return new DocumentTemporalOcr(nomOriginal, nomGuardat, contentType, desti);
+            return new DocumentTemporalOcr(
+                    nomOriginal,
+                    nomGuardat,
+                    contentType,
+                    desti
+            );
 
         } catch (IOException ex) {
             LOGGER.error("No s'ha pogut guardar el document temporal OCR.", ex);
@@ -293,9 +310,7 @@ public class OcrAlbaraProveidorService {
     }
 
     /**
-     * Executa OCR sobre les zones pròpies d'ARTIPAS. La taula es manté en un
-     * sol retall perquè, en aquest document, les files queden alineades i el
-     * Codi HS forma part de la mateixa línia que el producte rebut.
+     * Executa OCR sobre les zones pròpies d'ARTIPAS.
      */
     private String extreureTextZonesArtipas(DocumentTemporalOcr documentTemporal) {
         try {
@@ -308,20 +323,19 @@ public class OcrAlbaraProveidorService {
             String info = executarOcrZona(imatge, 0.040, 0.285, 0.480, 0.135, 6);
 
             /*
-            * Primera fila real de producte.
-            *
-            * La fila [N7K] queda just sota la capçalera de la taula. La zona anterior
-            * començava massa avall i capturava la fila següent.
-            */
+             * Primera fila real de producte.
+             *
+             * La fila [N7K] queda just sota la capçalera de la taula. La zona
+             * anterior començava massa avall i capturava la fila següent.
+             */
             String primeraLinia = executarOcrZona(imatge, 0.030, 0.438, 0.850, 0.035, 7);
 
             /*
-            * Taula principal completa.
-            *
-            * Es puja l'inici de la zona perquè inclogui la capçalera i sobretot la
-            * primera fila [N7K]. La zona anterior començava aproximadament a l'altura
-            * de la primera fila i Tesseract l'ometia.
-            */
+             * Taula principal completa.
+             *
+             * Es puja l'inici de la zona perquè inclogui la capçalera i la
+             * primera fila [N7K].
+             */
             String taula = executarOcrZona(imatge, 0.030, 0.415, 0.850, 0.225, 6);
 
             return """
@@ -379,6 +393,87 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+    /**
+     * Executa OCR per zones del model PASTISSA sense ampliar la imatge.
+     *
+     * Aquest document té tipografia petita i regular; en ampliar el retall
+     * Tesseract pot deformar especialment el número d'albarà F - 813964.
+     * La resta de proveïdors continuen utilitzant l'escalat habitual.
+     */
+    private String extreureTextZonesPastissa(DocumentTemporalOcr documentTemporal) {
+        try {
+            BufferedImage imatge = llegirPrimeraImatgeDocument(documentTemporal);
+
+            if (imatge == null) {
+                return "";
+            }
+
+            /*
+            * Capçalera superior: número d'albarà i data.
+            * Es puja respecte de l'anterior perquè no capturi les primeres files
+            * de productes.
+            */
+            String numeroAlbara = executarOcrZona(imatge, 0.120, 0.185, 0.175, 0.035, 7);
+            String info = executarOcrZona(imatge, 0.040, 0.165, 0.390, 0.090, 6);
+
+            /*
+            * Taula completa de productes.
+            * Les zones anteriors començaven massa avall i per això només es detectaven
+            * les files a partir del quart producte.
+            */
+            String materies = executarOcrZona(imatge, 0.050, 0.245, 0.470, 0.420, 6);
+            String lots = executarOcrZona(imatge, 0.500, 0.245, 0.165, 0.420, 6);
+            String quantitats = executarOcrZona(imatge, 0.635, 0.350, 0.075, 0.360, 6);
+
+            LOGGER.info("=== OCR PASTISSA - NUMERO ALBARA ===\n{}", numeroAlbara);
+            LOGGER.info("=== OCR PASTISSA - INFO ===\n{}", info);
+            LOGGER.info("=== OCR PASTISSA - MATERIES ===\n{}", materies);
+            LOGGER.info("=== OCR PASTISSA - LOTS ===\n{}", lots);
+            LOGGER.info("=== OCR PASTISSA - QUANTITATS ===\n{}", quantitats);
+
+            return """
+                    [[PASTISSA_NUMERO_ALBARA]]
+                    %s
+                    [[PASTISSA_INFO]]
+                    %s
+                    [[PASTISSA_MATERIES]]
+                    %s
+                    [[PASTISSA_LOTS]]
+                    %s
+                    [[PASTISSA_QUANTITATS]]
+                    %s
+                    [[FI_PASTISSA]]
+                    """.formatted(numeroAlbara, info, materies, lots, quantitats);
+
+        } catch (Exception ex) {
+            LOGGER.warn("No s'ha pogut executar l'OCR per zones de PASTISSA. Es farà servir el text OCR general.", ex);
+            return "";
+        }
+    }
+
+    /**
+     * Executa OCR sobre una zona que només ha de contenir valors numèrics.
+     *
+     * S'utilitza per a columnes com QUANT de PASTISSA, evitant que Tesseract
+     * intenti interpretar text de columnes pròximes.
+     */
+    private String executarOcrZonaNumerica(BufferedImage imatge,
+                                        double x,
+                                        double y,
+                                        double amplada,
+                                        double alcada,
+                                        int pageSegMode) throws TesseractException {
+
+        BufferedImage zona = retallarZona(imatge, x, y, amplada, alcada);
+        Tesseract tesseract = crearTesseract();
+
+        tesseract.setPageSegMode(pageSegMode);
+        tesseract.setTessVariable("tessedit_char_whitelist", "0123456789,.");
+        tesseract.setTessVariable("preserve_interword_spaces", "1");
+
+        return tesseract.doOCR(prepararImatgePerOcr(zona));
+    }
+
     private BufferedImage llegirPrimeraImatgeDocument(DocumentTemporalOcr documentTemporal) throws IOException {
         String nom = documentTemporal.nomGuardat().toLowerCase(Locale.ROOT);
 
@@ -396,17 +491,24 @@ public class OcrAlbaraProveidorService {
         return ImageIO.read(documentTemporal.ruta().toFile());
     }
 
-    private String executarOcrZona(BufferedImage imatge, double x, double y, double amplada, double alcada)
-            throws TesseractException {
+    private String executarOcrZona(
+            BufferedImage imatge,
+            double x,
+            double y,
+            double amplada,
+            double alcada
+    ) throws TesseractException {
         return executarOcrZona(imatge, x, y, amplada, alcada, null);
     }
 
-    private String executarOcrZona(BufferedImage imatge,
-                                   double x,
-                                   double y,
-                                   double amplada,
-                                   double alcada,
-                                   Integer pageSegMode) throws TesseractException {
+    private String executarOcrZona(
+            BufferedImage imatge,
+            double x,
+            double y,
+            double amplada,
+            double alcada,
+            Integer pageSegMode
+    ) throws TesseractException {
 
         BufferedImage zona = retallarZona(imatge, x, y, amplada, alcada);
         Tesseract tesseract = crearTesseract();
@@ -418,7 +520,38 @@ public class OcrAlbaraProveidorService {
         return tesseract.doOCR(prepararImatgePerOcr(zona));
     }
 
-    private BufferedImage retallarZona(BufferedImage imatge, double x, double y, double amplada, double alcada) {
+    /**
+     * Executa OCR sobre una zona sense canviar-ne la resolució.
+     *
+     * Només s'utilitza per PASTISSA per evitar deformar els caràcters petits
+     * del número d'albarà i de la seva taula.
+     */
+    private String executarOcrZonaSenseEscalar(
+            BufferedImage imatge,
+            double x,
+            double y,
+            double amplada,
+            double alcada,
+            Integer pageSegMode
+    ) throws TesseractException {
+
+        BufferedImage zona = retallarZona(imatge, x, y, amplada, alcada);
+        Tesseract tesseract = crearTesseract();
+
+        if (pageSegMode != null) {
+            tesseract.setPageSegMode(pageSegMode);
+        }
+
+        return tesseract.doOCR(convertirAGrisosSenseEscalar(zona));
+    }
+
+    private BufferedImage retallarZona(
+            BufferedImage imatge,
+            double x,
+            double y,
+            double amplada,
+            double alcada
+    ) {
         int imageWidth = imatge.getWidth();
         int imageHeight = imatge.getHeight();
 
@@ -438,16 +571,63 @@ public class OcrAlbaraProveidorService {
         int amplada = original.getWidth() * 2;
         int alcada = original.getHeight() * 2;
 
-        BufferedImage escalada = new BufferedImage(amplada, alcada, BufferedImage.TYPE_BYTE_GRAY);
-        Graphics2D graphics = escalada.createGraphics();
+        BufferedImage escalada = new BufferedImage(
+                amplada,
+                alcada,
+                BufferedImage.TYPE_BYTE_GRAY
+        );
 
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Graphics2D graphics = escalada.createGraphics();
+        graphics.setRenderingHint(
+                RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BICUBIC
+        );
+        graphics.setRenderingHint(
+                RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY
+        );
+        graphics.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON
+        );
         graphics.drawImage(original, 0, 0, amplada, alcada, null);
         graphics.dispose();
 
         return escalada;
+    }
+
+    /**
+     * Converteix una zona a escala de grisos mantenint la mida original.
+     *
+     * No amplia la imatge. Actualment només s'utilitza a PASTISSA.
+     */
+    private BufferedImage convertirAGrisosSenseEscalar(BufferedImage original) {
+        BufferedImage grisos = new BufferedImage(
+                original.getWidth(),
+                original.getHeight(),
+                BufferedImage.TYPE_BYTE_GRAY
+        );
+
+        Graphics2D graphics = grisos.createGraphics();
+        graphics.setRenderingHint(
+                RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY
+        );
+        graphics.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON
+        );
+        graphics.drawImage(
+                original,
+                0,
+                0,
+                original.getWidth(),
+                original.getHeight(),
+                null
+        );
+        graphics.dispose();
+
+        return grisos;
     }
 
     private Tesseract crearTesseract() {
@@ -458,6 +638,7 @@ public class OcrAlbaraProveidorService {
         tesseract.setLanguage(tesseractLanguage);
         tesseract.setTessVariable("preserve_interword_spaces", "1");
         tesseract.setTessVariable("user_defined_dpi", "300");
+
         return tesseract;
     }
 
@@ -466,8 +647,14 @@ public class OcrAlbaraProveidorService {
             throw new IllegalStateException("No s'ha configurat la ruta de tessdata: ocr.tessdata.path");
         }
 
-        String idioma = tesseractLanguage == null || tesseractLanguage.isBlank() ? "spa" : tesseractLanguage;
-        Path trainedData = Paths.get(tessdataPath).resolve(idioma + ".traineddata").toAbsolutePath().normalize();
+        String idioma = tesseractLanguage == null || tesseractLanguage.isBlank()
+                ? "spa"
+                : tesseractLanguage;
+
+        Path trainedData = Paths.get(tessdataPath)
+                .resolve(idioma + ".traineddata")
+                .toAbsolutePath()
+                .normalize();
 
         if (!Files.exists(trainedData)) {
             throw new IllegalStateException("No s'ha trobat el fitxer d'idioma OCR: " + trainedData);
@@ -476,14 +663,17 @@ public class OcrAlbaraProveidorService {
 
 
     /*********************       .DELEGACIÓ PARSER.       *********************/
-    private OcrAlbaraPendent parsejarAlbara(OcrProveidorDetectat proveidorDetectat,
-                                            String textOcrOriginal,
-                                            String textOcrNormalitzat) {
+    private OcrAlbaraPendent parsejarAlbara(
+            OcrProveidorDetectat proveidorDetectat,
+            String textOcrOriginal,
+            String textOcrNormalitzat
+    ) {
 
         if (proveidorDetectat == null) {
             OcrAlbaraPendent pendent = new OcrAlbaraPendent();
             pendent.afegirAvis("Proveïdor no detectat. Revisa el document i selecciona el proveïdor manualment.");
             pendent.setDataAlbara(OcrUtils.extreurePrimeraDataNormalitzada(textOcrNormalitzat));
+
             return pendent;
         }
 
@@ -494,12 +684,17 @@ public class OcrAlbaraProveidorService {
                 .orElseGet(() -> crearResultatSenseParser(proveidorDetectat, textOcrNormalitzat));
     }
 
-    private OcrAlbaraPendent crearResultatSenseParser(OcrProveidorDetectat proveidorDetectat, String textOcrNormalitzat) {
+    private OcrAlbaraPendent crearResultatSenseParser(
+            OcrProveidorDetectat proveidorDetectat,
+            String textOcrNormalitzat
+    ) {
         OcrAlbaraPendent pendent = new OcrAlbaraPendent();
+
         pendent.setProveidorDetectat(proveidorDetectat.getNomVisible());
         pendent.setProveidorCifDetectat(proveidorDetectat.getCifHabitual());
         pendent.setDataAlbara(OcrUtils.extreurePrimeraDataNormalitzada(textOcrNormalitzat));
         pendent.afegirAvis("No s'ha trobat cap parser OCR configurat per a " + proveidorDetectat.getNomVisible() + ".");
+
         return pendent;
     }
 
@@ -514,6 +709,7 @@ public class OcrAlbaraProveidorService {
         }
 
         String extensio = nom.substring(index).toLowerCase(Locale.ROOT);
+
         return extensio.matches("\\.[a-z0-9]{1,8}") ? extensio : ".bin";
     }
 
@@ -540,5 +736,6 @@ public class OcrAlbaraProveidorService {
             String nomGuardat,
             String contentType,
             Path ruta
-    ) { }
+    ) {
+    }
 }
