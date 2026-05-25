@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "ocr.tessdata.path",
+    "type": "java.lang.String",
+    "description": "A description for 'ocr.tessdata.path'"
+  },
+  {
+    "name": "ocr.tesseract.language",
+    "type": "java.lang.String",
+    "description": "A description for 'ocr.tesseract.language'"
+  },
+  {
+    "name": "ocr.documents.temp-path",
+    "type": "java.lang.String",
+    "description": "A description for 'ocr.documents.temp-path'"
+  },
+  {
+    "name": "ocr.documents.final-path",
+    "type": "java.lang.String",
+    "description": "A description for 'ocr.documents.final-path'"
+  }
+]}

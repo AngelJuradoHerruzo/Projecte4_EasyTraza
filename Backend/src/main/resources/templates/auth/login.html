@@ -48,6 +48,12 @@
                 <span>Correu electrònic o contrasenya incorrectes.</span>
             </div>
 
+            <!-- Missatge de sessió caducada -->
+            <div th:if="${param.expired}" class="form-error" style="width:100%; max-width:none; margin-bottom:18px;">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>La sessió ha caducat. Torna a iniciar sessió.</span>
+            </div>
+
             <!-- Missatge de logout correcte -->
             <div th:if="${param.logout}" class="form-success" style="width:100%; margin-bottom:18px;">
                 <i class="bi bi-check-circle"></i>
