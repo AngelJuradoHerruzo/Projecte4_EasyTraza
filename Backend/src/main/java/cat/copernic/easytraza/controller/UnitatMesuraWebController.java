@@ -3,6 +3,8 @@ package cat.copernic.easytraza.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/unitats-mesura")
 public class UnitatMesuraWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnitatMesuraWebController.class);
 
     private static final String SESSION_OCR_RESULTAT = "ocrResultatAlbaraProveidor";
 
@@ -62,6 +66,7 @@ public class UnitatMesuraWebController {
 
         try {
             UnitatMesura unitatMesura = unitatMesuraService.createUnitatMesura(novaUnitatMesura);
+            LOGGER.info("Unitat de mesura creada correctament.");
 
             if (indexUnitatMesura != null
                     && indexUnitatMesura >= 0
@@ -73,6 +78,7 @@ public class UnitatMesuraWebController {
             model.addAttribute("infoUnitatMesura", "Unitat de mesura creada correctament.");
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear la unitat de mesura des de l'albarà de proveïdor: {}", e.getMessage());
             model.addAttribute("errorUnitatMesura", e.getMessage());
             model.addAttribute("novaUnitatMesuraValor", novaUnitatMesura);
         }
@@ -118,6 +124,7 @@ public class UnitatMesuraWebController {
             model.addAttribute("ocrDocumentContentType", ocrAlbaraProveidorService.obtenirContentTypeDocumentTemporal(ocrDocumentTemporalId));
         }
         catch (RuntimeException ignored) {
+            LOGGER.warn("No s'ha pogut recuperar la vista prèvia del document OCR temporal.");
             model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
         }
     }

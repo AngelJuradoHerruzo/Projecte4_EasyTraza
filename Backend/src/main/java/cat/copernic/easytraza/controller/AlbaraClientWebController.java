@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,8 @@ import cat.copernic.easytraza.service.UsuariService;
 @Controller
 @RequestMapping("/albarans-client")
 public class AlbaraClientWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlbaraClientWebController.class);
 
     // ---------------------------- SERVICES I CONSTRUCTOR ----------------------------
     private final AlbaraClientService albaraClientService;
@@ -97,6 +101,7 @@ public class AlbaraClientWebController {
                                       RedirectAttributes redirectAttributes) {
         try {
             albaraClientService.createAlbaraClient(albaraClient);
+            LOGGER.info("Albarà de client creat correctament.");
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -106,6 +111,7 @@ public class AlbaraClientWebController {
             return "redirect:/albarans-client/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear l'albarà de client: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaraClient", albaraClient);
             prepararModelFormulari(model);
@@ -150,6 +156,7 @@ public class AlbaraClientWebController {
                                      RedirectAttributes redirectAttributes) {
         try {
             albaraClientService.updateAlbaraClient(id, albaraClient);
+            LOGGER.info("Albarà de client amb identificador {} actualitzat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -159,6 +166,7 @@ public class AlbaraClientWebController {
             return "redirect:/albarans-client/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar l'albarà de client amb identificador {}: {}", id, e.getMessage());
             albaraClient.setId(id);
 
             model.addAttribute("error", e.getMessage());
@@ -176,6 +184,7 @@ public class AlbaraClientWebController {
                                      RedirectAttributes redirectAttributes) {
         try {
             albaraClientService.deleteAlbaraClient(id);
+            LOGGER.info("Albarà de client amb identificador {} eliminat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -183,6 +192,7 @@ public class AlbaraClientWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar l'albarà de client amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
@@ -196,6 +206,7 @@ public class AlbaraClientWebController {
                                       RedirectAttributes redirectAttributes) {
         try {
             albaraClientService.lliurarAlbaraClient(id);
+            LOGGER.info("Albarà de client amb identificador {} marcat com a lliurat.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -203,6 +214,7 @@ public class AlbaraClientWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut marcar com a lliurat l'albarà de client amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 

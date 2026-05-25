@@ -1,11 +1,11 @@
 package cat.copernic.easytraza.controller;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,24 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import cat.copernic.easytraza.dto.OcrAlbaraPendent;
-import cat.copernic.easytraza.dto.OcrLiniaDto;
 import cat.copernic.easytraza.dto.OcrResultatAlbaraProveidorDto;
 import cat.copernic.easytraza.entities.AlbaraProveidor;
 import cat.copernic.easytraza.entities.LotProveidor;
-import cat.copernic.easytraza.entities.MateriaPrimera;
-import cat.copernic.easytraza.entities.Proveidor;
 import cat.copernic.easytraza.service.AlbaraProveidorService;
 import cat.copernic.easytraza.service.MateriaPrimeraService;
 import cat.copernic.easytraza.service.OcrAlbaraProveidorService;
 import cat.copernic.easytraza.service.ProveidorService;
 import cat.copernic.easytraza.service.UnitatMesuraService;
-import cat.copernic.easytraza.service.ocr.OcrUtils;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/albarans-proveidor")
 public class AlbaraProveidorWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlbaraProveidorWebController.class);
 
     private static final String SESSION_OCR_RESULTAT = "ocrResultatAlbaraProveidor";
 
@@ -122,10 +119,11 @@ public class AlbaraProveidorWebController {
                                Model model) {
         try {
             OcrResultatAlbaraProveidorDto resultatOcr = ocrAlbaraProveidorService.processarDocument(documentOcr);
-            completarAssociacionsOcr(resultatOcr);
+            LOGGER.info("Document OCR de l'albarà de proveïdor processat correctament.");
+            albaraProveidorService.completarAssociacionsOcr(resultatOcr);
             session.setAttribute(SESSION_OCR_RESULTAT, resultatOcr);
 
-            AlbaraProveidor albaraProveidor = convertirResultatOcrAFormulari(resultatOcr);
+            AlbaraProveidor albaraProveidor = albaraProveidorService.convertirResultatOcrAFormulari(resultatOcr);
 
             model.addAttribute("albaraProveidor", albaraProveidor);
             model.addAttribute("ocrResultat", resultatOcr);
@@ -138,6 +136,7 @@ public class AlbaraProveidorWebController {
             return "albaransProveidor/formAlbaraProveidor";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut processar el document OCR de l'albarà de proveïdor: {}", e.getMessage());
             AlbaraProveidor albaraProveidor = new AlbaraProveidor();
             albaraProveidor.setDataRecepcio(LocalDate.now());
             albaraProveidor.setLots(new ArrayList<>(List.of(new LotProveidor())));
@@ -162,9 +161,9 @@ public class AlbaraProveidorWebController {
         OcrResultatAlbaraProveidorDto resultatOcr = obtenirResultatOcrSessio(session);
 
         if (resultatOcr != null) {
-            netejarAvisosAssociacioOcr(resultatOcr);
-            completarAssociacionsOcr(resultatOcr);
-            aplicarAssociacionsOcrAlFormulari(albaraProveidor, resultatOcr);
+            albaraProveidorService.netejarAvisosAssociacioOcr(resultatOcr);
+            albaraProveidorService.completarAssociacionsOcr(resultatOcr);
+            albaraProveidorService.aplicarAssociacionsOcrAlFormulari(albaraProveidor, resultatOcr);
             model.addAttribute("ocrResultat", resultatOcr);
             ocrDocumentTemporalId = obtenirDocumentTemporalId(ocrDocumentTemporalId, resultatOcr);
         }
@@ -188,10 +187,12 @@ public class AlbaraProveidorWebController {
                                          Model model) {
         try {
             albaraProveidorService.createAlbaraProveidor(albaraProveidor, imatgeAlbara, ocrDocumentTemporalId, session);
+            LOGGER.info("Albarà de proveïdor creat correctament.");
             session.removeAttribute(SESSION_OCR_RESULTAT);
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear l'albarà de proveïdor: {}", e.getMessage());
             assegurarLotsFormulari(albaraProveidor);
 
             model.addAttribute("error", e.getMessage());
@@ -227,6 +228,7 @@ public class AlbaraProveidorWebController {
             return "albaransProveidor/formAlbaraProveidor";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut carregar l'albarà de proveïdor amb identificador {} per editar-lo: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaransPerProveidor", albaraProveidorService.getAlbaransAgrupatsPerProveidor());
             model.addAttribute("albaraProveidorService", albaraProveidorService);
@@ -246,10 +248,12 @@ public class AlbaraProveidorWebController {
                                         Model model) {
         try {
             albaraProveidorService.updateAlbaraProveidor(id, albaraProveidor, imatgeAlbara, ocrDocumentTemporalId, session);
+            LOGGER.info("Albarà de proveïdor amb identificador {} actualitzat correctament.", id);
             session.removeAttribute(SESSION_OCR_RESULTAT);
             return "redirect:/albarans-proveidor/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar l'albarà de proveïdor amb identificador {}: {}", id, e.getMessage());
             albaraProveidor.setId(id);
             assegurarLotsFormulari(albaraProveidor);
 
@@ -270,8 +274,10 @@ public class AlbaraProveidorWebController {
     public String deleteAlbaraProveidor(@PathVariable Long id, Model model) {
         try {
             albaraProveidorService.deleteAlbaraProveidor(id);
+            LOGGER.info("Albarà de proveïdor amb identificador {} eliminat correctament.", id);
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar l'albarà de proveïdor amb identificador {}: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("albaransPerProveidor", albaraProveidorService.getAlbaransAgrupatsPerProveidor());
             model.addAttribute("albaraProveidorService", albaraProveidorService);
@@ -303,6 +309,7 @@ public class AlbaraProveidorWebController {
             model.addAttribute("ocrDocumentContentType", ocrAlbaraProveidorService.obtenirContentTypeDocumentTemporal(ocrDocumentTemporalId));
         }
         catch (RuntimeException ignored) {
+            LOGGER.warn("No s'ha pogut recuperar la vista prèvia del document OCR temporal.");
             model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
         }
     }
@@ -327,250 +334,10 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // ELIMINAR AVISOS D'ASSOCIACIÓ ANTICS ABANS DE TORNAR A CONSULTAR LA BASE DE DADES
-    private void netejarAvisosAssociacioOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
-        if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
-            return;
-        }
-
-        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
-        pendent.getAvisos().removeIf(avis -> avis != null
-                && avis.startsWith("Proveïdor detectat per OCR no trobat"));
-
-        if (pendent.getLinies() != null) {
-            for (OcrLiniaDto linia : pendent.getLinies()) {
-                linia.getAvisos().removeIf(avis -> avis != null
-                        && avis.startsWith("Matèria primera no trobada"));
-            }
-        }
-    }
-
-
-    // APLICAR ASSOCIACIONS NOVES SENSE SOBREESCRIURE CANVIS MANUALS DE L'USUARI
-    private void aplicarAssociacionsOcrAlFormulari(AlbaraProveidor albaraProveidor,
-                                                    OcrResultatAlbaraProveidorDto resultatOcr) {
-        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
-
-        if ((albaraProveidor.getProveidor() == null || albaraProveidor.getProveidor().getId() == null)
-                && pendent.getProveidorId() != null) {
-            albaraProveidor.setProveidor(proveidorService.getProveidorById(pendent.getProveidorId()));
-        }
-
-        if (albaraProveidor.getLots() == null || pendent.getLinies() == null) {
-            return;
-        }
-
-        int numeroLinies = Math.min(albaraProveidor.getLots().size(), pendent.getLinies().size());
-
-        for (int index = 0; index < numeroLinies; index++) {
-            LotProveidor lotFormulari = albaraProveidor.getLots().get(index);
-            OcrLiniaDto liniaOcr = pendent.getLinies().get(index);
-
-            if ((lotFormulari.getMateriaPrimera() == null || lotFormulari.getMateriaPrimera().getId() == null)
-                    && liniaOcr.getMateriaPrimeraId() != null) {
-                lotFormulari.setMateriaPrimera(
-                        materiaPrimeraService.getMateriaPrimeraById(liniaOcr.getMateriaPrimeraId())
-                );
-            }
-        }
-    }
-
-
     // ASSEGURAR QUE EL FORMULARI TINGUI COM A MÍNIM UNA LÍNIA
     private void assegurarLotsFormulari(AlbaraProveidor albaraProveidor) {
         if (albaraProveidor.getLots() == null || albaraProveidor.getLots().isEmpty()) {
             albaraProveidor.setLots(new ArrayList<>(List.of(new LotProveidor())));
         }
-    }
-
-
-    // CONVERTIR EL RESULTAT OCR A L'ENTITAT USADA PEL FORMULARI
-    private AlbaraProveidor convertirResultatOcrAFormulari(OcrResultatAlbaraProveidorDto resultatOcr) {
-        AlbaraProveidor albaraProveidor = new AlbaraProveidor();
-        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
-
-        albaraProveidor.setNumeroAlbara(pendent.getNumeroAlbara());
-        albaraProveidor.setDataRecepcio(convertirDataOcr(pendent.getDataAlbara()));
-
-        if (pendent.getProveidorId() != null) {
-            albaraProveidor.setProveidor(proveidorService.getProveidorById(pendent.getProveidorId()));
-        }
-
-        List<LotProveidor> lots = new ArrayList<>();
-
-        if (pendent.getLinies() != null) {
-            for (OcrLiniaDto liniaOcr : pendent.getLinies()) {
-                lots.add(convertirLiniaOcrAFormulari(liniaOcr));
-            }
-        }
-
-        if (lots.isEmpty()) {
-            lots.add(new LotProveidor());
-        }
-
-        albaraProveidor.setLots(lots);
-
-        return albaraProveidor;
-    }
-
-
-    // CONVERTIR UNA LÍNIA OCR A LOT TEMPORAL DE FORMULARI
-    private LotProveidor convertirLiniaOcrAFormulari(OcrLiniaDto liniaOcr) {
-        LotProveidor lot = new LotProveidor();
-        lot.setIdentificadorLot(liniaOcr.getIdentificadorLot());
-        lot.setQuantitat(convertirQuantitatOcr(liniaOcr.getQuantitat()));
-        lot.setUnitats(liniaOcr.getUnitat());
-
-        if (liniaOcr.getMateriaPrimeraId() != null) {
-            lot.setMateriaPrimera(materiaPrimeraService.getMateriaPrimeraById(liniaOcr.getMateriaPrimeraId()));
-        }
-
-        return lot;
-    }
-
-
-    // COMPLETAR ASSOCIACIONS AMB ELEMENTS EXISTENTS DE BASE DE DADES
-    private void completarAssociacionsOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
-        if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
-            return;
-        }
-
-        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
-        associarProveidorOcr(pendent);
-        associarMateriesPrimeresOcr(pendent);
-    }
-
-
-    // ASSOCIAR PROVEÏDOR OCR SI EXISTEIX A LA BASE DE DADES
-    private void associarProveidorOcr(OcrAlbaraPendent pendent) {
-        Proveidor proveidor = buscarProveidor(pendent.getProveidorCifDetectat(), pendent.getProveidorDetectat());
-
-        if (proveidor != null) {
-            pendent.setProveidorId(proveidor.getId());
-            pendent.setProveidorNomAssociat(proveidor.getNomProveidor());
-            pendent.setProveidorTrobat(true);
-            return;
-        }
-
-        pendent.setProveidorTrobat(false);
-
-        if (pendent.getProveidorDetectat() != null && !pendent.getProveidorDetectat().isBlank()) {
-            pendent.afegirAvis("Proveïdor detectat per OCR no trobat a la base de dades: " + pendent.getProveidorDetectat());
-        }
-    }
-
-
-    // ASSOCIAR MATÈRIES PRIMERES OCR SI EXISTEIXEN A LA BASE DE DADES
-    private void associarMateriesPrimeresOcr(OcrAlbaraPendent pendent) {
-        if (pendent.getLinies() == null) {
-            return;
-        }
-
-        for (OcrLiniaDto linia : pendent.getLinies()) {
-            MateriaPrimera materiaPrimera = buscarMateriaPrimera(linia.getMateriaPrimeraDetectada());
-
-            if (materiaPrimera != null) {
-                linia.setMateriaPrimeraId(materiaPrimera.getId());
-                linia.setMateriaPrimeraNomAssociada(materiaPrimera.getNomMateria());
-                linia.setMateriaPrimeraTrobada(true);
-                continue;
-            }
-
-            linia.setMateriaPrimeraTrobada(false);
-
-            if (linia.getMateriaPrimeraDetectada() != null && !linia.getMateriaPrimeraDetectada().isBlank()) {
-                linia.afegirAvis("Matèria primera no trobada. OCR: " + linia.getMateriaPrimeraDetectada());
-            }
-        }
-    }
-
-
-    // BUSCAR PROVEÏDOR PER CIF O NOM FLEXIBLE
-    private Proveidor buscarProveidor(String cifDetectat, String nomDetectat) {
-        for (Proveidor proveidor : proveidorService.getAllProveidors()) {
-            if (cifDetectat != null && !cifDetectat.isBlank()
-                    && proveidor.getCif() != null
-                    && proveidor.getCif().replace(" ", "").equalsIgnoreCase(cifDetectat.replace(" ", ""))) {
-                return proveidor;
-            }
-        }
-
-        if (nomDetectat == null || nomDetectat.isBlank()) {
-            return null;
-        }
-
-        String nomOcr = OcrUtils.normalitzarPerComparar(nomDetectat);
-
-        for (Proveidor proveidor : proveidorService.getAllProveidors()) {
-            String nomBd = OcrUtils.normalitzarPerComparar(proveidor.getNomProveidor());
-
-            if (nomBd.equals(nomOcr)
-                    || nomBd.contains(nomOcr)
-                    || nomOcr.contains(nomBd)
-                    || OcrUtils.coincideixNomFlexible(nomDetectat, proveidor.getNomProveidor())) {
-                return proveidor;
-            }
-        }
-
-        return null;
-    }
-
-
-    // BUSCAR MATÈRIA PRIMERA PER NOM FLEXIBLE
-    private MateriaPrimera buscarMateriaPrimera(String materiaDetectada) {
-        if (materiaDetectada == null || materiaDetectada.isBlank()) {
-            return null;
-        }
-
-        String materiaOcr = OcrUtils.normalitzarPerComparar(materiaDetectada);
-
-        for (MateriaPrimera materiaPrimera : materiaPrimeraService.getAllMateriesPrimeres()) {
-            String materiaBd = OcrUtils.normalitzarPerComparar(materiaPrimera.getNomMateria());
-
-            if (materiaBd.equals(materiaOcr)
-                    || materiaBd.contains(materiaOcr)
-                    || materiaOcr.contains(materiaBd)
-                    || OcrUtils.coincideixNomFlexible(materiaDetectada, materiaPrimera.getNomMateria())) {
-                return materiaPrimera;
-            }
-        }
-
-        return null;
-    }
-
-
-    // CONVERTIR DATA OCR A LOCALDATE
-    private LocalDate convertirDataOcr(String dataOcr) {
-        if (dataOcr == null || dataOcr.isBlank()) {
-            return LocalDate.now();
-        }
-
-        try {
-            return LocalDate.parse(dataOcr);
-        }
-        catch (DateTimeParseException ignored) {
-            // Continua amb altres formats habituals.
-        }
-
-        for (String patro : List.of("dd/MM/yyyy", "dd-MM-yyyy", "d/M/yyyy", "d-M-yyyy")) {
-            try {
-                return LocalDate.parse(dataOcr, DateTimeFormatter.ofPattern(patro));
-            }
-            catch (DateTimeParseException ignored) {
-                // Es prova el següent format.
-            }
-        }
-
-        return LocalDate.now();
-    }
-
-
-    // CONVERTIR QUANTITAT OCR A ENTER PER AL FORMULARI ACTUAL
-    private Integer convertirQuantitatOcr(Double quantitat) {
-        if (quantitat == null) {
-            return null;
-        }
-
-        return (int) Math.round(quantitat);
     }
 }

@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/usuaris")
 public class UsuariWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UsuariWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final UsuariService usuariService;
@@ -68,6 +72,7 @@ public class UsuariWebController {
             tipusContingut = MediaType.parseMediaType(usuari.getAvatarTipusContingut());
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut interpretar el tipus de contingut de l'avatar de l'usuari amb identificador {}: {}", id, e.getMessage());
             tipusContingut = MediaType.APPLICATION_OCTET_STREAM;
         }
 
@@ -93,6 +98,7 @@ public class UsuariWebController {
                                 RedirectAttributes redirectAttributes) {
         try {
             usuariService.createUsuari(usuari, avatarFile);
+            LOGGER.info("Usuari creat correctament.");
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -102,6 +108,7 @@ public class UsuariWebController {
             return "redirect:/usuaris/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear l'usuari: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("usuari", usuari);
             return "usuaris/formUsuaris";
@@ -133,6 +140,7 @@ public class UsuariWebController {
                                RedirectAttributes redirectAttributes) {
         try {
             usuariService.updateUsuari(id, usuari, avatarFile);
+            LOGGER.info("Usuari amb identificador {} actualitzat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -142,6 +150,7 @@ public class UsuariWebController {
             return "redirect:/usuaris/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar l'usuari amb identificador {}: {}", id, e.getMessage());
             Usuari usuariActual = usuariService.getUsuariById(id);
 
             usuari.setId(id);
@@ -167,6 +176,7 @@ public class UsuariWebController {
                                RedirectAttributes redirectAttributes) {
         try {
             usuariService.deleteUsuari(id);
+            LOGGER.info("Usuari amb identificador {} eliminat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -174,6 +184,7 @@ public class UsuariWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar l'usuari amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute(
                 "error",
                 "No es pot eliminar l'usuari perquè està relacionat amb altres dades."

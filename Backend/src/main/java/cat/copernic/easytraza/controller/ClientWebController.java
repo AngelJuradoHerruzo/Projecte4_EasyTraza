@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,8 @@ import cat.copernic.easytraza.service.ClientService;
 @Controller
 @RequestMapping("/clients")
 public class ClientWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final ClientService clientService;
@@ -60,6 +64,7 @@ public class ClientWebController {
                                 RedirectAttributes redirectAttributes) {
         try {
             clientService.createClient(client);
+            LOGGER.info("Client creat correctament.");
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -69,6 +74,7 @@ public class ClientWebController {
             return "redirect:/clients/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear el client: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("client", client);
             return "clients/formClients";
@@ -98,6 +104,7 @@ public class ClientWebController {
                                RedirectAttributes redirectAttributes) {
         try {
             Client clientActualitzat = clientService.updateClient(id, client);
+            LOGGER.info("Client amb identificador {} actualitzat correctament.", id);
 
             if (clientActualitzat == null) {
                 redirectAttributes.addFlashAttribute(
@@ -116,6 +123,7 @@ public class ClientWebController {
             return "redirect:/clients/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar el client amb identificador {}: {}", id, e.getMessage());
             client.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("client", client);
@@ -130,6 +138,7 @@ public class ClientWebController {
                                RedirectAttributes redirectAttributes) {
         try {
             clientService.deleteClient(id);
+            LOGGER.info("Client amb identificador {} eliminat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -137,6 +146,7 @@ public class ClientWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar el client amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
