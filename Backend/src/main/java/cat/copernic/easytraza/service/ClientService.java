@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,9 +32,7 @@ public class ClientService {
 
         List<Client> clients = clientRepository.findAllByOrderByNomCompletAsc();
 
-        for (Client client : clients) {
-            client.setTeAlbarans(albaraClientRepository.existsByClientId(client.getId()));
-        }
+        informarClientsAmbAlbarans(clients);
 
         return clients;
     }
@@ -45,10 +45,17 @@ public class ClientService {
     }
 
 
-    // PREPARAR LLISTAT WEB DE CLIENTS AMB FILTRES OPCIONALS
-    public List<Client> getClientsLlistat(String nomComplet, String cif, String email, String telefon) {
+    // PREPARAR LLISTAT WEB DE CLIENTS AMB FILTRES I ORDENACIÓ OPCIONALS
+    public List<Client> getClientsLlistat(String nomComplet,
+                                           String cif,
+                                           String email,
+                                           String telefon,
+                                           String ordre,
+                                           String direccio) {
 
-        List<Client> clients = getAllClients();
+        List<Client> clients = new ArrayList<>(clientRepository.findAll());
+
+        informarClientsAmbAlbarans(clients);
 
         if (nomComplet != null && !nomComplet.isBlank()) {
             clients.removeIf(client -> !conteText(client.getNomComplet(), nomComplet));
@@ -65,6 +72,8 @@ public class ClientService {
         if (telefon != null && !telefon.isBlank()) {
             clients.removeIf(client -> !conteTelefon(client.getTelefon(), telefon));
         }
+
+        ordenarClients(clients, ordre, direccio);
 
         return clients;
     }
@@ -95,7 +104,7 @@ public class ClientService {
 
             clientActual.setNomComplet(client.getNomComplet().trim());
             clientActual.setTelefon(client.getTelefon().trim());
-            clientActual.setEmail(client.getEmail() != null ? client.getEmail().trim().toLowerCase() : null);
+            clientActual.setEmail(client.getEmail().trim().toLowerCase());
             clientActual.setAdreca(client.getAdreca().trim());
             clientActual.setObservacions(client.getObservacions() != null ? client.getObservacions().trim() : null);
 
@@ -117,6 +126,15 @@ public class ClientService {
     }
 
 
+    // INDICAR QUINS CLIENTS TENEN ALBARANS ASSOCIATS
+    private void informarClientsAmbAlbarans(List<Client> clients) {
+
+        for (Client client : clients) {
+            client.setTeAlbarans(albaraClientRepository.existsByClientId(client.getId()));
+        }
+    }
+
+
     // VALIDAR DADES DEL CLIENT
     private void validarDadesClient(Client client) {
 
@@ -134,10 +152,6 @@ public class ClientService {
 
         if (client.getEmail() != null) {
             client.setEmail(client.getEmail().trim().toLowerCase());
-
-            if (client.getEmail().isBlank()) {
-                client.setEmail(null);
-            }
         }
 
         if (client.getAdreca() != null) {
@@ -186,18 +200,19 @@ public class ClientService {
             throw new RuntimeException("Ja existeix un client amb aquest telèfon.");
         }
 
-        if (client.getEmail() != null
-                && !client.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        if (client.getEmail() == null || client.getEmail().isBlank()) {
+            throw new RuntimeException("El correu electrònic és obligatori.");
+        }
+
+        if (!client.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             throw new RuntimeException("El format del correu electrònic no és correcte.");
         }
 
-        if (client.getEmail() != null) {
-            Optional<Client> clientEmailExistent = clientRepository.findByEmail(client.getEmail());
+        Optional<Client> clientEmailExistent = clientRepository.findByEmail(client.getEmail());
 
-            if (clientEmailExistent.isPresent()
-                    && !clientEmailExistent.get().getId().equals(client.getId())) {
-                throw new RuntimeException("Ja existeix un client amb aquest correu electrònic.");
-            }
+        if (clientEmailExistent.isPresent()
+                && !clientEmailExistent.get().getId().equals(client.getId())) {
+            throw new RuntimeException("Ja existeix un client amb aquest correu electrònic.");
         }
 
         if (client.getAdreca() == null || client.getAdreca().isBlank()) {
@@ -207,6 +222,105 @@ public class ClientService {
         if (client.getObservacions() != null && client.getObservacions().length() > 50) {
             throw new RuntimeException("Les observacions no poden superar els 50 caràcters.");
         }
+    }
+
+
+    // ORDENAR CLIENTS PEL CAMP SELECCIONAT
+    private void ordenarClients(List<Client> clients, String ordre, String direccio) {
+
+        String campOrdre = ordre != null && !ordre.isBlank() ? ordre : "nomComplet";
+
+        Comparator<Client> comparator;
+
+        switch (campOrdre) {
+            case "cif":
+                comparator = Comparator.comparing(
+                    client -> valorText(client.getCif()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "telefon":
+                comparator = Comparator.comparing(
+                    client -> valorText(client.getTelefon()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "email":
+                comparator = Comparator.comparing(
+                    client -> valorText(client.getEmail()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "adreca":
+                comparator = Comparator.comparing(
+                    client -> valorText(client.getAdreca()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "observacions":
+                comparator = Comparator.comparing(
+                    client -> valorText(client.getObservacions()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "nomComplet":
+            default:
+                comparator = Comparator.comparing(
+                    client -> valorText(client.getNomComplet()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+        }
+
+        if ("desc".equalsIgnoreCase(direccio)) {
+            comparator = comparator.reversed();
+        }
+
+        clients.sort(comparator.thenComparing(Client::getId));
+    }
+
+
+    // RETORNAR TEXT SEGUR PER A L'ORDENACIÓ
+    private String valorText(String valor) {
+        return valor != null ? valor : "";
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
+    }
+
+
+    // COMPROVAR SI EL TELÈFON CONTÉ ELS DÍGITS DEL FILTRE
+    private boolean conteTelefon(String telefon, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (telefon == null) {
+            return false;
+        }
+
+        String telefonNetejat = telefon.replaceAll("\\s", "");
+        String filtreNetejat = filtre.replaceAll("\\s", "");
+
+        return telefonNetejat.contains(filtreNetejat);
     }
 
 
@@ -277,57 +391,20 @@ public class ClientService {
             // Lletra equivalent al dígit de control
             char lletraControl = "JABCDEFGHI".charAt(digitControl);
 
-            // A, B, E, H → només número
+            // Entitats que obligatòriament han de tenir lletra com a control
+            if ("PQRSNW".indexOf(lletraInicial) >= 0) {
+                return control == lletraControl;
+            }
+
+            // Entitats que obligatòriament han de tenir dígit com a control
             if ("ABEH".indexOf(lletraInicial) >= 0) {
                 return control == Character.forDigit(digitControl, 10);
             }
 
-            // K, P, Q, S → només lletra
-            if ("KPQS".indexOf(lletraInicial) >= 0) {
-                return control == lletraControl;
-            }
-
-            // La resta → pot ser número o lletra
+            // Altres entitats poden utilitzar dígit o lletra
             return control == Character.forDigit(digitControl, 10) || control == lletraControl;
         }
 
-        // Si no compleix cap dels formats anteriors → no vàlid
-        return false;
-    }
-
-
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
-    private boolean conteText(String valor, String filtre) {
-
-        if (filtre == null || filtre.isBlank()) {
-            return true;
-        }
-
-        if (valor == null) {
-            return false;
-        }
-
-        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
-    }
-
-
-    // COMPROVAR TELÈFONS IGNORANT ESPAIS
-    private boolean conteTelefon(String valor, String filtre) {
-
-        if (filtre == null || filtre.isBlank()) {
-            return true;
-        }
-
-        if (valor == null) {
-            return false;
-        }
-
-        return normalitzarTelefon(valor).contains(normalitzarTelefon(filtre));
-    }
-
-
-    // NORMALITZAR TELÈFON PER CERCAR
-    private String normalitzarTelefon(String telefon) {
-        return telefon.replaceAll("\\D", "");
+        return false; // Si no compleix cap format, no és vàlid
     }
 }

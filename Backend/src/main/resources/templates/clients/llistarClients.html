@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Clients - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/clients.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -22,7 +24,9 @@
         <section class="page-top">
             <div class="page-top-left">
                 <p class="page-eyebrow">Administració</p>
+
                 <h1 class="page-heading">Clients</h1>
+
                 <p class="page-description">
                     Consulta i gestiona els clients registrats al sistema EasyTraza.
                 </p>
@@ -30,161 +34,259 @@
 
             <div class="page-top-actions">
                 <a th:href="@{/clients/new}" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i>
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
                     <span>Nou client</span>
                 </a>
             </div>
         </section>
 
-        <!----------------------- CONTENIDOR PRINCIPAL ----------------------->
-        <section class="content-card">
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
 
-            <!----------------------- TOOLBAR ----------------------->
-            <div class="content-toolbar">
-                <div class="toolbar-block">
-                    <h2 class="content-title">Directori de clients</h2>
-                    <p class="content-subtitle">
-                        Filtra per nom, CIF / DNI, correu o telèfon.
+        <div th:if="${error}" class="alert alert-error" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!----------------------- PANELL PRINCIPAL ----------------------->
+        <section class="clients-panel">
+
+            <!----------------------- TOOLBAR I FILTRES ----------------------->
+            <div class="clients-toolbar">
+
+                <div class="clients-toolbar-info">
+                    <div class="clients-title-row">
+                        <h2 class="section-title">Directori de clients</h2>
+
+                        <span class="clients-counter"
+                              th:text="|${#lists.size(clients)} clients|">
+                            0 clients
+                        </span>
+                    </div>
+
+                    <p class="section-subtitle">
+                        Filtra i ordena els clients pels camps visibles del llistat.
                     </p>
                 </div>
 
                 <form th:action="@{/clients/list}"
                       method="get"
-                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                      class="clients-filter">
 
-                    <div class="search-field" style="width:220px;">
-                        <i class="bi bi-person"></i>
-                        <input name="nomComplet" type="text" th:value="${nomComplet}" placeholder="Nom...">
-                    </div>
+                    <div class="clients-filter-row">
 
-                    <div class="search-field" style="width:180px;">
-                        <i class="bi bi-upc-scan"></i>
-                        <input name="cif" type="text" th:value="${cif}" placeholder="CIF / DNI...">
-                    </div>
-
-                    <div class="search-field" style="width:230px;">
-                        <i class="bi bi-envelope"></i>
-                        <input name="email" type="text" th:value="${email}" placeholder="Correu...">
-                    </div>
-
-                    <div class="search-field" style="width:180px;">
-                        <i class="bi bi-telephone"></i>
-                        <input name="telefon" type="text" th:value="${telefon}" placeholder="Telèfon...">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-
-                    <a th:href="@{/clients/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Neteja</span>
-                    </a>
-                </form>
-            </div>
-
-            <!----------------------- MISSATGE D'ERROR ----------------------->
-            <div th:if="${error}" class="form-error" style="margin: 0 24px 18px 24px;">
-                <i class="bi bi-exclamation-circle"></i>
-                <span th:text="${error}"></span>
-            </div>
-
-            <!----------------------- TARGETES ----------------------->
-            <div class="cards-grid" id="clientsContainer">
-
-                <article th:each="client : ${clients}" class="info-card client-card">
-
-                    <!----------------------- CAPÇALERA TARGETA ----------------------->
-                    <div class="info-card-header">
-                        <div class="info-card-icon">
-                            <i class="bi bi-person-vcard"></i>
+                        <label for="nomComplet" class="sr-only">Filtrar clients per nom</label>
+                        <div class="search-field">
+                            <i class="bi bi-person" aria-hidden="true"></i>
+                            <input id="nomComplet"
+                                   name="nomComplet"
+                                   type="text"
+                                   th:value="${nomComplet}"
+                                   placeholder="Nom..."
+                                   autocomplete="off">
                         </div>
 
-                        <div class="info-card-body">
-                            <h3 class="info-card-title client-name" th:text="${client.nomComplet}">
+                        <label for="cif" class="sr-only">Filtrar clients per CIF o DNI</label>
+                        <div class="search-field search-field-small">
+                            <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                            <input id="cif"
+                                   name="cif"
+                                   type="text"
+                                   th:value="${cif}"
+                                   placeholder="CIF / DNI..."
+                                   autocomplete="off">
+                        </div>
+
+                        <label for="email" class="sr-only">Filtrar clients per correu electrònic</label>
+                        <div class="search-field">
+                            <i class="bi bi-envelope" aria-hidden="true"></i>
+                            <input id="email"
+                                   name="email"
+                                   type="text"
+                                   th:value="${email}"
+                                   placeholder="Correu..."
+                                   autocomplete="off">
+                        </div>
+
+                        <label for="telefon" class="sr-only">Filtrar clients per telèfon</label>
+                        <div class="search-field search-field-small">
+                            <i class="bi bi-telephone" aria-hidden="true"></i>
+                            <input id="telefon"
+                                   name="telefon"
+                                   type="text"
+                                   th:value="${telefon}"
+                                   placeholder="Telèfon..."
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="order-field">
+                            <label for="ordre">Ordenar per</label>
+
+                            <select id="ordre" name="ordre" class="form-select">
+                                <option value="nomComplet" th:selected="${ordre == 'nomComplet'}">Nom</option>
+                                <option value="cif" th:selected="${ordre == 'cif'}">CIF / DNI</option>
+                                <option value="telefon" th:selected="${ordre == 'telefon'}">Telèfon</option>
+                                <option value="email" th:selected="${ordre == 'email'}">Correu</option>
+                                <option value="adreca" th:selected="${ordre == 'adreca'}">Adreça</option>
+                                <option value="observacions" th:selected="${ordre == 'observacions'}">Observacions</option>
+                            </select>
+                        </div>
+
+                        <div class="order-field order-direction-field">
+                            <label for="direccio">Direcció</label>
+
+                            <select id="direccio" name="direccio" class="form-select">
+                                <option value="asc" th:selected="${direccio == 'asc'}">Ascendent</option>
+                                <option value="desc" th:selected="${direccio == 'desc'}">Descendent</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-icon"
+                                aria-label="Aplicar filtres i ordenació de clients">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+
+                        <a th:href="@{/clients/list}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            <span>Netejar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!----------------------- TARGETES DE CLIENTS ----------------------->
+            <div class="clients-grid" id="clientsContainer">
+
+                <article th:each="client : ${clients}" class="client-card">
+
+                    <!----------------------- INFORMACIÓ PRINCIPAL ----------------------->
+                    <header class="client-card-main">
+
+                        <div class="client-card-icon">
+                            <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="client-card-name-block">
+                            <p class="client-card-type">Client</p>
+
+                            <h3 class="client-card-title"
+                                th:text="${client.nomComplet}">
                                 Nom complet
                             </h3>
-
-                            <p class="info-card-description"
-                               th:text="${client.observacions != null && !#strings.isEmpty(client.observacions) ? client.observacions : 'Sense observacions'}">
-                                Observacions
-                            </p>
                         </div>
+
+                    </header>
+
+                    <!----------------------- OBSERVACIONS ----------------------->
+                    <div class="client-card-observations">
+                        <p th:text="${client.observacions != null && !#strings.isEmpty(client.observacions) ? client.observacions : 'Sense observacions registrades'}">
+                            Sense observacions registrades
+                        </p>
                     </div>
 
                     <!----------------------- DADES DEL CLIENT ----------------------->
-                    <div class="info-card-meta">
+                    <div class="client-card-data">
 
-                        <div class="info-card-meta-item">
-                            <i class="bi bi-upc-scan"></i>
-                            <div class="info-card-meta-text">
-                                <span class="info-card-meta-label">CIF / DNI</span>
-                                <span class="info-card-meta-value client-cif" th:text="${client.cif}">CIF / DNI</span>
+                        <div class="client-data-item">
+                            <div class="client-data-icon">
+                                <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                            </div>
+                            <div class="client-data-content">
+                                <span class="client-data-label">CIF / DNI</span>
+                                <span class="client-data-value" th:text="${client.cif}">CIF / DNI</span>
                             </div>
                         </div>
 
-                        <div class="info-card-meta-item">
-                            <i class="bi bi-telephone"></i>
-                            <div class="info-card-meta-text">
-                                <span class="info-card-meta-label">Telèfon</span>
-                                <span class="info-card-meta-value" th:text="${client.telefon}">Telèfon</span>
+                        <div class="client-data-item">
+                            <div class="client-data-icon">
+                                <i class="bi bi-telephone" aria-hidden="true"></i>
+                            </div>
+                            <div class="client-data-content">
+                                <span class="client-data-label">Telèfon</span>
+                                <span class="client-data-value" th:text="${client.telefon}">Telèfon</span>
                             </div>
                         </div>
 
-                        <div class="info-card-meta-item">
-                            <i class="bi bi-envelope"></i>
-                            <div class="info-card-meta-text">
-                                <span class="info-card-meta-label">Email</span>
-                                <span class="info-card-meta-value"
-                                      th:text="${client.email != null && !#strings.isEmpty(client.email) ? client.email : 'Sense email'}">
-                                    Email
-                                </span>
+                        <div class="client-data-item client-data-wide">
+                            <div class="client-data-icon">
+                                <i class="bi bi-envelope" aria-hidden="true"></i>
+                            </div>
+                            <div class="client-data-content">
+                                <span class="client-data-label">Correu electrònic</span>
+                                <span class="client-data-value" th:text="${client.email}">Correu</span>
                             </div>
                         </div>
 
-                        <div class="info-card-meta-item">
-                            <i class="bi bi-geo-alt"></i>
-                            <div class="info-card-meta-text">
-                                <span class="info-card-meta-label">Adreça</span>
-                                <span class="info-card-meta-value" th:text="${client.adreca}">Adreça</span>
+                        <div class="client-data-item client-data-wide">
+                            <div class="client-data-icon">
+                                <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                            </div>
+                            <div class="client-data-content">
+                                <span class="client-data-label">Adreça</span>
+                                <span class="client-data-value" th:text="${client.adreca}">Adreça</span>
                             </div>
                         </div>
 
                     </div>
 
                     <!----------------------- ACCIONS ----------------------->
-                    <div class="info-card-actions">
+                    <footer class="client-card-actions">
 
-                        <a th:href="@{/clients/edit/{id}(id=${client.id})}" class="btn-table btn-soft">
-                            <i class="bi bi-pencil-square"></i>
+                        <a th:href="@{/clients/edit/{id}(id=${client.id})}"
+                           class="card-action card-action-edit">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
                             <span>Editar</span>
                         </a>
 
-                        <a th:if="${!client.teAlbarans}"
-                           th:href="@{/clients/delete/{id}(id=${client.id})}"
-                           class="btn-table btn-delete"
-                           onclick="return confirm('Segur que vols eliminar aquest client?')">
-                            <i class="bi bi-trash3"></i>
-                            <span>Eliminar</span>
-                        </a>
+                        <form th:if="${!client.teAlbarans}"
+                              th:action="@{/clients/delete/{id}(id=${client.id})}"
+                              method="post"
+                              class="card-delete-form"
+                              onsubmit="return confirm('Segur que vols eliminar aquest client?');">
+
+                            <button type="submit" class="card-action card-action-delete">
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                <span>Eliminar</span>
+                            </button>
+
+                        </form>
 
                         <span th:if="${client.teAlbarans}"
-                              class="btn-table btn-disabled-delete"
+                              class="card-action card-action-disabled"
                               title="Aquest client no es pot eliminar perquè té albarans associats">
-                            <i class="bi bi-lock-fill"></i>
-                            <span>Albarans associats</span>
+                            <i class="bi bi-lock-fill" aria-hidden="true"></i>
+                            <span>En ús</span>
                         </span>
 
-                    </div>
+                    </footer>
 
                 </article>
 
                 <!----------------------- ESTAT BUIT ----------------------->
-                <div th:if="${#lists.isEmpty(clients)}" class="empty-state" style="grid-column: 1 / -1;">
-                    <div class="empty-box">
-                        <i class="bi bi-person-vcard"></i>
-                        <p>No hi ha clients que coincideixin amb els filtres.</p>
+                <div th:if="${#lists.isEmpty(clients)}" class="clients-empty-state">
+
+                    <div class="clients-empty-icon">
+                        <i class="bi bi-people" aria-hidden="true"></i>
                     </div>
+
+                    <h3>No s'han trobat clients</h3>
+
+                    <p>
+                        No hi ha clients que coincideixin amb els filtres seleccionats.
+                    </p>
+
+                    <a th:href="@{/clients/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span>Veure tots els clients</span>
+                    </a>
+
                 </div>
 
             </div>
@@ -194,9 +296,6 @@
     </main>
 
 </div>
-
-<!----------------------- SCRIPT JS ----------------------->
-<script th:src="@{/js/clients.js}"></script>
 
 </body>
 </html>

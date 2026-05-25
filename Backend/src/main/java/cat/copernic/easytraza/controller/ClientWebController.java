@@ -3,6 +3,7 @@ package cat.copernic.easytraza.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cat.copernic.easytraza.entities.Client;
 import cat.copernic.easytraza.service.ClientService;
@@ -25,13 +26,20 @@ public class ClientWebController {
                                  @RequestParam(required = false) String cif,
                                  @RequestParam(required = false) String email,
                                  @RequestParam(required = false) String telefon,
+                                 @RequestParam(required = false, defaultValue = "nomComplet") String ordre,
+                                 @RequestParam(required = false, defaultValue = "asc") String direccio,
                                  Model model) {
 
-        model.addAttribute("clients", clientService.getClientsLlistat(nomComplet, cif, email, telefon));
+        model.addAttribute(
+            "clients",
+            clientService.getClientsLlistat(nomComplet, cif, email, telefon, ordre, direccio)
+        );
         model.addAttribute("nomComplet", nomComplet);
         model.addAttribute("cif", cif);
         model.addAttribute("email", email);
         model.addAttribute("telefon", telefon);
+        model.addAttribute("ordre", ordre);
+        model.addAttribute("direccio", direccio);
 
         return "clients/llistarClients";
     }
@@ -47,9 +55,17 @@ public class ClientWebController {
 
     // GUARDAR CLIENT
     @PostMapping("/save")
-    public String guardarClient(@ModelAttribute("client") Client client, Model model) {
+    public String guardarClient(@ModelAttribute("client") Client client,
+                                Model model,
+                                RedirectAttributes redirectAttributes) {
         try {
             clientService.createClient(client);
+
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "El client s'ha creat correctament."
+            );
+
             return "redirect:/clients/list";
         }
         catch (RuntimeException e) {
@@ -78,9 +94,25 @@ public class ClientWebController {
     @PostMapping("/update/{id}")
     public String updateClient(@PathVariable Long id,
                                @ModelAttribute("client") Client client,
-                               Model model) {
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
         try {
-            clientService.updateClient(id, client);
+            Client clientActualitzat = clientService.updateClient(id, client);
+
+            if (clientActualitzat == null) {
+                redirectAttributes.addFlashAttribute(
+                    "error",
+                    "No s'ha trobat el client que vols modificar."
+                );
+
+                return "redirect:/clients/list";
+            }
+
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "El client s'ha actualitzat correctament."
+            );
+
             return "redirect:/clients/list";
         }
         catch (RuntimeException e) {
@@ -93,16 +125,21 @@ public class ClientWebController {
 
 
     // ELIMINAR CLIENT
-    @GetMapping("/delete/{id}")
-    public String deleteClient(@PathVariable Long id, Model model) {
+    @PostMapping("/delete/{id}")
+    public String deleteClient(@PathVariable Long id,
+                               RedirectAttributes redirectAttributes) {
         try {
             clientService.deleteClient(id);
-            return "redirect:/clients/list";
+
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "El client s'ha eliminat correctament."
+            );
         }
         catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("clients", clientService.getClientsLlistat(null, null, null, null));
-            return "clients/llistarClients";
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
+
+        return "redirect:/clients/list";
     }
 }
