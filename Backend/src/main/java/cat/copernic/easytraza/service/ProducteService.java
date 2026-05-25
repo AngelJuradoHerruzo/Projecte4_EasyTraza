@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,20 +23,22 @@ public class ProducteService {
     }
 
 
-    // OBTENIR TOTS ELS PRODUCTES
+    // OBTENIR TOTS ELS PRODUCTES ORDENATS ALFABÈTICAMENT
     public List<Producte> getAllProductes() {
-        return producteRepository.findAll();
+        return getAllProductes(null);
     }
 
 
-    // PREPARAR LLISTAT WEB DE PRODUCTES AMB FILTRE OPCIONAL
-    public List<Producte> getProductesLlistat(String nomProducte) {
+    // OBTENIR PRODUCTES AMB FILTRE OPCIONAL I ORDENATS ALFABÈTICAMENT
+    public List<Producte> getAllProductes(String nomProducte) {
 
-        List<Producte> productes = new java.util.ArrayList<>(producteRepository.findAll());
+        List<Producte> productes = new ArrayList<>(producteRepository.findAll());
 
         if (nomProducte != null && !nomProducte.isBlank()) {
             productes.removeIf(producte -> !conteText(producte.getNomProducte(), nomProducte));
         }
+
+        ordenarProductesPerNom(productes);
 
         return productes;
     }
@@ -108,6 +112,18 @@ public class ProducteService {
         if (producte.getDescripcio() != null && producte.getDescripcio().length() > 50) {
             throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
         }
+    }
+
+
+    // ORDENAR PRODUCTES ALFABÈTICAMENT PER NOM IGNORANT MAJÚSCULES I MINÚSCULES
+    private void ordenarProductesPerNom(List<Producte> productes) {
+
+        productes.sort(
+            Comparator.comparing(
+                producte -> producte.getNomProducte() != null ? producte.getNomProducte() : "",
+                String.CASE_INSENSITIVE_ORDER
+            )
+        );
     }
 
 

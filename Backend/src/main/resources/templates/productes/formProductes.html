@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Formulari Producte - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/productes.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -21,100 +22,142 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow">Administració · Productes</p>
 
                 <h1 class="page-heading"
                     th:text="${producte.id != null} ? 'Editar producte' : 'Nou producte'">
-                    Formulari
+                    Formulari producte
                 </h1>
 
                 <p class="page-description">
-                    Introdueix o modifica les dades del producte.
+                    Defineix el nom i la descripció que identificaran el producte al catàleg.
                 </p>
             </div>
 
             <div class="page-top-actions">
-                <a th:href="@{/productes/list}" class="btn btn-primary">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Tornar</span>
+                <a th:href="@{/productes/list}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span>Tornar al llistat</span>
                 </a>
             </div>
         </section>
 
         <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
-        <section class="content-card">
+        <section class="product-form-panel">
 
-            <!----------------------- TOOLBAR SUPERIOR ----------------------->
-            <div class="content-toolbar">
+            <!----------------------- PRESENTACIÓ FORMULARI ----------------------->
+            <div class="product-form-intro">
 
-                <div class="toolbar-block">
-                    <h2 class="content-title">Dades del producte</h2>
-                    <p class="content-subtitle">
-                        Completa els camps següents.
+                <div class="product-form-icon">
+                    <i class="bi bi-box-seam" aria-hidden="true"></i>
+                </div>
+
+                <div>
+                    <h2 class="section-title">Dades del producte</h2>
+
+                    <p class="section-subtitle">
+                        Els productes es mostraran ordenats alfabèticament al llistat general.
                     </p>
                 </div>
 
-                <div th:if="${error}" class="form-error">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <span th:text="${error}"></span>
-                </div>
+                <span th:if="${producte.id != null}"
+                      class="product-edit-badge"
+                      th:text="|ID #${producte.id}|">
+                    ID #1
+                </span>
 
+            </div>
+
+            <!----------------------- MISSATGE D'ERROR ----------------------->
+            <div th:if="${error}" class="alert alert-error product-form-alert" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                <span th:text="${error}"></span>
             </div>
 
             <!----------------------- COS DEL FORMULARI ----------------------->
-            <div style="padding: 20px 24px;">
+            <form id="producteForm"
+                  class="product-form"
+                  th:action="${producte.id != null} ? @{/productes/update/{id}(id=${producte.id})} : @{/productes/save}"
+                  th:object="${producte}"
+                  method="post">
 
-                <form id="producteForm"
-                      th:action="${producte.id != null} ? @{/productes/update/{id}(id=${producte.id})} : @{/productes/save}"
-                      th:object="${producte}"
-                      method="post">
+                <div class="product-form-grid">
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
+                    <!----------------------- NOM PRODUCTE ----------------------->
+                    <div class="form-group product-form-field-full">
+                        <label class="form-label" for="nomProducte">
+                            Nom del producte
+                            <span class="required-mark">*</span>
+                        </label>
 
-                        <!----------------------- NOM PRODUCTE ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="nomProducte">Nom producte</label>
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-tag form-input-icon" aria-hidden="true"></i>
+
                             <input id="nomProducte"
                                    type="text"
                                    th:field="*{nomProducte}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
                                    required
+                                   autocomplete="off"
+                                   placeholder="Ex. Pa integral"
                                    title="Introdueix el nom del producte">
                         </div>
 
-                        <!----------------------- DESCRIPCIÓ ----------------------->
-                        <div class="form-group">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <label class="form-label" for="descripcio">Descripció</label>
-                                <span id="descripcioCounter" style="font-size:13px;">0/50</span>
-                            </div>
+                        <p class="form-help">
+                            Aquest nom serà visible als albarans i als llistats de productes.
+                        </p>
+                    </div>
 
-                            <input id="descripcio"
-                                   type="text"
-                                   th:field="*{descripcio}"
-                                   class="form-input"
-                                   title="La descripció és vàlida entre 0 i 50 caràcters, amb un màxim d'entrada de 100">
+                    <!----------------------- DESCRIPCIÓ ----------------------->
+                    <div class="form-group product-form-field-full">
+
+                        <div class="form-label-row">
+                            <label class="form-label" for="descripcio">
+                                Descripció
+                            </label>
+
+                            <span id="descripcioCounter" class="character-counter">
+                                0/50
+                            </span>
                         </div>
 
+                        <div class="form-input-wrapper form-textarea-wrapper">
+                            <i class="bi bi-card-text form-input-icon form-input-icon-top" aria-hidden="true"></i>
+
+                            <textarea id="descripcio"
+                                      th:field="*{descripcio}"
+                                      class="form-input form-textarea form-input-with-icon"
+                                      maxlength="50"
+                                      rows="4"
+                                      placeholder="Afegeix una descripció breu del producte..."
+                                      title="La descripció pot tenir un màxim de 50 caràcters"></textarea>
+                        </div>
+
+                        <p class="form-help">
+                            Camp opcional. Màxim 50 caràcters.
+                        </p>
                     </div>
 
-                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
-                    <div style="margin-top:25px; display:flex; gap:10px;">
+                </div>
 
-                        <button type="submit" class="btn btn-soft">
-                            <i class="bi bi-save"></i>
-                            <span>Guardar</span>
-                        </button>
+                <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                <div class="product-form-actions">
 
-                        <a th:href="@{/productes/list}" class="btn btn-secondary">
-                            Cancel·lar
-                        </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        <span th:text="${producte.id != null} ? 'Guardar canvis' : 'Crear producte'">
+                            Guardar
+                        </span>
+                    </button>
 
-                    </div>
+                    <a th:href="@{/productes/list}" class="btn btn-secondary">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        <span>Cancel·lar</span>
+                    </a>
 
-                </form>
+                </div>
 
-            </div>
+            </form>
 
         </section>
 
