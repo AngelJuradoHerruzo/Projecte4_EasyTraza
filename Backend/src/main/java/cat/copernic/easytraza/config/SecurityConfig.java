@@ -135,6 +135,11 @@ public class SecurityConfig {
                 .permitAll()
             )
 
+            // ---------------------------- EXPIRACIÓ DE SESSIÓ ----------------------------
+            .sessionManagement(session -> session
+                .invalidSessionUrl("/login?expired=true")
+            )
+
             // ---------------------------- ERROR ACCÉS DENEGAT ----------------------------
             .exceptionHandling(exception -> exception
                 .accessDeniedPage("/error/403")
