@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,8 @@ import jakarta.servlet.http.HttpSession;
 @Service
 @Transactional
 public class AlbaraProveidorService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlbaraProveidorService.class);
 
     // ---------------------------- REPOSITORIS, SERVICES I CONFIGURACIÓ ----------------------------
     private final AlbaraProveidorRepository albaraProveidorRepository;
@@ -819,6 +823,7 @@ public class AlbaraProveidorService {
             substituirFitxerAssociat(albaraProveidor, nomFitxer);
         }
         catch (IOException e) {
+            LOGGER.error("No s'ha pogut guardar el fitxer de l'albarà.", e);
             throw new RuntimeException("No s'ha pogut guardar el fitxer de l'albarà.");
         }
     }
@@ -849,6 +854,7 @@ public class AlbaraProveidorService {
             substituirFitxerAssociat(albaraProveidor, nomFitxer);
         }
         catch (IOException e) {
+            LOGGER.error("No s'ha pogut guardar el document OCR de l'albarà.", e);
             throw new RuntimeException("No s'ha pogut guardar el document OCR de l'albarà.");
         }
     }

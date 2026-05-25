@@ -8,6 +8,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import cat.copernic.easytraza.repository.UsuariRepository;
 @Service
 @Transactional
 public class UsuariService {    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UsuariService.class);
 
     // ---------------------------- CONSTANTS ----------------------------
     private static final long MIDA_MAXIMA_AVATAR = 5 * 1024 * 1024;
@@ -277,6 +281,7 @@ public class UsuariService {
             usuari.setAvatarNomFitxer(avatarFile.getOriginalFilename());
         }
         catch (IOException e) {
+            LOGGER.error("No s'ha pogut guardar la foto o avatar.", e);
             throw new RuntimeException("No s'ha pogut guardar la foto o avatar");
         }
     }
