@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Albarans de proveïdor - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/albaransProveidor.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -13,6 +15,7 @@
 
 <div class="app-layout">
 
+    <!-- SIDEBAR -->
     <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
 
     <main class="main">
@@ -20,8 +23,10 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Recepcions</p>
+                <p class="page-eyebrow">Recepció</p>
+
                 <h1 class="page-heading">Albarans de proveïdor</h1>
+
                 <p class="page-description">
                     Consulta i gestiona les recepcions de matèria primera agrupades per proveïdor.
                 </p>
@@ -29,165 +34,263 @@
 
             <div class="page-top-actions">
                 <a th:href="@{/albarans-proveidor/new}" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i>
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
                     <span>Nou albarà</span>
                 </a>
             </div>
         </section>
 
-        <!----------------------- ERROR ----------------------->
-        <div th:if="${error}" class="form-error lot-error">
-            <i class="bi bi-exclamation-triangle"></i>
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${error}" class="alert alert-error" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
             <span th:text="${error}">Error</span>
         </div>
 
-        <!----------------------- CONTENIDOR ----------------------->
-        <section class="content-card">
+        <!----------------------- PANELL PRINCIPAL ----------------------->
+        <section class="deliveries-panel">
 
-            <!----------------------- TOOLBAR ----------------------->
-            <div class="content-toolbar">
-                <div class="toolbar-block">
-                    <h2 class="content-title">Llistat d'albarans</h2>
-                    <p class="content-subtitle">
-                        Filtra per proveïdor, número, lot o usuari receptor.
+            <!----------------------- TOOLBAR I FILTRES ----------------------->
+            <div class="deliveries-toolbar">
+
+                <div class="deliveries-toolbar-info">
+                    <div class="deliveries-title-row">
+                        <h2 class="section-title">Llistat d'albarans</h2>
+                    </div>
+
+                    <p class="section-subtitle">
+                        Filtra per proveïdor, número d'albarà, lot o usuari receptor.
                     </p>
                 </div>
 
                 <form th:action="@{/albarans-proveidor/list}"
                       method="get"
-                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; flex:1; min-width:0;">
+                      class="deliveries-filter">
 
-                    <div class="search-field" style="width:165px;">
-                        <i class="bi bi-building"></i>
-                        <input name="proveidor" type="text" th:value="${proveidor}" placeholder="Proveïdor...">
+                    <label for="proveidor" class="sr-only">
+                        Filtrar per proveïdor
+                    </label>
+
+                    <div class="search-field search-field-supplier">
+                        <i class="bi bi-truck" aria-hidden="true"></i>
+
+                        <input id="proveidor"
+                               name="proveidor"
+                               type="text"
+                               th:value="${proveidor}"
+                               placeholder="Proveïdor..."
+                               autocomplete="off">
                     </div>
 
-                    <div class="search-field" style="width:135px;">
-                        <i class="bi bi-receipt"></i>
-                        <input name="numeroAlbara" type="text" th:value="${numeroAlbara}" placeholder="Número...">
+                    <label for="numeroAlbara" class="sr-only">
+                        Filtrar per número d'albarà
+                    </label>
+
+                    <div class="search-field search-field-number">
+                        <i class="bi bi-receipt" aria-hidden="true"></i>
+
+                        <input id="numeroAlbara"
+                               name="numeroAlbara"
+                               type="text"
+                               th:value="${numeroAlbara}"
+                               placeholder="Número..."
+                               autocomplete="off">
                     </div>
 
-                    <div class="search-field" style="width:145px;">
-                        <i class="bi bi-upc-scan"></i>
-                        <input name="identificadorLot" type="text" th:value="${identificadorLot}" placeholder="Lot...">
+                    <label for="identificadorLot" class="sr-only">
+                        Filtrar per identificador de lot
+                    </label>
+
+                    <div class="search-field search-field-lot">
+                        <i class="bi bi-box-seam" aria-hidden="true"></i>
+
+                        <input id="identificadorLot"
+                               name="identificadorLot"
+                               type="text"
+                               th:value="${identificadorLot}"
+                               placeholder="Lot..."
+                               autocomplete="off">
                     </div>
 
-                    <div class="search-field" style="width:160px;">
-                        <i class="bi bi-person"></i>
-                        <input name="receptor" type="text" th:value="${receptor}" placeholder="Receptor...">
+                    <label for="receptor" class="sr-only">
+                        Filtrar per receptor
+                    </label>
+
+                    <div class="search-field search-field-receiver">
+                        <i class="bi bi-person" aria-hidden="true"></i>
+
+                        <input id="receptor"
+                               name="receptor"
+                               type="text"
+                               th:value="${receptor}"
+                               placeholder="Receptor..."
+                               autocomplete="off">
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-arrow-right"></i>
+                    <button type="submit"
+                            class="btn btn-primary btn-icon"
+                            aria-label="Aplicar filtres d'albarans de proveïdor">
+                        <i class="bi bi-search" aria-hidden="true"></i>
                     </button>
 
-                    <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Neteja</span>
+                    <a th:href="@{/albarans-proveidor/list}"
+                       class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span>Netejar</span>
                     </a>
+
                 </form>
+
             </div>
 
             <!----------------------- LLISTAT AGRUPAT ----------------------->
-            <div class="lots-grouped-list" id="albaransContainer">
+            <div class="deliveries-grouped-list" id="albaransContainer">
 
                 <section th:each="grup : ${albaransPerProveidor}"
-                         class="lot-group">
+                         class="delivery-group">
 
-                    <!----------------------- TÍTOL GRUP ----------------------->
-                    <div class="lot-group-header">
-                        <div>
-                            <h3 th:text="${grup.key}">Proveïdor</h3>
+                    <!----------------------- PROVEÏDOR DEL GRUP ----------------------->
+                    <header class="delivery-group-header">
+
+                        <div class="delivery-group-icon">
+                            <i class="bi bi-truck" aria-hidden="true"></i>
                         </div>
-                    </div>
 
-                    <!----------------------- TARGETES GRUP ----------------------->
-                    <div class="cards-grid" style="align-items:stretch;">
+                        <div class="delivery-group-title">
+                            <p>Proveïdor</p>
+
+                            <h3 th:text="${grup.key}">
+                                Nom proveïdor
+                            </h3>
+                        </div>
+
+                        <span class="delivery-group-counter"
+                              th:text="|${#lists.size(grup.value)} albarans|">
+                            0 albarans
+                        </span>
+
+                    </header>
+
+                    <!----------------------- TARGETES DEL GRUP ----------------------->
+                    <div class="deliveries-grid">
 
                         <article th:each="albara : ${grup.value}"
-                                 class="info-card albara-card"
-                                 style="height:100%; display:flex; flex-direction:column; gap:14px;">
+                                 class="delivery-card">
 
-                            <!----------------------- HEADER ----------------------->
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
+                            <!----------------------- CAPÇALERA TARGETA ----------------------->
+                            <header class="delivery-card-header">
 
-                                <div>
-                                    <h3 class="info-card-title"
-                                        style="margin-bottom:4px;"
-                                        th:text="${albaraProveidorService.obtenirNumeroAlbaraVisible(albara)}">
-                                        1
-                                    </h3>
+                                <div class="delivery-card-heading">
 
-                                    <p class="info-card-description"
-                                       th:text="${#temporals.format(albara.dataRecepcio, 'dd/MM/yyyy')}">
-                                        01/01/2026
-                                    </p>
+                                    <div class="delivery-card-icon">
+                                        <i class="bi bi-receipt" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div class="delivery-card-title-block">
+
+                                        <p class="delivery-card-type">Albarà</p>
+
+                                        <h3 class="delivery-card-title"
+                                            th:text="${albaraProveidorService.obtenirNumeroAlbaraVisible(albara)}">
+                                            Número albarà
+                                        </h3>
+
+                                    </div>
+
                                 </div>
 
-                                <span class="status-badge status-pendent">
+                                <span class="delivery-status-badge">
                                     Recepció
                                 </span>
 
+                            </header>
+
+                            <!----------------------- DADES PRINCIPALS ----------------------->
+                            <div class="delivery-card-data">
+
+                                <div class="delivery-data-item">
+
+                                    <div class="delivery-data-icon">
+                                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div class="delivery-data-content">
+                                        <span class="delivery-data-label">Data recepció</span>
+
+                                        <span class="delivery-data-value"
+                                              th:text="${#temporals.format(albara.dataRecepcio, 'dd/MM/yyyy')}">
+                                            01/01/2026
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="delivery-data-item">
+
+                                    <div class="delivery-data-icon">
+                                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div class="delivery-data-content">
+                                        <span class="delivery-data-label">Usuari receptor</span>
+
+                                        <span class="delivery-data-value"
+                                              th:text="${albara.usuariReceptor != null ? albara.usuariReceptor.nomComplet : '-'}">
+                                            Usuari receptor
+                                        </span>
+                                    </div>
+
+                                </div>
+
                             </div>
 
-                            <!----------------------- PROVEÏDOR I RESUM ----------------------->
-                            <div style="padding:12px 14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5; display:flex; flex-direction:column; gap:10px;">
+                            <!----------------------- RESUM DE LA RECEPCIÓ ----------------------->
+                            <div class="delivery-card-summary">
 
-                                <div style="display:grid; grid-template-columns:90px 1fr; gap:10px; align-items:center;">
-                                    <span class="info-card-meta-label">Proveïdor</span>
-                                    <span class="info-card-meta-value"
-                                          th:text="${albara.proveidor != null ? albara.proveidor.nomProveidor : '-'}">
-                                        Proveïdor
-                                    </span>
-                                </div>
+                                <div class="delivery-summary-item">
+                                    <i class="bi bi-box-seam" aria-hidden="true"></i>
 
-                                <div style="display:grid; grid-template-columns:90px 1fr; gap:10px; align-items:center;">
-                                    <span class="info-card-meta-label">Receptor</span>
-                                    <span class="info-card-meta-value"
-                                          th:text="${albara.usuariReceptor != null ? albara.usuariReceptor.nomComplet : '-'}">
-                                        Usuari
-                                    </span>
-                                </div>
-
-                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-
-                                    <div style="display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center; padding:8px 10px; border:1px solid #f0e6dc; border-radius:12px; background:white;">
-                                        <span class="info-card-meta-label">Lots</span>
-                                        <span class="info-card-meta-value" style="text-align:right;"
+                                    <div>
+                                        <span class="delivery-summary-value"
                                               th:text="${albara.lots != null ? #lists.size(albara.lots) : 0}">
                                             0
                                         </span>
-                                    </div>
 
-                                    <div style="display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center; padding:8px 10px; border:1px solid #f0e6dc; border-radius:12px; background:white;">
-                                        <span class="info-card-meta-label">Imatge</span>
-                                        <span class="info-card-meta-value" style="text-align:right;"
+                                        <span class="delivery-summary-label">lots</span>
+                                    </div>
+                                </div>
+
+                                <div class="delivery-summary-item">
+                                    <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
+
+                                    <div>
+                                        <span class="delivery-summary-value"
                                               th:text="${albara.fitxers != null and !albara.fitxers.isEmpty() ? 'Sí' : 'No'}">
                                             Sí
                                         </span>
-                                    </div>
 
+                                        <span class="delivery-summary-label">document</span>
+                                    </div>
                                 </div>
 
                             </div>
 
-                            <!----------------------- LOTS ----------------------->
-                            <div style="flex:1; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fff;">
+                            <!----------------------- LOTS RECEPCIONATS ----------------------->
+                            <div class="delivery-card-lots">
 
-                                <span class="info-card-meta-label">Lots recepcionats</span>
+                                <span class="delivery-data-label">Lots recepcionats</span>
 
                                 <div th:if="${albara.lots != null and !albara.lots.isEmpty()}"
-                                     style="margin-top:10px; display:flex; flex-direction:column; gap:7px;">
+                                     class="delivery-lots-list">
 
                                     <div th:each="lot : ${albara.lots}"
-                                         style="display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center;">
+                                         class="delivery-lot-item">
 
-                                        <span class="info-card-meta-value"
+                                        <span class="delivery-lot-name"
                                               th:text="${lot.identificadorLot}">
                                             Lot
                                         </span>
 
-                                        <span class="info-card-meta-value" style="white-space:nowrap; text-align:right;">
+                                        <span class="delivery-lot-quantity">
                                             <span th:text="${lot.quantitat}">1</span>
                                             <span th:text="${lot.unitats}">kg</span>
                                         </span>
@@ -197,59 +300,54 @@
                                 </div>
 
                                 <p th:if="${albara.lots == null or albara.lots.isEmpty()}"
-                                   class="content-subtitle"
-                                   style="margin-top:8px;">
+                                   class="delivery-lots-empty">
                                     Sense lots registrats.
                                 </p>
 
                             </div>
 
-                            <!----------------------- ACCIONS ----------------------->
-                            <div th:if="${albaraProveidorService.esModificable(albara)}"
-                                 style="margin-top:auto; padding-top:14px; border-top:1px solid #f0e6dc; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                            <!----------------------- ACCIONS MODIFICABLES ----------------------->
+                            <footer th:if="${albaraProveidorService.esModificable(albara)}"
+                                    class="delivery-card-actions">
 
                                 <a th:href="@{/albarans-proveidor/detail/{id}(id=${albara.id})}"
-                                   class="btn-table btn-action-view"
-                                   style="justify-content:center;">
-                                    <i class="bi bi-eye"></i>
+                                   class="card-action card-action-view">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
                                     <span>Veure</span>
                                 </a>
 
                                 <a th:href="@{/albarans-proveidor/edit/{id}(id=${albara.id})}"
-                                   class="btn-table btn-action-edit"
-                                   style="justify-content:center;">
-                                    <i class="bi bi-pencil-square"></i>
+                                   class="card-action card-action-edit">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
                                     <span>Editar</span>
                                 </a>
 
                                 <a th:href="@{/albarans-proveidor/delete/{id}(id=${albara.id})}"
-                                   class="btn-table btn-action-delete"
-                                   style="justify-content:center;"
-                                   onclick="return confirm('Segur que vols eliminar aquest albarà?')">
-                                    <i class="bi bi-trash3"></i>
+                                   class="card-action card-action-delete"
+                                   onclick="return confirm('Segur que vols eliminar aquest albarà?');">
+                                    <i class="bi bi-trash3" aria-hidden="true"></i>
                                     <span>Eliminar</span>
                                 </a>
 
-                            </div>
+                            </footer>
 
-                            <div th:if="${!albaraProveidorService.esModificable(albara)}"
-                                 style="margin-top:auto; padding-top:14px; border-top:1px solid #f0e6dc; display:grid; grid-template-columns:1fr 2fr; gap:8px;">
+                            <!----------------------- ACCIONS BLOQUEJADES ----------------------->
+                            <footer th:if="${!albaraProveidorService.esModificable(albara)}"
+                                    class="delivery-card-actions delivery-card-actions-locked">
 
                                 <a th:href="@{/albarans-proveidor/detail/{id}(id=${albara.id})}"
-                                   class="btn-table btn-action-view"
-                                   style="justify-content:center;">
-                                    <i class="bi bi-eye"></i>
+                                   class="card-action card-action-view">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
                                     <span>Veure</span>
                                 </a>
 
-                                <span class="btn-table btn-disabled-delete"
-                                      style="justify-content:center; width:100%;"
+                                <span class="card-action card-action-locked"
                                       title="Aquest albarà no es pot modificar ni eliminar perquè té algun lot iniciat o acabat">
-                                    <i class="bi bi-lock-fill"></i>
+                                    <i class="bi bi-lock-fill" aria-hidden="true"></i>
                                     <span>Lot iniciat</span>
                                 </span>
 
-                            </div>
+                            </footer>
 
                         </article>
 
@@ -258,11 +356,24 @@
                 </section>
 
                 <!----------------------- ESTAT BUIT TOTAL ----------------------->
-                <div th:if="${#maps.isEmpty(albaransPerProveidor)}" class="empty-state" style="grid-column: 1 / -1;">
-                    <div class="empty-box">
-                        <i class="bi bi-receipt"></i>
-                        <p>No hi ha albarans de proveïdor que coincideixin amb els filtres.</p>
+                <div th:if="${#maps.isEmpty(albaransPerProveidor)}"
+                     class="deliveries-empty-state">
+
+                    <div class="deliveries-empty-icon">
+                        <i class="bi bi-receipt" aria-hidden="true"></i>
                     </div>
+
+                    <h3>No s'han trobat albarans</h3>
+
+                    <p>
+                        No hi ha albarans de proveïdor que coincideixin amb els filtres introduïts.
+                    </p>
+
+                    <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span>Veure tots els albarans</span>
+                    </a>
+
                 </div>
 
             </div>

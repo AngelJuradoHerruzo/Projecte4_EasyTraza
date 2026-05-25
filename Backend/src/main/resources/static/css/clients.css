@@ -229,7 +229,6 @@
     font-size: 13px;
     line-height: 1.4;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
 }
 
 .client-card-data {
