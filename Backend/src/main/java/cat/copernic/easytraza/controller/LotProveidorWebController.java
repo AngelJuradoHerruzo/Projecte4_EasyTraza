@@ -2,6 +2,8 @@ package cat.copernic.easytraza.controller;
 
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,8 @@ import cat.copernic.easytraza.service.LotProveidorService;
 @Controller
 @RequestMapping("/lots")
 public class LotProveidorWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LotProveidorWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final LotProveidorService lotProveidorService;
@@ -51,6 +55,7 @@ public class LotProveidorWebController {
             return "lots/detallLot";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut consultar el lot amb identificador {}: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
@@ -74,9 +79,11 @@ public class LotProveidorWebController {
             }
 
             lotProveidorService.iniciarLot(id, false);
+            LOGGER.info("Lot amb identificador {} iniciat correctament.", id);
             return "redirect:/lots/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut iniciar el lot amb identificador {}: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
@@ -91,9 +98,11 @@ public class LotProveidorWebController {
     public String confirmarIniciLot(@PathVariable Long id, Model model) {
         try {
             lotProveidorService.iniciarLot(id, true);
+            LOGGER.info("Inici del lot amb identificador {} confirmat correctament.", id);
             return "redirect:/lots/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut confirmar l'inici del lot amb identificador {}: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());
@@ -108,9 +117,11 @@ public class LotProveidorWebController {
     public String finalitzarLot(@PathVariable Long id, Model model) {
         try {
             lotProveidorService.finalitzarLot(id);
+            LOGGER.info("Lot amb identificador {} finalitzat correctament.", id);
             return "redirect:/lots/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut finalitzar el lot amb identificador {}: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lots", lotProveidorService.getLotsProveidorLlistat(null, null, null, null, null));
             model.addAttribute("materiesPrimeres", lotProveidorService.getAllMateriesPrimeresOrdenades());

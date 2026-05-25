@@ -2,6 +2,8 @@ package cat.copernic.easytraza.controller;
 
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import cat.copernic.easytraza.service.TracabilitatService;
 @Controller
 @RequestMapping("/tracabilitat")
 public class TracabilitatWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TracabilitatWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final TracabilitatService tracabilitatService;
@@ -52,6 +56,7 @@ public class TracabilitatWebController {
             return "tracabilitat/llistatPerLot";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'han pogut carregar les dades de traçabilitat: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
 
             model.addAllAttributes(tracabilitatService.getModelTracabilitat(

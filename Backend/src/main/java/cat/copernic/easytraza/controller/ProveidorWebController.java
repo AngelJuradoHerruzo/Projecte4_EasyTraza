@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,8 @@ import cat.copernic.easytraza.service.ProveidorService;
 @Controller
 @RequestMapping("/proveidors")
 public class ProveidorWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProveidorWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final ProveidorService proveidorService;
@@ -59,6 +63,7 @@ public class ProveidorWebController {
                                    RedirectAttributes redirectAttributes) {
         try {
             proveidorService.createProveidor(proveidor);
+            LOGGER.info("Proveïdor creat correctament.");
 
             if (popup) {
                 model.addAttribute("missatge", "Proveïdor creat correctament.");
@@ -73,6 +78,7 @@ public class ProveidorWebController {
             return "redirect:/proveidors/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear el proveïdor: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("proveidor", proveidor);
             model.addAttribute("popup", popup);
@@ -107,6 +113,7 @@ public class ProveidorWebController {
                                   RedirectAttributes redirectAttributes) {
         try {
             Proveidor proveidorActualitzat = proveidorService.updateProveidor(id, proveidor);
+            LOGGER.info("Proveïdor amb identificador {} actualitzat correctament.", id);
 
             if (proveidorActualitzat == null) {
                 redirectAttributes.addFlashAttribute(
@@ -130,6 +137,7 @@ public class ProveidorWebController {
             return "redirect:/proveidors/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar el proveïdor amb identificador {}: {}", id, e.getMessage());
             proveidor.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("proveidor", proveidor);
@@ -145,6 +153,7 @@ public class ProveidorWebController {
                                   RedirectAttributes redirectAttributes) {
         try {
             proveidorService.deleteProveidor(id);
+            LOGGER.info("Proveïdor amb identificador {} eliminat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -152,6 +161,7 @@ public class ProveidorWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar el proveïdor amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute(
                 "error",
                 "No es pot eliminar el proveïdor perquè està relacionat amb altres dades."

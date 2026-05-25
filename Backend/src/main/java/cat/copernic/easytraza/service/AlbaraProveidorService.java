@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -14,27 +16,39 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import cat.copernic.easytraza.dto.OcrAlbaraPendent;
+import cat.copernic.easytraza.dto.OcrLiniaDto;
+import cat.copernic.easytraza.dto.OcrResultatAlbaraProveidorDto;
 import cat.copernic.easytraza.entities.AlbaraProveidor;
 import cat.copernic.easytraza.entities.LotProveidor;
+import cat.copernic.easytraza.entities.MateriaPrimera;
+import cat.copernic.easytraza.entities.Proveidor;
 import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.AlbaraProveidorRepository;
 import cat.copernic.easytraza.repository.UsuariRepository;
+import cat.copernic.easytraza.service.ocr.OcrUtils;
 import jakarta.servlet.http.HttpSession;
 
 @Service
 @Transactional
 public class AlbaraProveidorService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlbaraProveidorService.class);
+
     // ---------------------------- REPOSITORIS, SERVICES I CONFIGURACIÓ ----------------------------
     private final AlbaraProveidorRepository albaraProveidorRepository;
     private final UsuariRepository usuariRepository;
     private final UnitatMesuraService unitatMesuraService;
+    private final ProveidorService proveidorService;
+    private final MateriaPrimeraService materiaPrimeraService;
     private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
 
     @Value("${ocr.documents.final-path:backend/uploads/albarans-proveidor}")
@@ -45,10 +59,14 @@ public class AlbaraProveidorService {
     public AlbaraProveidorService(AlbaraProveidorRepository albaraProveidorRepository,
                                   UsuariRepository usuariRepository,
                                   UnitatMesuraService unitatMesuraService,
+                                  ProveidorService proveidorService,
+                                  MateriaPrimeraService materiaPrimeraService,
                                   OcrAlbaraProveidorService ocrAlbaraProveidorService) {
         this.albaraProveidorRepository = albaraProveidorRepository;
         this.usuariRepository = usuariRepository;
         this.unitatMesuraService = unitatMesuraService;
+        this.proveidorService = proveidorService;
+        this.materiaPrimeraService = materiaPrimeraService;
         this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
     }
 
@@ -279,6 +297,245 @@ public class AlbaraProveidorService {
         }
     }
 
+
+    // ELIMINAR AVISOS D'ASSOCIACIÓ ANTICS ABANS DE TORNAR A CONSULTAR LA BASE DE DADES
+    public void netejarAvisosAssociacioOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
+        if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
+            return;
+        }
+
+        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
+        pendent.getAvisos().removeIf(avis -> avis != null
+                && avis.startsWith("Proveïdor detectat per OCR no trobat"));
+
+        if (pendent.getLinies() != null) {
+            for (OcrLiniaDto linia : pendent.getLinies()) {
+                linia.getAvisos().removeIf(avis -> avis != null
+                        && avis.startsWith("Matèria primera no trobada"));
+            }
+        }
+    }
+
+
+    // APLICAR ASSOCIACIONS NOVES SENSE SOBREESCRIURE CANVIS MANUALS DE L'USUARI
+    public void aplicarAssociacionsOcrAlFormulari(AlbaraProveidor albaraProveidor,
+                                                    OcrResultatAlbaraProveidorDto resultatOcr) {
+        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
+
+        if ((albaraProveidor.getProveidor() == null || albaraProveidor.getProveidor().getId() == null)
+                && pendent.getProveidorId() != null) {
+            albaraProveidor.setProveidor(proveidorService.getProveidorById(pendent.getProveidorId()));
+        }
+
+        if (albaraProveidor.getLots() == null || pendent.getLinies() == null) {
+            return;
+        }
+
+        int numeroLinies = Math.min(albaraProveidor.getLots().size(), pendent.getLinies().size());
+
+        for (int index = 0; index < numeroLinies; index++) {
+            LotProveidor lotFormulari = albaraProveidor.getLots().get(index);
+            OcrLiniaDto liniaOcr = pendent.getLinies().get(index);
+
+            if ((lotFormulari.getMateriaPrimera() == null || lotFormulari.getMateriaPrimera().getId() == null)
+                    && liniaOcr.getMateriaPrimeraId() != null) {
+                lotFormulari.setMateriaPrimera(
+                        materiaPrimeraService.getMateriaPrimeraById(liniaOcr.getMateriaPrimeraId())
+                );
+            }
+        }
+    }
+
+
+    // CONVERTIR EL RESULTAT OCR A L'ENTITAT USADA PEL FORMULARI
+    public AlbaraProveidor convertirResultatOcrAFormulari(OcrResultatAlbaraProveidorDto resultatOcr) {
+        AlbaraProveidor albaraProveidor = new AlbaraProveidor();
+        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
+
+        albaraProveidor.setNumeroAlbara(pendent.getNumeroAlbara());
+        albaraProveidor.setDataRecepcio(convertirDataOcr(pendent.getDataAlbara()));
+
+        if (pendent.getProveidorId() != null) {
+            albaraProveidor.setProveidor(proveidorService.getProveidorById(pendent.getProveidorId()));
+        }
+
+        List<LotProveidor> lots = new ArrayList<>();
+
+        if (pendent.getLinies() != null) {
+            for (OcrLiniaDto liniaOcr : pendent.getLinies()) {
+                lots.add(convertirLiniaOcrAFormulari(liniaOcr));
+            }
+        }
+
+        if (lots.isEmpty()) {
+            lots.add(new LotProveidor());
+        }
+
+        albaraProveidor.setLots(lots);
+
+        return albaraProveidor;
+    }
+
+
+    // CONVERTIR UNA LÍNIA OCR A LOT TEMPORAL DE FORMULARI
+    private LotProveidor convertirLiniaOcrAFormulari(OcrLiniaDto liniaOcr) {
+        LotProveidor lot = new LotProveidor();
+        lot.setIdentificadorLot(liniaOcr.getIdentificadorLot());
+        lot.setQuantitat(convertirQuantitatOcr(liniaOcr.getQuantitat()));
+        lot.setUnitats(liniaOcr.getUnitat());
+
+        if (liniaOcr.getMateriaPrimeraId() != null) {
+            lot.setMateriaPrimera(materiaPrimeraService.getMateriaPrimeraById(liniaOcr.getMateriaPrimeraId()));
+        }
+
+        return lot;
+    }
+
+
+    // COMPLETAR ASSOCIACIONS AMB ELEMENTS EXISTENTS DE BASE DE DADES
+    public void completarAssociacionsOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
+        if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
+            return;
+        }
+
+        OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
+        associarProveidorOcr(pendent);
+        associarMateriesPrimeresOcr(pendent);
+    }
+
+
+    // ASSOCIAR PROVEÏDOR OCR SI EXISTEIX A LA BASE DE DADES
+    private void associarProveidorOcr(OcrAlbaraPendent pendent) {
+        Proveidor proveidor = buscarProveidor(pendent.getProveidorCifDetectat(), pendent.getProveidorDetectat());
+
+        if (proveidor != null) {
+            pendent.setProveidorId(proveidor.getId());
+            pendent.setProveidorNomAssociat(proveidor.getNomProveidor());
+            pendent.setProveidorTrobat(true);
+            return;
+        }
+
+        pendent.setProveidorTrobat(false);
+
+        if (pendent.getProveidorDetectat() != null && !pendent.getProveidorDetectat().isBlank()) {
+            pendent.afegirAvis("Proveïdor detectat per OCR no trobat a la base de dades: " + pendent.getProveidorDetectat());
+        }
+    }
+
+
+    // ASSOCIAR MATÈRIES PRIMERES OCR SI EXISTEIXEN A LA BASE DE DADES
+    private void associarMateriesPrimeresOcr(OcrAlbaraPendent pendent) {
+        if (pendent.getLinies() == null) {
+            return;
+        }
+
+        for (OcrLiniaDto linia : pendent.getLinies()) {
+            MateriaPrimera materiaPrimera = buscarMateriaPrimera(linia.getMateriaPrimeraDetectada());
+
+            if (materiaPrimera != null) {
+                linia.setMateriaPrimeraId(materiaPrimera.getId());
+                linia.setMateriaPrimeraNomAssociada(materiaPrimera.getNomMateria());
+                linia.setMateriaPrimeraTrobada(true);
+                continue;
+            }
+
+            linia.setMateriaPrimeraTrobada(false);
+
+            if (linia.getMateriaPrimeraDetectada() != null && !linia.getMateriaPrimeraDetectada().isBlank()) {
+                linia.afegirAvis("Matèria primera no trobada. OCR: " + linia.getMateriaPrimeraDetectada());
+            }
+        }
+    }
+
+
+    // BUSCAR PROVEÏDOR PER CIF O NOM FLEXIBLE
+    private Proveidor buscarProveidor(String cifDetectat, String nomDetectat) {
+        for (Proveidor proveidor : proveidorService.getAllProveidors()) {
+            if (cifDetectat != null && !cifDetectat.isBlank()
+                    && proveidor.getCif() != null
+                    && proveidor.getCif().replace(" ", "").equalsIgnoreCase(cifDetectat.replace(" ", ""))) {
+                return proveidor;
+            }
+        }
+
+        if (nomDetectat == null || nomDetectat.isBlank()) {
+            return null;
+        }
+
+        String nomOcr = OcrUtils.normalitzarPerComparar(nomDetectat);
+
+        for (Proveidor proveidor : proveidorService.getAllProveidors()) {
+            String nomBd = OcrUtils.normalitzarPerComparar(proveidor.getNomProveidor());
+
+            if (nomBd.equals(nomOcr)
+                    || nomBd.contains(nomOcr)
+                    || nomOcr.contains(nomBd)
+                    || OcrUtils.coincideixNomFlexible(nomDetectat, proveidor.getNomProveidor())) {
+                return proveidor;
+            }
+        }
+
+        return null;
+    }
+
+
+    // BUSCAR MATÈRIA PRIMERA PER NOM FLEXIBLE
+    private MateriaPrimera buscarMateriaPrimera(String materiaDetectada) {
+        if (materiaDetectada == null || materiaDetectada.isBlank()) {
+            return null;
+        }
+
+        String materiaOcr = OcrUtils.normalitzarPerComparar(materiaDetectada);
+
+        for (MateriaPrimera materiaPrimera : materiaPrimeraService.getAllMateriesPrimeres()) {
+            String materiaBd = OcrUtils.normalitzarPerComparar(materiaPrimera.getNomMateria());
+
+            if (materiaBd.equals(materiaOcr)
+                    || materiaBd.contains(materiaOcr)
+                    || materiaOcr.contains(materiaBd)
+                    || OcrUtils.coincideixNomFlexible(materiaDetectada, materiaPrimera.getNomMateria())) {
+                return materiaPrimera;
+            }
+        }
+
+        return null;
+    }
+
+
+    // CONVERTIR DATA OCR A LOCALDATE
+    private LocalDate convertirDataOcr(String dataOcr) {
+        if (dataOcr == null || dataOcr.isBlank()) {
+            return LocalDate.now();
+        }
+
+        try {
+            return LocalDate.parse(dataOcr);
+        }
+        catch (DateTimeParseException ignored) {
+            // Continua amb altres formats habituals.
+        }
+
+        for (String patro : List.of("dd/MM/yyyy", "dd-MM-yyyy", "d/M/yyyy", "d-M-yyyy")) {
+            try {
+                return LocalDate.parse(dataOcr, DateTimeFormatter.ofPattern(patro));
+            }
+            catch (DateTimeParseException ignored) {
+                // Es prova el següent format.
+            }
+        }
+
+        return LocalDate.now();
+    }
+
+
+    // CONVERTIR QUANTITAT OCR A ENTER PER AL FORMULARI ACTUAL
+    private Integer convertirQuantitatOcr(Double quantitat) {
+        if (quantitat == null) {
+            return null;
+        }
+
+        return (int) Math.round(quantitat);
+    }
 
     // COMPROVAR FILTRE PER PROVEÏDOR
     private boolean coincideixProveidor(AlbaraProveidor albaraProveidor, String proveidor) {
@@ -566,6 +823,7 @@ public class AlbaraProveidorService {
             substituirFitxerAssociat(albaraProveidor, nomFitxer);
         }
         catch (IOException e) {
+            LOGGER.error("No s'ha pogut guardar el fitxer de l'albarà.", e);
             throw new RuntimeException("No s'ha pogut guardar el fitxer de l'albarà.");
         }
     }
@@ -596,6 +854,7 @@ public class AlbaraProveidorService {
             substituirFitxerAssociat(albaraProveidor, nomFitxer);
         }
         catch (IOException e) {
+            LOGGER.error("No s'ha pogut guardar el document OCR de l'albarà.", e);
             throw new RuntimeException("No s'ha pogut guardar el document OCR de l'albarà.");
         }
     }

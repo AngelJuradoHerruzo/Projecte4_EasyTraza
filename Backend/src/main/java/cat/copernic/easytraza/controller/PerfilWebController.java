@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/perfil")
 public class PerfilWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PerfilWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final UsuariService usuariService;
@@ -65,6 +69,7 @@ public class PerfilWebController {
             tipusContingut = MediaType.parseMediaType(usuari.getAvatarTipusContingut());
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut interpretar el tipus de contingut de l'avatar del perfil: {}", e.getMessage());
             tipusContingut = MediaType.APPLICATION_OCTET_STREAM;
         }
 
@@ -109,6 +114,7 @@ public class PerfilWebController {
 
         try {
             Usuari usuariActualitzat = usuariService.updatePerfilUsuari(usuariId, usuari, avatarFile);
+            LOGGER.info("Perfil de l'usuari amb identificador {} actualitzat correctament.", usuariId);
 
             session.setAttribute("usuariNom", usuariActualitzat.getNomComplet());
             session.setAttribute("usuariEmail", usuariActualitzat.getEmail());
@@ -122,6 +128,7 @@ public class PerfilWebController {
             return "redirect:/perfil";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar el perfil de l'usuari amb identificador {}: {}", usuariId, e.getMessage());
             Usuari usuariActual = usuariService.getUsuariById(usuariId);
 
             usuari.setId(usuariId);

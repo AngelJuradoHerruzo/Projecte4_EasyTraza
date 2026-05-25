@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,8 @@ import cat.copernic.easytraza.service.ProducteService;
 @Controller
 @RequestMapping("/productes")
 public class ProducteWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProducteWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final ProducteService producteService;
@@ -47,6 +51,7 @@ public class ProducteWebController {
                                    RedirectAttributes redirectAttributes) {
         try {
             producteService.createProducte(producte);
+            LOGGER.info("Producte creat correctament.");
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -56,6 +61,7 @@ public class ProducteWebController {
             return "redirect:/productes/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear el producte: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("producte", producte);
             return "productes/formProductes";
@@ -86,6 +92,7 @@ public class ProducteWebController {
                                   RedirectAttributes redirectAttributes) {
         try {
             Producte producteActualitzat = producteService.updateProducte(id, producte);
+            LOGGER.info("Producte amb identificador {} actualitzat correctament.", id);
 
             if (producteActualitzat == null) {
                 redirectAttributes.addFlashAttribute(
@@ -104,6 +111,7 @@ public class ProducteWebController {
             return "redirect:/productes/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar el producte amb identificador {}: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             producte.setId(id);
             model.addAttribute("producte", producte);
@@ -118,6 +126,7 @@ public class ProducteWebController {
                                   RedirectAttributes redirectAttributes) {
         try {
             producteService.deleteProducte(id);
+            LOGGER.info("Producte amb identificador {} eliminat correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -125,6 +134,7 @@ public class ProducteWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar el producte amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute(
                 "error",
                 "No es pot eliminar el producte perquè està relacionat amb altres dades."

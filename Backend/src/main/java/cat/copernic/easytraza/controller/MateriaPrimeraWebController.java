@@ -2,6 +2,8 @@ package cat.copernic.easytraza.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,8 @@ import cat.copernic.easytraza.service.MateriaPrimeraService;
 @Controller
 @RequestMapping("/materies-primeres")
 public class MateriaPrimeraWebController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MateriaPrimeraWebController.class);
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final MateriaPrimeraService materiaPrimeraService;
@@ -63,6 +67,7 @@ public class MateriaPrimeraWebController {
                                         RedirectAttributes redirectAttributes) {
         try {
             materiaPrimeraService.createMateriaPrimera(materiaPrimera);
+            LOGGER.info("Matèria primera creada correctament.");
 
             if (popup) {
                 model.addAttribute("missatge", "Matèria primera creada correctament.");
@@ -77,6 +82,7 @@ public class MateriaPrimeraWebController {
             return "redirect:/materies-primeres/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut crear la matèria primera: {}", e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("materiaPrimera", materiaPrimera);
             model.addAttribute("popup", popup);
@@ -111,6 +117,7 @@ public class MateriaPrimeraWebController {
                                        RedirectAttributes redirectAttributes) {
         try {
             MateriaPrimera materiaActualitzada = materiaPrimeraService.updateMateriaPrimera(id, materiaPrimera);
+            LOGGER.info("Matèria primera amb identificador {} actualitzada correctament.", id);
 
             if (materiaActualitzada == null) {
                 redirectAttributes.addFlashAttribute(
@@ -134,6 +141,7 @@ public class MateriaPrimeraWebController {
             return "redirect:/materies-primeres/list";
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut actualitzar la matèria primera amb identificador {}: {}", id, e.getMessage());
             materiaPrimera.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("materiaPrimera", materiaPrimera);
@@ -149,6 +157,7 @@ public class MateriaPrimeraWebController {
                                        RedirectAttributes redirectAttributes) {
         try {
             materiaPrimeraService.deleteMateriaPrimera(id);
+            LOGGER.info("Matèria primera amb identificador {} eliminada correctament.", id);
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
@@ -156,6 +165,7 @@ public class MateriaPrimeraWebController {
             );
         }
         catch (RuntimeException e) {
+            LOGGER.warn("No s'ha pogut eliminar la matèria primera amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
