@@ -1,3 +1,4 @@
+/*********************       .ELEMENTS DEL FORMULARI.       *********************/
 const form = document.getElementById('usuariForm');
 
 const dniInput = document.getElementById('dni');
@@ -7,143 +8,127 @@ const rolSelect = document.getElementById('rolUsuari');
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
 
+const avatarInput = document.getElementById('avatarFile');
+const avatarPreview = document.getElementById('avatarPreview');
+let avatarPreviewImage = document.getElementById('avatarPreviewImage');
+let avatarPreviewIcon = document.getElementById('avatarPreviewIcon');
+
+let avatarPreviewUrl = null;
 
 
-// ---------------------------- AJUDES DEL FORMULARI ----------------------------
+/*********************       .SUPORT VISUAL DEL FORMULARI.       *********************/
 if (form) {
 
-    // DNI: elimina caràcters no vàlids, passa la lletra a majúscula i limita a 9 caràcters
-    if (dniInput) {
-        dniInput.addEventListener('input', function () {
-            let value = this.value;
-
-            value = value.replace(/[^0-9A-Za-z]/g, '');
-            value = value.toUpperCase();
-
-            if (value.length > 9) {
-                value = value.substring(0, 9);
-            }
-
-            this.value = value;
-        });
-    }
-
-
-    // Nom complet: només permet lletres i espais, evita espais duplicats i capitalitza cada paraula
-    if (nomInput) {
-        nomInput.addEventListener('input', function () {
-            let value = this.value;
-
-            value = value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
-            value = value.replace(/\s+/g, ' ');
-            value = value.trimStart();
-
-            value = value
-                .split(' ')
-                .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
-                .join(' ');
-
-            this.value = value;
-        });
-
-        // En sortir del camp, elimina espais sobrants al principi i al final
-        nomInput.addEventListener('blur', function () {
-            this.value = this.value.trim();
-        });
-    }
-
-
-    // Correu electrònic: elimina espais i passa tot el text a minúscules
-    if (emailInput) {
-        emailInput.addEventListener('input', function () {
-            this.value = this.value.replace(/\s/g, '').toLowerCase();
-        });
-    }
-
-
-    // Contrasenya: permet mostrar o ocultar el contingut del camp
+    // MOSTRAR O OCULTAR LA CONTRASENYA INTRODUÏDA
     if (togglePassword && passwordInput) {
         togglePassword.addEventListener('click', function () {
-            const icon = this.querySelector('i');
 
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.className = 'bi bi-eye-slash';
+            const icon = this.querySelector('i');
+            const passwordVisible = passwordInput.type === 'text';
+
+            passwordInput.type = passwordVisible ? 'password' : 'text';
+
+            if (icon) {
+                icon.className = passwordVisible ? 'bi bi-eye' : 'bi bi-eye-slash';
             }
-            else {
-                passwordInput.type = 'password';
-                icon.className = 'bi bi-eye';
+
+            this.setAttribute(
+                'aria-label',
+                passwordVisible ? 'Mostrar la contrasenya' : 'Ocultar la contrasenya'
+            );
+        });
+    }
+
+
+    // ACTUALITZAR LA VISTA PRÈVIA DE L'AVATAR SELECCIONAT
+    if (avatarInput && avatarPreview) {
+        avatarInput.addEventListener('change', function () {
+
+            const file = this.files && this.files.length > 0 ? this.files[0] : null;
+
+            if (!file || !file.type.startsWith('image/')) {
+                return;
+            }
+
+            if (avatarPreviewUrl) {
+                URL.revokeObjectURL(avatarPreviewUrl);
+            }
+
+            avatarPreviewUrl = URL.createObjectURL(file);
+
+            if (!avatarPreviewImage) {
+                avatarPreviewImage = document.createElement('img');
+                avatarPreviewImage.id = 'avatarPreviewImage';
+                avatarPreviewImage.alt = 'Vista prèvia de l\'avatar';
+                avatarPreview.appendChild(avatarPreviewImage);
+            }
+
+            avatarPreviewImage.src = avatarPreviewUrl;
+
+            if (avatarPreviewIcon) {
+                avatarPreviewIcon.remove();
+                avatarPreviewIcon = null;
             }
         });
     }
 
 
-    // Elimina els estats visuals de validació del camp
-    function clearState(field) {
+    // ELIMINAR L'ESTAT VISUAL D'UN CAMP
+    function clearFieldState(field) {
         field.classList.remove('field-valid', 'field-invalid');
     }
 
 
-    // Marca visualment el camp com a vàlid
-    function markValid(field) {
-        field.classList.remove('field-invalid');
-        field.classList.add('field-valid');
-    }
+    // ACTUALITZAR L'ESTAT VISUAL SEGONS LA VALIDACIÓ HTML DEL CAMP
+    function updateFieldState(field) {
 
+        if (!field || field.readOnly || field.disabled) {
+            return;
+        }
 
-    // Marca visualment el camp com a invàlid
-    function markInvalid(field) {
-        field.classList.remove('field-valid');
-        field.classList.add('field-invalid');
-    }
-
-
-    // Valida visualment un camp utilitzant les regles definides a l'HTML
-    function validateField(field) {
-        const value = field.value.trim();
-
-        const passwordOptional = field.id === 'password' && !field.hasAttribute('required');
-
-        if (value === '') {
-            clearState(field);
-            return passwordOptional;
+        if (field.value.trim() === '') {
+            clearFieldState(field);
+            return;
         }
 
         if (field.checkValidity()) {
-            markValid(field);
-            return true;
+            field.classList.remove('field-invalid');
+            field.classList.add('field-valid');
         }
-
-        markInvalid(field);
-        return false;
+        else {
+            field.classList.remove('field-valid');
+            field.classList.add('field-invalid');
+        }
     }
 
 
-    // Camps que participen en la validació visual del formulari
-    const fields = [dniInput, nomInput, emailInput, rolSelect, passwordInput].filter(Boolean);
+    // APLICAR RETORN VISUAL ALS CAMPS DEL FORMULARI
+    const formFields = [
+        dniInput,
+        nomInput,
+        emailInput,
+        rolSelect,
+        passwordInput,
+        avatarInput
+    ].filter(Boolean);
 
+    formFields.forEach(field => {
+        field.addEventListener('change', function () {
+            updateFieldState(this);
+        });
 
-    // Valida visualment els camps mentre l'usuari escriu o canvia valors
-    fields.forEach(field => {
-        field.addEventListener('input', () => validateField(field));
-        field.addEventListener('change', () => validateField(field));
+        if (field.type !== 'file' && field.tagName !== 'SELECT') {
+            field.addEventListener('input', function () {
+                updateFieldState(this);
+            });
+        }
     });
 
 
-    // Abans d'enviar, comprova que tots els camps compleixin les validacions HTML
-    form.addEventListener('submit', function (event) {
-        let valid = true;
-
-        fields.forEach(field => {
-            const ok = validateField(field);
-
-            if (!ok) {
-                valid = false;
-            }
-        });
-
-        if (!valid) {
-            event.preventDefault();
+    // ALLIBERAR LA URL TEMPORAL DE LA PREVISUALITZACIÓ EN SORTIR DE LA PÀGINA
+    window.addEventListener('beforeunload', function () {
+        if (avatarPreviewUrl) {
+            URL.revokeObjectURL(avatarPreviewUrl);
         }
     });
 }

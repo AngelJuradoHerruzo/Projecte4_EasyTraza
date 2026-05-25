@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Formulari Usuari - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Full d'estils global del projecte -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-
-    <!-- Llibreria d'icones Bootstrap Icons -->
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/usuaris.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -21,167 +20,271 @@
 
     <main class="main">
 
-        <!----------------------- CAPÇALERA DE LA PÀGINA ----------------------->
+        <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
+                <p class="page-eyebrow">Administració · Usuaris</p>
 
-                <!-- Secció actual -->
-                <p class="page-eyebrow">Administració</p>
-
-                <!-- Títol dinàmic segons si es crea o s'edita -->
                 <h1 class="page-heading"
                     th:text="${usuari.id != null} ? 'Editar usuari' : 'Nou usuari'">
-                    Formulari
+                    Formulari usuari
                 </h1>
 
-                <!-- Descripció de la pantalla -->
                 <p class="page-description">
-                    Introdueix o modifica les dades de l'usuari.
+                    Gestiona les dades personals, el rol d'accés i la foto identificativa de l'usuari.
                 </p>
             </div>
 
-            <!-- Botó per tornar al llistat -->
             <div class="page-top-actions">
-                <a th:href="@{/usuaris/list}" class="btn btn-primary">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Tornar</span>
+                <a th:href="@{/usuaris/list}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span>Tornar al llistat</span>
                 </a>
             </div>
         </section>
 
-        <!----------------------- CONTENIDOR PRINCIPAL DEL FORMULARI ----------------------->
-        <section class="content-card">
+        <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
+        <section class="user-form-panel">
 
-            <!----------------------- TOOLBAR SUPERIOR ----------------------->
-            <div class="content-toolbar">
+            <!----------------------- PRESENTACIÓ FORMULARI ----------------------->
+            <div class="user-form-intro">
 
-                <!-- Informació del formulari -->
-                <div class="toolbar-block">
-                    <h2 class="content-title">Dades de l'usuari</h2>
-                    <p class="content-subtitle">
-                        Completa els camps següents.
+                <div class="user-form-icon">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
+                </div>
+
+                <div>
+                    <h2 class="section-title">Dades de l'usuari</h2>
+
+                    <p class="section-subtitle">
+                        Tots els usuaris han de disposar d'una foto o avatar identificatiu.
                     </p>
                 </div>
 
-                <!-- Missatge d'error retornat pel backend -->
-                <div th:if="${error}" class="form-error">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <span th:text="${error}"></span>
-                </div>
+                <span th:if="${usuari.id != null}"
+                      class="user-edit-badge"
+                      th:text="|ID #${usuari.id}|">
+                    ID #1
+                </span>
+
+            </div>
+
+            <!----------------------- MISSATGE D'ERROR ----------------------->
+            <div th:if="${error}" class="alert alert-error user-form-alert" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                <span th:text="${error}"></span>
             </div>
 
             <!----------------------- COS DEL FORMULARI ----------------------->
-            <div style="padding: 20px 24px;">
+            <form id="usuariForm"
+                  class="user-form"
+                  th:action="${usuari.id != null} ? @{/usuaris/update/{id}(id=${usuari.id})} : @{/usuaris/save}"
+                  th:object="${usuari}"
+                  method="post"
+                  enctype="multipart/form-data">
 
-                <!-- Formulari de creació o modificació d'usuari -->
-                <form id="usuariForm"
-                      th:action="${usuari.id != null} ? @{/usuaris/update/{id}(id=${usuari.id})} : @{/usuaris/save}"
-                      th:object="${usuari}"
-                      method="post">
+                <!----------------------- AVATAR ----------------------->
+                <section class="avatar-upload-panel">
 
-                    <!-- Graella de camps del formulari -->
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div class="avatar-preview" id="avatarPreview">
 
-                        <!----------------------- CAMP DNI ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="dni">DNI *</label>
+                        <img id="avatarPreviewImage"
+                             th:if="${usuari.avatar != null}"
+                             th:src="@{/usuaris/avatar/{id}(id=${usuari.id})}"
+                             alt="Vista prèvia de l'avatar">
+
+                        <i id="avatarPreviewIcon"
+                           th:unless="${usuari.avatar != null}"
+                           class="bi bi-person-fill"
+                           aria-hidden="true"></i>
+
+                    </div>
+
+                    <div class="avatar-upload-content">
+
+                        <div class="form-label-row">
+                            <label class="form-label" for="avatarFile">
+                                Foto o avatar
+                                <span class="required-mark">*</span>
+                            </label>
+
+                            <span th:if="${usuari.id != null && usuari.avatar != null}"
+                                  class="avatar-current-badge">
+                                Avatar actual guardat
+                            </span>
+                        </div>
+
+                        <input id="avatarFile"
+                               name="avatarFile"
+                               type="file"
+                               class="form-input avatar-input"
+                               accept="image/png,image/jpeg,image/webp"
+                               th:required="${usuari.id == null || usuari.avatar == null}">
+
+                        <p class="form-help">
+                            Imatge JPG, PNG o WEBP. Màxim 5 MB.
+                            <span th:if="${usuari.id != null && usuari.avatar != null}">
+                                Si no selecciones cap imatge nova, es conservarà l'actual.
+                            </span>
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <!----------------------- CAMPS DEL FORMULARI ----------------------->
+                <div class="user-form-grid">
+
+                    <!----------------------- DNI ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="dni">
+                            DNI
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-person-vcard form-input-icon" aria-hidden="true"></i>
+
                             <input id="dni"
                                    type="text"
                                    th:field="*{dni}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
                                    th:classappend="${usuari.id != null} ? ' input-readonly' : ''"
                                    required
                                    minlength="9"
                                    maxlength="9"
                                    pattern="^[0-9]{8}[A-Za-z]$"
+                                   autocomplete="off"
+                                   placeholder="12345678A"
                                    title="Introdueix un DNI vàlid amb format 12345678A"
                                    th:readonly="${usuari.id != null}">
                         </div>
 
-                        <!----------------------- CAMP NOM COMPLET ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="nomComplet">Nom complet *</label>
+                        <p class="form-help" th:if="${usuari.id != null}">
+                            El DNI no es pot modificar després de crear l'usuari.
+                        </p>
+                    </div>
+
+                    <!----------------------- NOM COMPLET ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="nomComplet">
+                            Nom complet
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-person form-input-icon" aria-hidden="true"></i>
+
                             <input id="nomComplet"
                                    type="text"
                                    th:field="*{nomComplet}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
                                    required
                                    minlength="3"
                                    maxlength="100"
                                    pattern="^[A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)+$"
+                                   autocomplete="off"
+                                   placeholder="Nom i cognoms"
                                    title="Introdueix nom i cognoms, només amb lletres">
                         </div>
+                    </div>
 
-                        <!----------------------- CAMP CORREU ELECTRÒNIC ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="email">Correu electrònic *</label>
+                    <!----------------------- CORREU ELECTRÒNIC ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="email">
+                            Correu electrònic
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-envelope form-input-icon" aria-hidden="true"></i>
+
                             <input id="email"
                                    type="email"
                                    th:field="*{email}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
                                    required
                                    maxlength="100"
-                                   pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                                   autocomplete="off"
+                                   placeholder="usuari@easytraza.cat"
                                    title="Introdueix un correu electrònic vàlid">
                         </div>
+                    </div>
 
-                        <!----------------------- CAMP ROL ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="rolUsuari">Rol *</label>
+                    <!----------------------- ROL ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="rolUsuari">
+                            Rol
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-shield-check form-input-icon" aria-hidden="true"></i>
+
                             <select id="rolUsuari"
                                     th:field="*{rolUsuari}"
-                                    class="form-select"
+                                    class="form-select form-select-with-icon"
                                     required>
                                 <option value="">-- Selecciona rol --</option>
                                 <option value="ADMIN">ADMIN</option>
                                 <option value="OPERARI">OPERARI</option>
                             </select>
                         </div>
+                    </div>
 
-                        <!----------------------- CAMP CONTRASENYA ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="password">
-                                Contrasenya <span th:if="${usuari.id == null}">*</span>
-                            </label>
+                    <!----------------------- CONTRASENYA ----------------------->
+                    <div class="form-group user-form-field-full">
+                        <label class="form-label" for="password">
+                            Contrasenya
+                            <span th:if="${usuari.id == null}" class="required-mark">*</span>
+                        </label>
 
-                            <!-- Camp de contrasenya amb botó per mostrar o ocultar -->
-                            <div class="password-wrapper">
-                                <input id="password"
-                                       name="password"
-                                       type="password"
-                                       class="form-input password-input"
-                                       th:required="${usuari.id == null}"
-                                       minlength="6"
-                                       maxlength="100"
-                                       placeholder="Deixar en blanc per no modificar">
+                        <div class="password-wrapper">
+                            <i class="bi bi-lock form-input-icon" aria-hidden="true"></i>
 
-                                <button type="button" class="toggle-password" id="togglePassword">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
+                            <input id="password"
+                                   name="password"
+                                   type="password"
+                                   class="form-input form-input-with-icon password-input"
+                                   th:required="${usuari.id == null}"
+                                   minlength="6"
+                                   maxlength="100"
+                                   autocomplete="new-password"
+                                   th:placeholder="${usuari.id != null} ? 'Deixar en blanc per mantenir la contrasenya actual' : 'Mínim 6 caràcters'">
+
+                            <button type="button"
+                                    class="toggle-password"
+                                    id="togglePassword"
+                                    aria-label="Mostrar o ocultar la contrasenya">
+                                <i class="bi bi-eye" aria-hidden="true"></i>
+                            </button>
                         </div>
 
+                        <p class="form-help" th:if="${usuari.id != null}">
+                            Deixa aquest camp en blanc si no vols modificar la contrasenya.
+                        </p>
                     </div>
 
-                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
-                    <div style="margin-top:25px; display:flex; gap:10px;">
+                </div>
 
-                        <!-- Botó per guardar l'usuari -->
-                        <button type="submit" class="btn btn-soft">
-                            <i class="bi bi-save"></i>
-                            <span>Guardar</span>
-                        </button>
+                <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                <div class="user-form-actions">
 
-                        <!-- Botó per cancel·lar i tornar al llistat -->
-                        <a th:href="@{/usuaris/list}" class="btn btn-secondary">
-                            Cancel·lar
-                        </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        <span th:text="${usuari.id != null} ? 'Guardar canvis' : 'Crear usuari'">
+                            Guardar
+                        </span>
+                    </button>
 
-                    </div>
+                    <a th:href="@{/usuaris/list}" class="btn btn-secondary">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        <span>Cancel·lar</span>
+                    </a>
 
-                </form>
+                </div>
 
-            </div>
+            </form>
 
         </section>
 
