@@ -32,6 +32,7 @@ public class TracabilitatWebController {
                                       @RequestParam(required = false) String sortField,
                                       @RequestParam(required = false) String sortDir,
                                       @RequestParam(required = false) Long producteGraficId,
+                                      @RequestParam(required = false) String mesGrafic,
                                       Model model) {
         try {
             model.addAllAttributes(tracabilitatService.getModelTracabilitat(
@@ -44,7 +45,8 @@ public class TracabilitatWebController {
                     buscar,
                     sortField,
                     sortDir,
-                    producteGraficId
+                    producteGraficId,
+                    mesGrafic
             ));
 
             return "tracabilitat/llistatPerLot";
@@ -62,7 +64,8 @@ public class TracabilitatWebController {
                     buscar,
                     sortField,
                     sortDir,
-                    producteGraficId
+                    producteGraficId,
+                    mesGrafic
             ));
 
             return "tracabilitat/llistatPerLot";

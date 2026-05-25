@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/tracabilitat.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -402,19 +403,21 @@
         </section>
 
         <!----------------------- GRÀFIC MENSUAL DE PRODUCTES ----------------------->
-        <section class="content-card" style="margin-top:20px;">
+        <section class="content-card monthly-chart-panel">
 
-            <div class="content-toolbar" style="display:block;">
-                <div class="toolbar-block" style="margin-bottom:16px;">
+            <div class="content-toolbar monthly-chart-toolbar">
+                <div class="toolbar-block monthly-chart-toolbar-heading">
                     <h2 class="content-title">Gràfic mensual de productes</h2>
                     <p class="content-subtitle">
-                        Evolució mensual de la producció total per producte.
+                        Evolució diària de les unitats venudes en albarans lliurats durant el mes seleccionat.
                     </p>
                 </div>
 
-                <form th:action="@{/tracabilitat/list}"
+                <form id="graficFiltresForm"
+                      class="monthly-chart-filters"
+                      th:action="@{/tracabilitat/list}"
                       method="get"
-                      style="display:flex; align-items:center; gap:10px; flex-wrap:nowrap; width:100%;">
+                      >
 
                     <input type="hidden" name="buscar" th:value="${buscar}">
                     <input type="hidden" name="materiaId" th:value="${materiaId}">
@@ -426,22 +429,52 @@
                     <input type="hidden" name="sortDir" th:value="${sortDir}">
                     <input type="hidden" name="lotId" th:value="${lotId}">
 
-                    <div class="search-field" style="flex:1; min-width:220px;">
-                        <i class="bi bi-box-seam"></i>
-                        <select name="producteGraficId"
-                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
-                            <option value="">Tots els productes</option>
-                            <option th:each="producte : ${productesGrafic}"
-                                    th:value="${producte.id}"
-                                    th:selected="${producteGraficId != null && producteGraficId == producte.id}"
-                                    th:text="${producte.nomProducte}">
-                                Producte
-                            </option>
-                        </select>
+                    <div class="monthly-chart-filter monthly-chart-filter-month">
+                        <label for="mesGrafic" class="form-label monthly-chart-label">Mes</label>
+
+                        <div class="search-field monthly-chart-field">
+                            <i class="bi bi-calendar3"></i>
+
+                            <select id="mesGrafic"
+                                    name="mesGrafic"
+                                    onchange="this.form.submit()"
+                                    class="monthly-chart-select">
+                                <option th:each="mes : ${mesosGrafic}"
+                                        th:value="${mes}"
+                                        th:selected="${mes.toString() == mesGrafic}"
+                                        th:text="${#temporals.format(mes.atDay(1), 'MM/yyyy')}">
+                                    05/2026
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="height:46px; min-width:46px; padding:0 16px; flex-shrink:0;">
-                        <i class="bi bi-bar-chart"></i>
+                    <div class="monthly-chart-filter monthly-chart-filter-product">
+                        <label for="producteGraficId" class="form-label monthly-chart-label">Producte</label>
+
+                        <div class="search-field monthly-chart-field">
+                            <i class="bi bi-box-seam"></i>
+
+                            <select id="producteGraficId"
+                                    name="producteGraficId"
+                                    onchange="this.form.submit()"
+                                    class="monthly-chart-select">
+                                <option value="">Tots els productes</option>
+                                <option th:each="producte : ${productesGrafic}"
+                                        th:value="${producte.id}"
+                                        th:selected="${producteGraficId != null && producteGraficId == producte.id}"
+                                        th:text="${producte.nomProducte}">
+                                    Producte
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                            aria-label="Actualitzar el gràfic de vendes"
+                            class="btn btn-primary monthly-chart-button">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Actualitzar</span>
                     </button>
 
                     <a th:href="@{/tracabilitat/list(
@@ -455,27 +488,53 @@
                             sortDir=${sortDir},
                             lotId=${lotId}
                        )}"
-                       class="btn btn-secondary"
-                       style="height:46px; padding:0 16px; flex-shrink:0;">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Tots</span>
+                       class="btn btn-secondary monthly-chart-button">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span>Netejar</span>
                     </a>
 
                 </form>
             </div>
 
-            <!----------------------- GRÀFIC ----------------------->
-            <div th:if="${graficTeDades}" style="height:380px; padding:10px 0;">
+            <!----------------------- RESUM DEL MES ----------------------->
+            <div class="monthly-chart-summary">
+
+                <div class="monthly-chart-summary-total">
+                    <p class="monthly-chart-summary-label">
+                        Total d'unitats venudes
+                    </p>
+
+                    <p class="monthly-chart-total"
+                       th:text="${totalMensual}">
+                        0
+                    </p>
+                </div>
+
+                <div class="monthly-chart-summary-selection">
+                    <p class="monthly-chart-summary-label">
+                        Selecció actual
+                    </p>
+
+                    <p class="monthly-chart-current-selection"
+                       th:text="|${graficLabelSerie} · ${mesGraficText}|">
+                        Tots els productes · 05/2026
+                    </p>
+                </div>
+
+            </div>
+
+            <!----------------------- GRÀFIC DIARI ----------------------->
+            <div class="monthly-chart-canvas-container">
                 <canvas id="graficProductesMensual"
-                        th:attr="data-labels=${graficLabelsJson}, data-datasets=${graficDatasetsJson}">
+                        th:attr="data-labels=${graficLabelsJson}, data-dades=${graficDadesJson}, data-serie=${graficLabelSerie}">
                 </canvas>
             </div>
 
-            <!----------------------- SENSE DADES GRÀFIC ----------------------->
-            <div th:if="${!graficTeDades}" class="empty-state">
+            <!----------------------- SENSE VENDES AL MES ----------------------->
+            <div th:if="${!graficTeDades}" class="empty-state monthly-chart-empty">
                 <div class="empty-box" style="justify-content:center; width:100%;">
-                    <i class="bi bi-bar-chart"></i>
-                    <p>No hi ha producció registrada per generar el gràfic mensual.</p>
+                    <i class="bi bi-info-circle"></i>
+                    <p>No hi ha vendes lliurades per a la selecció actual.</p>
                 </div>
             </div>
 
@@ -485,11 +544,9 @@
 
 </div>
 
-<script th:if="${graficTeDades}"
-        src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script th:if="${graficTeDades}"
-        th:src="@{/js/graficProductesMensual.js}"></script>
+<script th:src="@{/js/graficProductesMensual.js}"></script>
 
 </body>
 </html>
