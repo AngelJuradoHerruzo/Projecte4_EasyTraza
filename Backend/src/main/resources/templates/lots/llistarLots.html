@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Lots - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/lots.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -13,6 +15,7 @@
 
 <div class="app-layout">
 
+    <!-- SIDEBAR -->
     <div th:replace="~{layout/sidebar :: sidebar('lots')}"></div>
 
     <main class="main">
@@ -29,31 +32,43 @@
         </section>
 
         <!----------------------- ERROR ----------------------->
-        <div th:if="${error}" class="form-error lot-error">
-            <i class="bi bi-exclamation-triangle"></i>
+        <div th:if="${error}" class="alert alert-error lot-error" role="alert">
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
             <span th:text="${error}">Error</span>
         </div>
 
         <!----------------------- CONTENIDOR ----------------------->
-        <section class="content-card">
+        <section class="lots-panel">
 
             <!----------------------- TOOLBAR ----------------------->
-            <div class="content-toolbar">
-                <div class="toolbar-block">
-                    <h2 class="content-title">Llistat de lots</h2>
-                    <p class="content-subtitle">
-                        Filtra per matèries, id de lot o dates.
+            <div class="lots-toolbar">
+                <div class="lots-toolbar-info">
+                    <div class="lots-title-row">
+                        <h2 class="section-title">Llistat de lots</h2>
+
+                        <span class="lots-counter"
+                              th:text="|${#lists.size(lots)} lots|">
+                            0 lots
+                        </span>
+                    </div>
+
+                    <p class="section-subtitle">
+                        Filtra per matèria primera, identificador o dates del lot.
                     </p>
                 </div>
 
                 <form th:action="@{/lots/list}"
                       method="get"
-                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                      class="lots-filter">
 
-                    <div class="search-field" style="width:260px;">
-                        <i class="bi bi-flower1"></i>
-                        <select name="materiaId"
-                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
+                    <label for="materiaId" class="sr-only">
+                        Filtrar per matèria primera
+                    </label>
+
+                    <div class="search-field search-field-materia">
+                        <i class="bi bi-flower1" aria-hidden="true"></i>
+
+                        <select id="materiaId" name="materiaId">
                             <option value="">Totes les matèries</option>
                             <option th:each="materia : ${materiesPrimeres}"
                                     th:value="${materia.id}"
@@ -64,34 +79,72 @@
                         </select>
                     </div>
 
-                    <div class="search-field" style="width:220px;">
-                        <i class="bi bi-upc-scan"></i>
-                        <input name="identificadorLot" type="text" th:value="${identificadorLot}" placeholder="Identificador lot...">
+                    <label for="identificadorLot" class="sr-only">
+                        Filtrar per identificador de lot
+                    </label>
+
+                    <div class="search-field search-field-lot">
+                        <i class="bi bi-upc-scan" aria-hidden="true"></i>
+
+                        <input id="identificadorLot"
+                               name="identificadorLot"
+                               type="text"
+                               th:value="${identificadorLot}"
+                               placeholder="Identificador lot...">
                     </div>
 
-                    <div class="search-field" style="width:185px;">
-                        <i class="bi bi-calendar-event"></i>
-                        <input name="dataCaducitat" type="date" th:value="${dataCaducitat}">
+                    <label for="dataCaducitat" class="sr-only">
+                        Filtrar per data de caducitat
+                    </label>
+
+                    <div class="search-field search-field-date">
+                        <i class="bi bi-calendar-event" aria-hidden="true"></i>
+
+                        <input id="dataCaducitat"
+                               name="dataCaducitat"
+                               type="date"
+                               th:value="${dataCaducitat}">
                     </div>
 
-                    <div class="search-field" style="width:185px;">
-                        <i class="bi bi-calendar-plus"></i>
-                        <input name="dataObertura" type="date" th:value="${dataObertura}">
+                    <label for="dataObertura" class="sr-only">
+                        Filtrar per data d'obertura
+                    </label>
+
+                    <div class="search-field search-field-date">
+                        <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+
+                        <input id="dataObertura"
+                               name="dataObertura"
+                               type="date"
+                               th:value="${dataObertura}">
                     </div>
 
-                    <div class="search-field" style="width:185px;">
-                        <i class="bi bi-calendar-check"></i>
-                        <input name="dataAcabament" type="date" th:value="${dataAcabament}">
+                    <label for="dataAcabament" class="sr-only">
+                        Filtrar per data d'acabament
+                    </label>
+
+                    <div class="search-field search-field-date">
+                        <i class="bi bi-calendar-check" aria-hidden="true"></i>
+
+                        <input id="dataAcabament"
+                               name="dataAcabament"
+                               type="date"
+                               th:value="${dataAcabament}">
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-arrow-right"></i>
+                    <button type="submit"
+                            class="btn btn-primary btn-icon"
+                            aria-label="Aplicar filtres de lots">
+                        <i class="bi bi-search" aria-hidden="true"></i>
                     </button>
 
-                    <a th:href="@{/lots/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Neteja</span>
+                    <a th:href="@{/lots/list}"
+                       class="btn btn-secondary"
+                       aria-label="Netejar filtres de lots">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span>Netejar</span>
                     </a>
+
                 </form>
             </div>
 
@@ -105,17 +158,26 @@
 
                     <!----------------------- TÍTOL GRUP ----------------------->
                     <div class="lot-group-header">
-                        <div>
+                        <div class="lot-group-icon">
+                            <i class="bi bi-flower1" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="lot-group-title">
                             <h3 th:text="${materia.nomMateria}">Harina Blanca</h3>
                             <p th:text="${materia.descripcio != null && !#strings.isEmpty(materia.descripcio) ? materia.descripcio : 'Sense descripció'}">
                                 Descripció
                             </p>
                         </div>
+
+                        <span class="lot-group-counter"
+                              th:text="|${#lists.size(lotsMateria)} lots|">
+                            0 lots
+                        </span>
                     </div>
 
                     <!----------------------- TAULA GRUP ----------------------->
                     <div class="table-container">
-                        <table class="data-table lots-table lot-group-table">
+                        <table class="lots-table lot-group-table">
 
                             <colgroup>
                                 <col class="col-id">
@@ -160,17 +222,17 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <span class="badge-role operari"
+                                    <span class="lot-badge lot-badge-estoc"
                                           th:if="${lot.estat.name() == 'EN_ESTOC'}">
                                         EN ESTOC
                                     </span>
 
-                                    <span class="badge-role admin"
+                                    <span class="lot-badge lot-badge-obert"
                                           th:if="${lot.estat.name() == 'OBERT'}">
                                         OBERT
                                     </span>
 
-                                    <span class="badge-role lot-badge-acabat"
+                                    <span class="lot-badge lot-badge-acabat"
                                           th:if="${lot.estat.name() == 'ACABAT'}">
                                         ACABAT
                                     </span>
@@ -196,7 +258,7 @@
 
                                         <a th:href="@{/lots/detail/{id}(id=${lot.id})}"
                                            class="lot-action-btn lot-action-view">
-                                            <i class="bi bi-eye"></i>
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
                                             <span>Consultar</span>
                                         </a>
 
@@ -208,7 +270,7 @@
                                                          data-message='Segur que vols iniciar aquest lot?',
                                                          data-button='Iniciar',
                                                          data-icon='bi-play-fill'">
-                                            <i class="bi bi-play-fill"></i>
+                                            <i class="bi bi-play-fill" aria-hidden="true"></i>
                                             <span>Iniciar</span>
                                         </button>
 
@@ -220,7 +282,7 @@
                                                          data-message='Segur que vols finalitzar aquest lot?',
                                                          data-button='Finalitzar',
                                                          data-icon='bi-stop-fill'">
-                                            <i class="bi bi-stop-fill"></i>
+                                            <i class="bi bi-stop-fill" aria-hidden="true"></i>
                                             <span>Finalitzar</span>
                                         </button>
 
@@ -235,11 +297,22 @@
 
                 </section>
 
-                <div th:if="${#lists.isEmpty(lots)}" class="empty-state" style="grid-column: 1 / -1;">
-                    <div class="empty-box">
-                        <i class="bi bi-archive"></i>
-                        <p>No hi ha lots que coincideixin amb els filtres.</p>
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(lots)}" class="lots-empty-state">
+                    <div class="lots-empty-icon">
+                        <i class="bi bi-archive" aria-hidden="true"></i>
                     </div>
+
+                    <h3>No s'han trobat lots</h3>
+
+                    <p>
+                        No hi ha lots que coincideixin amb els filtres seleccionats.
+                    </p>
+
+                    <a th:href="@{/lots/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span>Veure tots els lots</span>
+                    </a>
                 </div>
 
             </div>
@@ -256,7 +329,7 @@
 
         <div class="lot-modal-header">
             <div class="lot-modal-icon">
-                <i id="modalIcon" class="bi bi-exclamation-circle"></i>
+                <i id="modalIcon" class="bi bi-exclamation-circle" aria-hidden="true"></i>
             </div>
 
             <div>
@@ -268,12 +341,12 @@
         <form id="modalForm" method="post">
             <div class="lot-modal-actions">
                 <button type="button" id="modalCancel" class="btn btn-secondary">
-                    <i class="bi bi-x-lg"></i>
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
                     <span>Cancel·lar</span>
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    <i id="modalSubmitIcon" class="bi bi-check-lg"></i>
+                    <i id="modalSubmitIcon" class="bi bi-check-lg" aria-hidden="true"></i>
                     <span id="modalSubmitText">Confirmar</span>
                 </button>
             </div>

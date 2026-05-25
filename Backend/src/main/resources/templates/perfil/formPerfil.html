@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Editar perfil - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Full d'estils global del projecte -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-
-    <!-- Llibreria d'icones Bootstrap Icons -->
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/perfil.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -21,130 +20,253 @@
 
     <main class="main">
 
-        <!----------------------- CAPÇALERA DE LA PÀGINA ----------------------->
+        <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-
-                <p class="page-eyebrow">Perfil</p>
+                <p class="page-eyebrow">Compte · El meu perfil</p>
 
                 <h1 class="page-heading">Editar perfil</h1>
 
                 <p class="page-description">
-                    Modifica les dades associades al teu usuari.
+                    Modifica les dades personals i la foto identificativa del teu usuari.
                 </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/perfil}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span>Tornar al perfil</span>
+                </a>
             </div>
         </section>
 
-        <!----------------------- CONTENIDOR PRINCIPAL DEL FORMULARI ----------------------->
-        <section class="content-card">
+        <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
+        <section class="profile-form-panel">
 
-            <!----------------------- TOOLBAR SUPERIOR ----------------------->
-            <div class="content-toolbar">
+            <!----------------------- PRESENTACIÓ FORMULARI ----------------------->
+            <div class="profile-form-intro">
 
-                <div class="toolbar-block">
-                    <h2 class="content-title">Dades personals</h2>
-                    <p class="content-subtitle">
-                        Actualitza la informació del teu perfil.
+                <div class="profile-form-icon">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
+                </div>
+
+                <div class="profile-form-intro-text">
+                    <h2 class="section-title">Dades del perfil</h2>
+
+                    <p class="section-subtitle">
+                        Actualitza la informació visible del teu compte i la teva foto o avatar.
                     </p>
                 </div>
 
-                <div th:if="${error}" class="form-error">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <span th:text="${error}"></span>
-                </div>
+                <span class="profile-edit-badge"
+                      th:text="|ID #${usuari.id}|">
+                    ID #1
+                </span>
 
-                <a th:href="@{/perfil}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Tornar</span>
-                </a>
+            </div>
+
+            <!----------------------- MISSATGE D'ERROR ----------------------->
+            <div th:if="${error}" class="alert alert-error profile-form-alert" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                <span th:text="${error}"></span>
             </div>
 
             <!----------------------- COS DEL FORMULARI ----------------------->
-            <div style="padding: 20px 24px;">
+            <form id="perfilForm"
+                  class="profile-form"
+                  th:action="@{/perfil/update}"
+                  th:object="${usuari}"
+                  method="post"
+                  enctype="multipart/form-data">
 
-                <form th:action="@{/perfil/update}"
-                      th:object="${usuari}"
-                      method="post">
+                <!----------------------- AVATAR ----------------------->
+                <section class="avatar-upload-panel">
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div class="avatar-preview" id="avatarPreview">
 
-                        <!----------------------- CAMP DNI ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="dni">DNI *</label>
+                        <img id="avatarPreviewImage"
+                             th:if="${usuari.avatar != null}"
+                             th:src="@{/perfil/avatar}"
+                             alt="Vista prèvia de l'avatar">
+
+                        <i id="avatarPreviewIcon"
+                           th:unless="${usuari.avatar != null}"
+                           class="bi bi-person-fill"
+                           aria-hidden="true"></i>
+
+                    </div>
+
+                    <div class="avatar-upload-content">
+
+                        <div class="form-label-row">
+                            <label class="form-label" for="avatarFile">
+                                Foto o avatar
+                                <span class="required-mark">*</span>
+                            </label>
+
+                            <span th:if="${usuari.avatar != null}"
+                                  class="avatar-current-badge">
+                                Avatar actual guardat
+                            </span>
+                        </div>
+
+                        <input id="avatarFile"
+                               name="avatarFile"
+                               type="file"
+                               class="form-input avatar-input"
+                               accept="image/png,image/jpeg,image/webp"
+                               th:required="${usuari.avatar == null}">
+
+                        <p class="form-help">
+                            Imatge JPG, PNG o WEBP. Màxim 5 MB.
+                            <span th:if="${usuari.avatar != null}">
+                                Si no selecciones cap imatge nova, es conservarà l'actual.
+                            </span>
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <!----------------------- CAMPS DEL FORMULARI ----------------------->
+                <div class="profile-form-grid">
+
+                    <!----------------------- DNI ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="dni">
+                            DNI
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-person-vcard form-input-icon" aria-hidden="true"></i>
+
                             <input id="dni"
                                    type="text"
                                    th:field="*{dni}"
-                                   class="form-input input-readonly"
+                                   class="form-input form-input-with-icon input-readonly"
                                    readonly>
                         </div>
 
-                        <!----------------------- CAMP NOM COMPLET ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="nomComplet">Nom complet *</label>
-                            <input id="nomComplet"
-                                   type="text"
-                                   th:field="*{nomComplet}"
-                                   class="form-input">
-                        </div>
+                        <p class="form-help">
+                            El DNI no es pot modificar des del perfil.
+                        </p>
+                    </div>
 
-                        <!----------------------- CAMP CORREU ELECTRÒNIC ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="email">Correu electrònic *</label>
-                            <input id="email"
-                                   type="text"
-                                   th:field="*{email}"
-                                   class="form-input">
-                        </div>
+                    <!----------------------- ROL ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="rolUsuari">
+                            Rol
+                        </label>
 
-                        <!----------------------- CAMP ROL ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="rolUsuari">Rol</label>
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-shield-check form-input-icon" aria-hidden="true"></i>
+
                             <input id="rolUsuari"
                                    type="text"
                                    th:value="${usuari.rolUsuari}"
-                                   class="form-input input-readonly"
+                                   class="form-input form-input-with-icon input-readonly"
                                    readonly>
                         </div>
 
-                        <!----------------------- CAMP CONTRASENYA ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="password">Contrasenya</label>
+                        <p class="form-help">
+                            El rol només es pot gestionar des de l'administració d'usuaris.
+                        </p>
+                    </div>
 
-                            <div class="password-wrapper">
-                                <input id="password"
-                                       name="password"
-                                       type="password"
-                                       class="form-input password-input"
-                                       placeholder="Deixar en blanc per no modificar">
+                    <!----------------------- NOM COMPLET ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="nomComplet">
+                            Nom complet
+                            <span class="required-mark">*</span>
+                        </label>
 
-                                <button type="button"
-                                        class="toggle-password"
-                                        id="togglePassword"
-                                        aria-label="Mostrar o amagar contrasenya">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-person form-input-icon" aria-hidden="true"></i>
+
+                            <input id="nomComplet"
+                                   type="text"
+                                   th:field="*{nomComplet}"
+                                   class="form-input form-input-with-icon"
+                                   required
+                                   minlength="3"
+                                   maxlength="100"
+                                   autocomplete="name"
+                                   placeholder="Nom i cognoms"
+                                   title="Introdueix el nom complet de l'usuari">
+                        </div>
+                    </div>
+
+                    <!----------------------- CORREU ELECTRÒNIC ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="email">
+                            Correu electrònic
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-envelope form-input-icon" aria-hidden="true"></i>
+
+                            <input id="email"
+                                   type="email"
+                                   th:field="*{email}"
+                                   class="form-input form-input-with-icon"
+                                   required
+                                   maxlength="100"
+                                   autocomplete="email"
+                                   placeholder="usuari@easytraza.cat"
+                                   title="Introdueix un correu electrònic vàlid">
+                        </div>
+                    </div>
+
+                    <!----------------------- CONTRASENYA ----------------------->
+                    <div class="form-group profile-form-field-full">
+                        <label class="form-label" for="password">
+                            Nova contrasenya
+                        </label>
+
+                        <div class="password-wrapper">
+                            <i class="bi bi-lock form-input-icon" aria-hidden="true"></i>
+
+                            <input id="password"
+                                   name="password"
+                                   type="password"
+                                   class="form-input form-input-with-icon password-input"
+                                   minlength="6"
+                                   maxlength="100"
+                                   autocomplete="new-password"
+                                   placeholder="Deixar en blanc per mantenir la contrasenya actual">
+
+                            <button type="button"
+                                    class="toggle-password"
+                                    id="togglePassword"
+                                    aria-label="Mostrar la contrasenya">
+                                <i class="bi bi-eye" aria-hidden="true"></i>
+                            </button>
                         </div>
 
+                        <p class="form-help">
+                            Deixa aquest camp en blanc si no vols modificar la contrasenya.
+                        </p>
                     </div>
 
-                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
-                    <div style="margin-top:25px; display:flex; gap:10px;">
+                </div>
 
-                        <button type="submit" class="btn btn-soft">
-                            <i class="bi bi-save"></i>
-                            <span>Guardar canvis</span>
-                        </button>
+                <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                <div class="profile-form-actions">
 
-                        <a th:href="@{/perfil}" class="btn btn-secondary">
-                            <span>Cancel·lar</span>
-                        </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        <span>Guardar canvis</span>
+                    </button>
 
-                    </div>
+                    <a th:href="@{/perfil}" class="btn btn-secondary">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        <span>Cancel·lar</span>
+                    </a>
 
-                </form>
+                </div>
 
-            </div>
+            </form>
 
         </section>
 
@@ -152,8 +274,8 @@
 
 </div>
 
-<!----------------------- SCRIPT DEL PERFIL ----------------------->
-<script th:src="@{/js/login.js}"></script>
+<!----------------------- SCRIPT DEL MÒDUL DE PERFIL ----------------------->
+<script th:src="@{/js/perfil.js}"></script>
 
 </body>
 </html>

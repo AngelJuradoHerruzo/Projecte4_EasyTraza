@@ -9,8 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,6 +20,7 @@ import cat.copernic.easytraza.entities.LotProveidor;
 import cat.copernic.easytraza.entities.MateriaPrimera;
 import cat.copernic.easytraza.entities.Producte;
 import cat.copernic.easytraza.entities.Proveidor;
+import cat.copernic.easytraza.enums.EstatAlbaraClient;
 import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.AlbaraClientRepository;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
@@ -63,7 +62,8 @@ public class TracabilitatService {
                                                     Boolean buscar,
                                                     String sortField,
                                                     String sortDir,
-                                                    Long producteGraficId) {
+                                                    Long producteGraficId,
+                                                    String mesGrafic) {
 
         Map<String, Object> model = new LinkedHashMap<>();
 
@@ -108,7 +108,7 @@ public class TracabilitatService {
         model.put("lotSeleccionat", getLotById(lotId));
         model.put("liniesProduccio", getProduccioPerLot(lotId));
 
-        carregarModelGraficMensual(model, producteGraficId);
+        carregarModelGraficMensual(model, producteGraficId, mesGrafic);
 
         return model;
     }
@@ -223,36 +223,103 @@ public class TracabilitatService {
     }
 
 
-    // CARREGAR DADES DEL GRÀFIC MENSUAL DE PRODUCTES
-    private void carregarModelGraficMensual(Map<String, Object> model, Long producteGraficId) {
+    // CARREGAR DADES DEL GRÀFIC DIARI DEL MES SELECCIONAT
+    private void carregarModelGraficMensual(Map<String, Object> model,
+                                             Long producteGraficId,
+                                             String mesGrafic) {
 
-        Map<YearMonth, Map<String, Integer>> produccioMensual = getProduccioMensualProductes(producteGraficId);
-        TreeSet<String> productes = obtenirProductesGrafic(produccioMensual);
+        List<YearMonth> mesosDisponibles = getMesosDisponiblesGrafic();
+        YearMonth mesSeleccionat = obtenirMesSeleccionat(mesGrafic, mesosDisponibles);
 
-        List<String> graficLabels = obtenirLabelsMesos(produccioMensual);
-        List<Map<String, Object>> graficDatasets = obtenirDatasetsProductes(produccioMensual, productes);
+        List<String> graficLabels = obtenirLabelsDiesMes(mesSeleccionat);
+        List<Integer> graficDades = getVendesDiariesMes(mesSeleccionat, producteGraficId);
+        Integer totalMensual = graficDades.stream().mapToInt(Integer::intValue).sum();
 
-        model.put("graficLabels", graficLabels);
-        model.put("graficDatasets", graficDatasets);
+        model.put("mesosGrafic", mesosDisponibles);
+        model.put("mesGrafic", mesSeleccionat.toString());
+        model.put("mesGraficText", mesSeleccionat.format(DateTimeFormatter.ofPattern("MM/yyyy")));
+        model.put("producteGraficId", producteGraficId);
+        model.put("graficLabelSerie", obtenirLabelSerie(producteGraficId));
         model.put("graficLabelsJson", convertirLabelsAJson(graficLabels));
-        model.put("graficDatasetsJson", convertirDatasetsAJson(graficDatasets));
-        model.put("graficTeDades", !graficLabels.isEmpty() && !graficDatasets.isEmpty());
+        model.put("graficDadesJson", convertirNumerosAJson(graficDades));
+        model.put("totalMensual", totalMensual);
+        model.put("graficTeDades", totalMensual > 0);
     }
 
 
-    // OBTENIR PRODUCCIÓ MENSUAL AGRUPADA PER PRODUCTE
-    private Map<YearMonth, Map<String, Integer>> getProduccioMensualProductes(Long producteGraficId) {
+    // OBTENIR ELS ÚLTIMS DOTZE MESOS AMB VENDES LLIURADES
+    private List<YearMonth> getMesosDisponiblesGrafic() {
 
-        Map<YearMonth, Map<String, Integer>> produccioMensual = new TreeMap<>();
+        List<YearMonth> mesosDisponibles = new ArrayList<>();
         List<AlbaraClient> albaransClient = albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc();
 
         for (AlbaraClient albaraClient : albaransClient) {
 
-            if (albaraClient.getDataAlbara() == null || albaraClient.getLiniesProduccio() == null) {
+            if (albaraClient.getEstat() != EstatAlbaraClient.LLIURAT
+                    || albaraClient.getDataAlbara() == null) {
                 continue;
             }
 
             YearMonth mes = YearMonth.from(albaraClient.getDataAlbara());
+
+            if (!mesosDisponibles.contains(mes)) {
+                mesosDisponibles.add(mes);
+            }
+
+            if (mesosDisponibles.size() == 12) {
+                break;
+            }
+        }
+
+        if (mesosDisponibles.isEmpty()) {
+            mesosDisponibles.add(YearMonth.now());
+        }
+
+        return mesosDisponibles;
+    }
+
+
+    // OBTENIR EL MES SELECCIONAT O EL MÉS RECENT DISPONIBLE
+    private YearMonth obtenirMesSeleccionat(String mesGrafic, List<YearMonth> mesosDisponibles) {
+
+        if (mesGrafic != null && !mesGrafic.isBlank()) {
+            try {
+                YearMonth mesSollicitat = YearMonth.parse(mesGrafic);
+
+                if (mesosDisponibles.contains(mesSollicitat)) {
+                    return mesSollicitat;
+                }
+            }
+            catch (RuntimeException e) {
+                // Es manté el mes per defecte si el filtre rebut no és vàlid.
+            }
+        }
+
+        return mesosDisponibles.get(0);
+    }
+
+
+    // OBTENIR VENDES DIÀRIES DEL MES SELECCIONAT
+    private List<Integer> getVendesDiariesMes(YearMonth mesSeleccionat, Long producteGraficId) {
+
+        List<Integer> vendesDiaries = new ArrayList<>();
+
+        for (int dia = 0; dia < mesSeleccionat.lengthOfMonth(); dia++) {
+            vendesDiaries.add(0);
+        }
+
+        List<AlbaraClient> albaransClient = albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc();
+
+        for (AlbaraClient albaraClient : albaransClient) {
+
+            if (albaraClient.getEstat() != EstatAlbaraClient.LLIURAT
+                    || albaraClient.getDataAlbara() == null
+                    || albaraClient.getLiniesProduccio() == null
+                    || !mesSeleccionat.equals(YearMonth.from(albaraClient.getDataAlbara()))) {
+                continue;
+            }
+
+            int posicioDia = albaraClient.getDataAlbara().getDayOfMonth() - 1;
 
             for (LiniaProduccio liniaProduccio : albaraClient.getLiniesProduccio()) {
 
@@ -265,67 +332,42 @@ public class TracabilitatService {
                     continue;
                 }
 
-                String nomProducte = liniaProduccio.getProducte().getNomProducte();
-                Integer quantitat = liniaProduccio.getQuantitat();
-
-                Map<String, Integer> dadesMes = produccioMensual.computeIfAbsent(mes, key -> new TreeMap<>());
-                dadesMes.put(nomProducte, dadesMes.getOrDefault(nomProducte, 0) + quantitat);
+                Integer totalDia = vendesDiaries.get(posicioDia) + liniaProduccio.getQuantitat();
+                vendesDiaries.set(posicioDia, totalDia);
             }
         }
 
-        return produccioMensual;
+        return vendesDiaries;
     }
 
 
-    // OBTENIR PRODUCTES DEL GRÀFIC
-    private TreeSet<String> obtenirProductesGrafic(Map<YearMonth, Map<String, Integer>> produccioMensual) {
-
-        TreeSet<String> productes = new TreeSet<>();
-
-        for (Map<String, Integer> dadesMes : produccioMensual.values()) {
-            productes.addAll(dadesMes.keySet());
-        }
-
-        return productes;
-    }
-
-
-    // OBTENIR ETIQUETES DELS MESOS
-    private List<String> obtenirLabelsMesos(Map<YearMonth, Map<String, Integer>> produccioMensual) {
+    // OBTENIR ETIQUETES DELS DIES DEL MES
+    private List<String> obtenirLabelsDiesMes(YearMonth mesSeleccionat) {
 
         List<String> labels = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
 
-        for (YearMonth mes : produccioMensual.keySet()) {
-            labels.add(mes.format(formatter));
+        for (int dia = 1; dia <= mesSeleccionat.lengthOfMonth(); dia++) {
+            labels.add(String.valueOf(dia));
         }
 
         return labels;
     }
 
 
-    // OBTENIR DATASETS DELS PRODUCTES
-    private List<Map<String, Object>> obtenirDatasetsProductes(Map<YearMonth, Map<String, Integer>> produccioMensual,
-                                                               TreeSet<String> productes) {
+    // OBTENIR NOM DE LA SÈRIE MOSTRADA AL GRÀFIC
+    private String obtenirLabelSerie(Long producteGraficId) {
 
-        List<Map<String, Object>> datasets = new ArrayList<>();
-
-        for (String producte : productes) {
-
-            Map<String, Object> dataset = new LinkedHashMap<>();
-            List<Integer> dadesProducte = new ArrayList<>();
-
-            for (YearMonth mes : produccioMensual.keySet()) {
-                dadesProducte.add(produccioMensual.get(mes).getOrDefault(producte, 0));
-            }
-
-            dataset.put("label", producte);
-            dataset.put("data", dadesProducte);
-
-            datasets.add(dataset);
+        if (producteGraficId == null) {
+            return "Tots els productes";
         }
 
-        return datasets;
+        Optional<Producte> producteOpt = producteRepository.findById(producteGraficId);
+
+        if (producteOpt.isPresent() && producteOpt.get().getNomProducte() != null) {
+            return producteOpt.get().getNomProducte();
+        }
+
+        return "Producte seleccionat";
     }
 
 
@@ -341,33 +383,6 @@ public class TracabilitatService {
             }
 
             json.append("\"").append(escaparJson(labels.get(i))).append("\"");
-        }
-
-        json.append("]");
-
-        return json.toString();
-    }
-
-
-    // CONVERTIR DATASETS A JSON
-    private String convertirDatasetsAJson(List<Map<String, Object>> datasets) {
-
-        StringBuilder json = new StringBuilder("[");
-        
-        for (int i = 0; i < datasets.size(); i++) {
-
-            if (i > 0) {
-                json.append(",");
-            }
-
-            String label = (String) datasets.get(i).get("label");
-            @SuppressWarnings("unchecked")
-            List<Integer> dades = (List<Integer>) datasets.get(i).get("data");
-
-            json.append("{");
-            json.append("\"label\":\"").append(escaparJson(label)).append("\",");
-            json.append("\"data\":").append(convertirNumerosAJson(dades));
-            json.append("}");
         }
 
         json.append("]");

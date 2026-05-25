@@ -6,37 +6,27 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    const labelsProductesMensuals = JSON.parse(canvas.dataset.labels || "[]");
-    const datasetsProductesMensuals = JSON.parse(canvas.dataset.datasets || "[]");
-
-    const colorsGrafic = [
-        "#8B5E34",
-        "#C07A3F",
-        "#D9A441",
-        "#6F8F72",
-        "#7A9E9F",
-        "#6D7FA3",
-        "#9A7AA0",
-        "#B86B6B",
-        "#A68A64",
-        "#5F6F52"
-    ];
-
-    datasetsProductesMensuals.forEach((dataset, index) => {
-        const color = colorsGrafic[index % colorsGrafic.length];
-
-        dataset.backgroundColor = color;
-        dataset.borderColor = color;
-        dataset.borderWidth = 1;
-        dataset.borderRadius = 8;
-        dataset.maxBarThickness = 46;
-    });
+    const labelsDiesMes = JSON.parse(canvas.dataset.labels || "[]");
+    const dadesVendesDiaries = JSON.parse(canvas.dataset.dades || "[]");
+    const labelSerie = canvas.dataset.serie || "Tots els productes";
 
     new Chart(canvas, {
-        type: "bar",
+        type: "line",
         data: {
-            labels: labelsProductesMensuals,
-            datasets: datasetsProductesMensuals
+            labels: labelsDiesMes,
+            datasets: [{
+                label: labelSerie,
+                data: dadesVendesDiaries,
+                backgroundColor: "rgba(139, 94, 52, 0.12)",
+                borderColor: "#8B5E34",
+                borderWidth: 2,
+                pointBackgroundColor: "#8B5E34",
+                pointBorderColor: "#8B5E34",
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                tension: 0.25,
+                fill: true
+            }]
         },
         options: {
             responsive: true,
@@ -57,8 +47,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 tooltip: {
                     callbacks: {
+                        title: function (context) {
+                            return "Dia " + context[0].label;
+                        },
                         label: function (context) {
-                            return context.dataset.label + ": " + context.parsed.y;
+                            return context.dataset.label + ": " + context.parsed.y + " unitats";
                         }
                     }
                 }
@@ -66,18 +59,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
             scales: {
                 x: {
+                    title: {
+                        display: true,
+                        text: "Dia del mes"
+                    },
                     grid: {
                         display: true,
-                        color: "rgba(60, 47, 40, 0.18)",
+                        color: "rgba(60, 47, 40, 0.10)",
                         lineWidth: 1,
                         drawTicks: true
                     },
                     ticks: {
+                        autoSkip: false,
                         padding: 8
                     }
                 },
                 y: {
                     beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Unitats venudes"
+                    },
                     grid: {
                         color: "rgba(60, 47, 40, 0.10)"
                     },

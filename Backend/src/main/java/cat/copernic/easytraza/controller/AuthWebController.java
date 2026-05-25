@@ -1,9 +1,8 @@
 package cat.copernic.easytraza.controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.security.Principal;
 
 /**
  * CONTROLADOR D'AUTENTICACIÓ WEB
@@ -15,21 +14,38 @@ import java.security.Principal;
 @Controller
 public class AuthWebController {
 
-    // REDIRECCIÓ INICIAL
+    // REDIRECCIÓ INICIAL SEGONS EL ROL DE L'USUARI
     @GetMapping("/")
-    public String index() {
+    public String index(Authentication authentication) {
+
+        if (esOperari(authentication)) {
+            return "redirect:/albarans-proveidor/list";
+        }
+
         return "redirect:/productes/list";
     }
 
 
     // FORMULARI DE LOGIN
     @GetMapping("/login")
-    public String login(Principal principal) {
+    public String login(Authentication authentication) {
 
-        if (principal != null) {
-            return "redirect:/productes/list";
+        if (authentication != null && authentication.isAuthenticated()) {
+            return index(authentication);
         }
 
         return "auth/login";
+    }
+
+
+    // COMPROVAR SI L'USUARI AUTENTICAT ÉS OPERARI
+    private boolean esOperari(Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_OPERARI".equals(authority.getAuthority()));
     }
 }

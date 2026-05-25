@@ -35,6 +35,14 @@ public class Usuari {
 
     private String password;
 
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] avatar;
+
+    private String avatarTipusContingut;
+
+    private String avatarNomFitxer;
+
 
     /*********************       .CONSTRUCTORS.       *********************/
     public Usuari() { }
@@ -73,4 +81,20 @@ public class Usuari {
     // ────────── PSWD ──────────
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    // ───────── AVATAR ─────────
+    public byte[] getAvatar() { return avatar; }
+    public void setAvatar(byte[] avatar) { this.avatar = avatar; }
+
+    // ───── TIPUS CONTINGUT AVATAR ─────
+    public String getAvatarTipusContingut() { return avatarTipusContingut; }
+    public void setAvatarTipusContingut(String avatarTipusContingut) {
+        this.avatarTipusContingut = avatarTipusContingut;
+    }
+
+    // ───── NOM FITXER AVATAR ─────
+    public String getAvatarNomFitxer() { return avatarNomFitxer; }
+    public void setAvatarNomFitxer(String avatarNomFitxer) {
+        this.avatarNomFitxer = avatarNomFitxer;
+    }
 }

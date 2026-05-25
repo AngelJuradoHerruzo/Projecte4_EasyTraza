@@ -1,124 +1,81 @@
+/*********************       .ELEMENTS DEL FORMULARI.       *********************/
 const form = document.getElementById('materiaPrimeraForm');
 const nomInput = document.getElementById('nomMateria');
 const descripcioInput = document.getElementById('descripcio');
 const descripcioCounter = document.getElementById('descripcioCounter');
 
 
-// NOM: FORMAT CORRECTE (MAJÚSCULA INICIAL) I ESPAIS CONTROLATS
-nomInput.addEventListener('input', function () {
-    let value = this.value;
+/*********************       .SUPORT VISUAL DEL FORMULARI.       *********************/
+if (form) {
 
-    value = value.replace(/\s+/g, ' ').trimStart();
+    // ACTUALITZAR EL COMPTADOR VISUAL DE LA DESCRIPCIÓ
+    function actualitzarComptadorDescripcio() {
 
-    value = value
-        .split(' ')
-        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
-        .join(' ');
-
-    this.value = value;
-});
-
-
-// DESCRIPCIÓ: LIMITA L'ENTRADA A 100 CARÀCTERS
-descripcioInput.addEventListener('input', function () {
-    if (this.value.length > 100) {
-        this.value = this.value.substring(0, 100);
-    }
-
-    updateCounter();
-});
-
-
-// ELIMINA QUALSEVOL ESTAT DE VALIDACIÓ
-function clearState(field) {
-    field.classList.remove('field-valid', 'field-invalid');
-}
-
-
-// MARCA EL CAMP COM A VÀLID
-function markValid(field) {
-    field.classList.remove('field-invalid');
-    field.classList.add('field-valid');
-}
-
-
-// MARCA EL CAMP COM A INVÀLID
-function markInvalid(field) {
-    field.classList.remove('field-valid');
-    field.classList.add('field-invalid');
-}
-
-
-// ACTUALITZA EL COMPTADOR DE LA DESCRIPCIÓ
-function updateCounter() {
-    const length = descripcioInput.value.length;
-
-    descripcioCounter.textContent = `${length}/50`;
-
-    if (length <= 50) {
-        descripcioCounter.style.color = '#198754';
-    } else {
-        descripcioCounter.style.color = '#dc3545';
-    }
-}
-
-
-// VALIDACIÓ ESTIL USUARIS
-function validateField(field) {
-    const value = field.value.trim();
-
-    // Si està buit → no aplicar cap color
-    if (value === '') {
-        clearState(field);
-        return !field.hasAttribute('required');
-    }
-
-    // CAS ESPECIAL DESCRIPCIÓ (VISUAL NOMÉS)
-    if (field.id === 'descripcio') {
-        if (field.value.length <= 50) {
-            markValid(field);
-        } else {
-            markInvalid(field);
+        if (!descripcioInput || !descripcioCounter) {
+            return;
         }
 
-        return true;
+        const longitud = descripcioInput.value.length;
+
+        descripcioCounter.textContent = `${longitud}/50`;
+        descripcioCounter.classList.remove('counter-valid', 'counter-limit');
+
+        if (longitud >= 45) {
+            descripcioCounter.classList.add('counter-limit');
+        }
+        else {
+            descripcioCounter.classList.add('counter-valid');
+        }
     }
 
-    // VALIDACIÓ NORMAL (com Usuaris)
-    if (field.checkValidity()) {
-        markValid(field);
-        return true;
-    } 
-    else {
-        markInvalid(field);
-        return false;
+
+    // ELIMINAR L'ESTAT VISUAL D'UN CAMP
+    function netejarEstatCamp(field) {
+        field.classList.remove('field-valid', 'field-invalid');
     }
-}
 
 
-// VALIDACIÓ EN TEMPS REAL
-[nomInput, descripcioInput].forEach(field => {
-    field.addEventListener('input', () => validateField(field));
-    field.addEventListener('change', () => validateField(field));
-});
+    // ACTUALITZAR L'ESTAT VISUAL SEGONS LA VALIDACIÓ HTML DEL CAMP
+    function actualitzarEstatCamp(field) {
+
+        if (!field || field.readOnly || field.disabled) {
+            return;
+        }
+
+        if (field.value.trim() === '') {
+            netejarEstatCamp(field);
+            return;
+        }
+
+        if (field.checkValidity()) {
+            field.classList.remove('field-invalid');
+            field.classList.add('field-valid');
+        }
+        else {
+            field.classList.remove('field-valid');
+            field.classList.add('field-invalid');
+        }
+    }
 
 
-// VALIDACIÓ FINAL ABANS D'ENVIAR
-form.addEventListener('submit', function (event) {
-    let valid = true;
+    // APLICAR RETORN VISUAL ALS CAMPS DEL FORMULARI
+    [nomInput, descripcioInput].filter(Boolean).forEach(field => {
+        field.addEventListener('input', function () {
+            actualitzarEstatCamp(this);
+        });
 
-    const fields = [nomInput, descripcioInput];
-
-    fields.forEach(field => {
-        const ok = validateField(field);
-        if (!ok) valid = false;
+        field.addEventListener('change', function () {
+            actualitzarEstatCamp(this);
+        });
     });
 
-    if (!valid) {
-        event.preventDefault();
+
+    // ACTUALITZAR COMPTADOR EN ESCRIURE LA DESCRIPCIÓ
+    if (descripcioInput) {
+        descripcioInput.addEventListener('input', actualitzarComptadorDescripcio);
     }
-});
 
 
-// INIT
-updateCounter();
+    // INICIALITZAR EL COMPTADOR EN CARREGAR EL FORMULARI
+    actualitzarComptadorDescripcio();
+}

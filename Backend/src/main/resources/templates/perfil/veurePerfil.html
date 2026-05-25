@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>El meu perfil - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Full d'estils global del projecte -->
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-
-    <!-- Llibreria d'icones Bootstrap Icons -->
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/perfil.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -21,122 +20,162 @@
 
     <main class="main">
 
-        <!----------------------- CAPÇALERA DE LA PÀGINA ----------------------->
+        <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-
-                <p class="page-eyebrow">Perfil</p>
+                <p class="page-eyebrow">Compte</p>
 
                 <h1 class="page-heading">El meu perfil</h1>
 
                 <p class="page-description">
-                    Consulta les dades associades al teu usuari.
+                    Consulta les dades del teu usuari i mantén actualitzada la teva foto identificativa.
                 </p>
             </div>
-        </section>
 
-        <!----------------------- TARGETA DEL PERFIL ----------------------->
-        <section class="content-card profile-detail-card">
-
-            <!----------------------- TOOLBAR SUPERIOR ----------------------->
-            <div class="content-toolbar">
-
-                <div class="toolbar-block">
-                    <h2 class="content-title">Informació del compte</h2>
-                    <p class="content-subtitle">
-                        Dades de l'usuari que ha iniciat sessió.
-                    </p>
-                </div>
-
-                <div th:if="${param.success}" class="form-success">
-                    <i class="bi bi-check-circle"></i>
-                    <span>Perfil actualitzat correctament.</span>
-                </div>
-
-                <a th:href="@{/perfil/edit}" class="btn btn-soft">
-                    <i class="bi bi-pencil-square"></i>
+            <div class="page-top-actions">
+                <a th:href="@{/perfil/edit}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
                     <span>Editar perfil</span>
                 </a>
             </div>
+        </section>
 
-            <!----------------------- COS DEL PERFIL ----------------------->
-            <div class="profile-detail-body">
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
 
-                <!----------------------- RESUM SUPERIOR ----------------------->
-                <div class="profile-detail-header">
+        <!----------------------- PANELL DEL PERFIL ----------------------->
+        <section class="profile-panel">
 
-                    <div class="profile-detail-avatar">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
+            <!----------------------- PRESENTACIÓ DEL PERFIL ----------------------->
+            <div class="profile-intro">
 
-                    <div class="profile-detail-summary">
-                        <h2 th:text="${usuari.nomComplet}">Nom usuari</h2>
+                <div class="profile-avatar profile-avatar-large">
+                    <img th:if="${usuari.avatar != null}"
+                         th:src="@{/perfil/avatar}"
+                         th:alt="|Avatar de ${usuari.nomComplet}|">
 
-                        <p th:text="${usuari.email}">
-                            email@exemple.com
-                        </p>
-
-                        <span th:text="${usuari.rolUsuari}">
-                            ROL
-                        </span>
-                    </div>
-
+                    <i th:unless="${usuari.avatar != null}"
+                       class="bi bi-person-fill"
+                       aria-hidden="true"></i>
                 </div>
 
-                <!----------------------- DADES DEL PERFIL ----------------------->
-                <div class="profile-detail-table">
+                <div class="profile-identity">
+                    <p class="profile-identity-eyebrow">Usuari autenticat</p>
 
-                    <div class="profile-detail-row">
-                        <div class="profile-detail-label">
-                            DNI
-                        </div>
+                    <h2 th:text="${usuari.nomComplet}">
+                        Nom usuari
+                    </h2>
 
-                        <div class="profile-detail-value" th:text="${usuari.dni}">
-                            12345678A
-                        </div>
-                    </div>
-
-                    <div class="profile-detail-row">
-                        <div class="profile-detail-label">
-                            Nom complet
-                        </div>
-
-                        <div class="profile-detail-value" th:text="${usuari.nomComplet}">
-                            Nom usuari
-                        </div>
-                    </div>
-
-                    <div class="profile-detail-row">
-                        <div class="profile-detail-label">
-                            Correu electrònic
-                        </div>
-
-                        <div class="profile-detail-value" th:text="${usuari.email}">
-                            email@exemple.com
-                        </div>
-                    </div>
-
-                    <div class="profile-detail-row">
-                        <div class="profile-detail-label">
-                            Rol
-                        </div>
-
-                        <div class="profile-detail-value" th:text="${usuari.rolUsuari}">
-                            ROL
-                        </div>
-                    </div>
-
-                    <div class="profile-detail-row">
-                        <div class="profile-detail-label">
-                            ID intern
-                        </div>
-
-                        <div class="profile-detail-value" th:text="${usuari.id}">
-                            1
-                        </div>
-                    </div>
-
+                    <p th:text="${usuari.email}">
+                        correu@exemple.com
+                    </p>
                 </div>
+
+                <span class="profile-role-badge"
+                      th:text="${usuari.rolUsuari}">
+                    ADMIN
+                </span>
+
+            </div>
+
+            <!----------------------- DADES PERSONALS ----------------------->
+            <div class="profile-body">
+
+                <section class="profile-section">
+
+                    <div class="profile-section-heading">
+
+                        <div class="profile-section-icon">
+                            <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="section-title">Dades personals</h2>
+
+                            <p class="section-subtitle">
+                                Informació associada al teu compte.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="profile-data-grid">
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-hash" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label">ID intern</span>
+                                <span class="profile-data-value" th:text="${usuari.id}">1</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label">DNI</span>
+                                <span class="profile-data-value" th:text="${usuari.dni}">12345678A</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-person" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label">Nom complet</span>
+                                <span class="profile-data-value" th:text="${usuari.nomComplet}">Nom usuari</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-envelope" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label">Correu electrònic</span>
+                                <span class="profile-data-value" th:text="${usuari.email}">correu@exemple.com</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label">Rol</span>
+                                <span class="profile-data-value" th:text="${usuari.rolUsuari}">ADMIN</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-image" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label">Foto / avatar</span>
+                                <span class="profile-data-value"
+                                      th:text="${usuari.avatar != null ? 'Avatar configurat' : 'Sense avatar'}">
+                                    Avatar configurat
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
 
             </div>
 

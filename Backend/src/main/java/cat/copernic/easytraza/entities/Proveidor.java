@@ -23,6 +23,7 @@ public class Proveidor {
     @Column(nullable = false)
     private String nomProveidor;
 
+    @Column(nullable = false)
     private String adreca;
 
     @Column(length = 200)

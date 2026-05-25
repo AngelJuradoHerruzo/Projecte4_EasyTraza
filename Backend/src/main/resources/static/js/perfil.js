@@ -1,13 +1,7 @@
-/*********************       .ELEMENTS DEL FORMULARI.       *********************/
-const form = document.getElementById('usuariForm');
-
-const dniInput = document.getElementById('dni');
-const nomInput = document.getElementById('nomComplet');
-const emailInput = document.getElementById('email');
-const rolSelect = document.getElementById('rolUsuari');
+/*********************       .ELEMENTS DEL PERFIL.       *********************/
+const perfilForm = document.getElementById('perfilForm');
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
-
 const avatarInput = document.getElementById('avatarFile');
 const avatarPreview = document.getElementById('avatarPreview');
 let avatarPreviewImage = document.getElementById('avatarPreviewImage');
@@ -17,7 +11,7 @@ let avatarPreviewUrl = null;
 
 
 /*********************       .SUPORT VISUAL DEL FORMULARI.       *********************/
-if (form) {
+if (perfilForm) {
 
     // MOSTRAR O OCULTAR LA CONTRASENYA INTRODUÏDA
     if (togglePassword && passwordInput) {
@@ -71,58 +65,6 @@ if (form) {
             }
         });
     }
-
-
-    // ELIMINAR L'ESTAT VISUAL D'UN CAMP
-    function clearFieldState(field) {
-        field.classList.remove('field-valid', 'field-invalid');
-    }
-
-
-    // ACTUALITZAR L'ESTAT VISUAL SEGONS LA VALIDACIÓ HTML DEL CAMP
-    function updateFieldState(field) {
-
-        if (!field || field.readOnly || field.disabled) {
-            return;
-        }
-
-        if (field.value.trim() === '') {
-            clearFieldState(field);
-            return;
-        }
-
-        if (field.checkValidity()) {
-            field.classList.remove('field-invalid');
-            field.classList.add('field-valid');
-        }
-        else {
-            field.classList.remove('field-valid');
-            field.classList.add('field-invalid');
-        }
-    }
-
-
-    // APLICAR RETORN VISUAL ALS CAMPS DEL FORMULARI
-    const formFields = [
-        dniInput,
-        nomInput,
-        emailInput,
-        rolSelect,
-        passwordInput,
-        avatarInput
-    ].filter(Boolean);
-
-    formFields.forEach(field => {
-        field.addEventListener('change', function () {
-            updateFieldState(this);
-        });
-
-        if (field.type !== 'file' && field.tagName !== 'SELECT') {
-            field.addEventListener('input', function () {
-                updateFieldState(this);
-            });
-        }
-    });
 
 
     // ALLIBERAR LA URL TEMPORAL DE LA PREVISUALITZACIÓ EN SORTIR DE LA PÀGINA

@@ -1,165 +1,122 @@
-const form = document.getElementById('proveidorForm');
-
+/*********************       .ELEMENTS DEL FORMULARI.       *********************/
+const proveidorForm = document.getElementById('proveidorForm');
 const cifInput = document.getElementById('cif');
-const nomInput = document.getElementById('nomProveidor');
+const nomProveidorInput = document.getElementById('nomProveidor');
 const adrecaInput = document.getElementById('adreca');
 const descripcioInput = document.getElementById('descripcio');
-
 const descripcioCounter = document.getElementById('descripcioCounter');
 const tipusDocument = document.getElementById('tipusDocument');
 
 
-// FORMAT CORRECTE (MAJÚSCULA INICIAL I ESPAIS CONTROLATS)
-nomInput.addEventListener('input', function () {
-    let value = this.value;
+/*********************       .SUPORT VISUAL DEL FORMULARI.       *********************/
+if (proveidorForm) {
 
-    value = value.replace(/\s+/g, ' ').trimStart();
+    // MOSTRAR EL TIPUS DE DOCUMENT INTRODUÏT AL CAMP CIF / DNI
+    function updateTipusDocument() {
 
-    value = value
-        .split(' ')
-        .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : '')
-        .join(' ');
+        if (!cifInput || !tipusDocument) {
+            return;
+        }
 
-    this.value = value;
-});
+        const value = cifInput.value.trim();
 
+        if (value === '') {
+            tipusDocument.textContent = '';
+            tipusDocument.classList.remove('visible');
+            return;
+        }
 
-// MAJÚSCULES I SENSE CARÀCTERS INVÀLIDS
-cifInput.addEventListener('input', function () {
-    let value = this.value.toUpperCase();
-
-    value = value.replace(/\s+/g, '');
-    value = value.replace(/[^A-Z0-9]/g, '');
-
-    this.value = value;
-
-    updateTipusDocument();
-});
-
-
-// LIMIT D'ENTRADA: 100 CARÀCTERS
-descripcioInput.addEventListener('input', function () {
-
-    if (this.value.length > 100) {
-        this.value = this.value.substring(0, 100);
-    }
-
-    updateDescripcioCounter();
-});
-
-
-// FUNCIONS ESTAT
-function clearState(field) {
-    field.classList.remove('field-valid', 'field-invalid');
-}
-
-function markValid(field) {
-    field.classList.remove('field-invalid');
-    field.classList.add('field-valid');
-}
-
-function markInvalid(field) {
-    field.classList.remove('field-valid');
-    field.classList.add('field-invalid');
-}
-
-
-// DETECTA DNI O CIF SEGONS EL PRIMER CARÀCTER
-function updateTipusDocument() {
-    const value = cifInput.value.trim();
-
-    if (value === '') {
-        tipusDocument.textContent = '';
-        return;
-    }
-
-    if (/^\d/.test(value)) {
-        tipusDocument.textContent = 'DNI';
-    } 
-    else if (/^[A-Z]/.test(value)) {
-        tipusDocument.textContent = 'CIF';
-    } 
-    else {
-        tipusDocument.textContent = '';
-    }
-}
-
-
-// COMPTADOR DESCRIPCIÓ
-function updateDescripcioCounter() {
-    const length = descripcioInput.value.length;
-
-    descripcioCounter.textContent = `${length}/50`;
-
-    // 0–50 → verd
-    if (length <= 50) {
-        descripcioCounter.style.color = '#198754';
-    }
-    // 51–100 → vermell
-    else {
-        descripcioCounter.style.color = '#dc3545';
-    }
-}
-
-
-// VALIDA SEGONS HTML + CASOS ESPECIALS
-function validateField(field) {
-    const value = field.value.trim();
-
-    // Si està buit → no color
-    if (value === '') {
-        clearState(field);
-        return !field.hasAttribute('required');
-    }
-
-    // DESCRIPCIÓ → només validem longitud
-    if (field.id === 'descripcio') {
-        if (field.value.length <= 50) {
-            markValid(field);
-            return true;
-        } 
+        if (/^\d/.test(value)) {
+            tipusDocument.textContent = 'DNI';
+        }
         else {
-            markInvalid(field);
-            return false;
+            tipusDocument.textContent = 'CIF';
+        }
+
+        tipusDocument.classList.add('visible');
+    }
+
+
+    // ACTUALITZAR EL COMPTADOR VISUAL DE LA DESCRIPCIÓ
+    function updateDescripcioCounter() {
+
+        if (!descripcioInput || !descripcioCounter) {
+            return;
+        }
+
+        const length = descripcioInput.value.length;
+
+        descripcioCounter.textContent = `${length}/50`;
+        descripcioCounter.classList.remove('counter-valid', 'counter-limit');
+
+        if (length >= 45) {
+            descripcioCounter.classList.add('counter-limit');
+        }
+        else {
+            descripcioCounter.classList.add('counter-valid');
         }
     }
 
-    // VALIDACIÓ ESTÀNDARD (pattern, required…)
-    if (field.checkValidity()) {
-        markValid(field);
-        return true;
-    } 
-    else {
-        markInvalid(field);
-        return false;
+
+    // ELIMINAR L'ESTAT VISUAL D'UN CAMP
+    function clearFieldState(field) {
+        field.classList.remove('field-valid', 'field-invalid');
     }
-}
 
 
-// EVENTS VALIDACIÓ
-[cifInput, nomInput, adrecaInput, descripcioInput].forEach(field => {
-    field.addEventListener('input', () => validateField(field));
-    field.addEventListener('change', () => validateField(field));
-});
+    // ACTUALITZAR L'ESTAT VISUAL SEGONS LA VALIDACIÓ HTML DEL CAMP
+    function updateFieldState(field) {
+
+        if (!field || field.readOnly || field.disabled) {
+            return;
+        }
+
+        if (field.value.trim() === '') {
+            clearFieldState(field);
+            return;
+        }
+
+        if (field.checkValidity()) {
+            field.classList.remove('field-invalid');
+            field.classList.add('field-valid');
+        }
+        else {
+            field.classList.remove('field-valid');
+            field.classList.add('field-invalid');
+        }
+    }
 
 
-// SUBMIT
-form.addEventListener('submit', function (event) {
+    // APLICAR RETORN VISUAL ALS CAMPS DEL FORMULARI
+    const formFields = [
+        cifInput,
+        nomProveidorInput,
+        adrecaInput,
+        descripcioInput
+    ].filter(Boolean);
 
-    let valid = true;
-    const fields = [cifInput, nomInput, adrecaInput, descripcioInput];
+    formFields.forEach(field => {
+        field.addEventListener('input', function () {
+            updateFieldState(this);
+        });
 
-    fields.forEach(field => {
-        const ok = validateField(field);
-        if (!ok) valid = false;
+        field.addEventListener('change', function () {
+            updateFieldState(this);
+        });
     });
 
-    if (!valid) {
-        event.preventDefault();
+
+    // ACTUALITZAR AJUDES VISUALS DELS CAMPS CORRESPONENTS
+    if (cifInput) {
+        cifInput.addEventListener('input', updateTipusDocument);
     }
-});
+
+    if (descripcioInput) {
+        descripcioInput.addEventListener('input', updateDescripcioCounter);
+    }
 
 
-// INIT
-updateTipusDocument();
-updateDescripcioCounter();
+    // INICIALITZAR ELS ELEMENTS VISUALS DEL FORMULARI
+    updateTipusDocument();
+    updateDescripcioCounter();
+}

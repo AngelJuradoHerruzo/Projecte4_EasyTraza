@@ -1,0 +1,613 @@
+/*********************       .PANELL DEL LLISTAT.       *********************/
+.materials-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background-color: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.materials-toolbar {
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    flex-wrap: wrap;
+    padding: 20px 24px 17px;
+    border-bottom: 1px solid var(--border);
+}
+
+.materials-toolbar-info {
+    flex: 1;
+    min-width: 245px;
+}
+
+.materials-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.section-title {
+    margin: 0;
+    color: var(--text);
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.section-subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.materials-counter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.materials-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.materials-filter-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.search-field {
+    width: 225px;
+    max-width: 100%;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel-soft);
+}
+
+.search-field i {
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.search-field input {
+    width: 100%;
+    border: none;
+    outline: none;
+    color: var(--text);
+    background-color: transparent;
+    font-size: 14px;
+}
+
+.search-field input::placeholder {
+    color: var(--muted);
+}
+
+.search-field:focus-within {
+    border-color: var(--accent);
+}
+
+.order-field {
+    width: 155px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.order-direction-field {
+    width: 135px;
+}
+
+.order-field label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.materials-filter-row .form-select {
+    min-height: 46px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.materials-filter-row .btn {
+    min-height: 46px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.materials-filter-row .btn-icon {
+    width: 46px;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+
+/*********************       .LLISTAT COMPACTE DE MATÈRIES PRIMERES.       *********************/
+.materials-list {
+    padding: 14px 18px 18px;
+}
+
+.materials-list-head {
+    display: grid;
+    grid-template-columns: 76px minmax(190px, 1fr) minmax(220px, 1.35fr) 126px 184px;
+    align-items: center;
+    gap: 14px;
+    padding: 0 14px 9px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.materials-head-status {
+    text-align: center;
+}
+
+.materials-head-actions {
+    text-align: right;
+}
+
+.material-row {
+    display: grid;
+    grid-template-columns: 76px minmax(190px, 1fr) minmax(220px, 1.35fr) 126px 184px;
+    align-items: center;
+    gap: 14px;
+    min-height: 70px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.material-row:last-of-type {
+    margin-bottom: 0;
+}
+
+.material-row:hover {
+    border-color: var(--accent);
+    background-color: var(--panel-soft);
+    transform: translateX(2px);
+}
+
+.material-row-id {
+    display: flex;
+    align-items: center;
+}
+
+.material-id-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 52px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.material-id-badge i {
+    font-size: 11px;
+}
+
+.material-row-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.material-row-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 15px;
+}
+
+.material-row-title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.material-row-description {
+    margin: 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.material-row-status {
+    display: flex;
+    justify-content: center;
+}
+
+.material-status-badge {
+    min-width: 106px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.material-status-used {
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+}
+
+.material-status-free {
+    color: var(--green-text);
+    background-color: var(--green-soft);
+}
+
+.material-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.row-delete-form {
+    display: flex;
+    margin: 0;
+}
+
+.row-action {
+    min-height: 33px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.row-action-edit {
+    color: var(--edit-text);
+    background-color: var(--edit-soft);
+}
+
+.row-action-edit:hover {
+    background-color: var(--accent-soft);
+}
+
+.row-action-delete {
+    color: var(--danger-text);
+    background-color: var(--danger-soft);
+}
+
+.row-action-delete:hover {
+    background-color: var(--danger-soft);
+}
+
+.row-action-disabled {
+    color: var(--muted);
+    background-color: var(--panel-soft);
+    cursor: not-allowed;
+}
+
+.row-action:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+
+/*********************       .ESTAT BUIT.       *********************/
+.materials-empty-state {
+    min-height: 285px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    padding: 34px 20px;
+    border-radius: var(--radius-xl);
+    background-color: var(--panel-soft);
+    text-align: center;
+}
+
+.materials-empty-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    border-radius: var(--radius-lg);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 24px;
+}
+
+.materials-empty-state h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.materials-empty-state p {
+    max-width: 430px;
+    margin: 0 0 9px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+
+/*********************       .FORMULARI MATÈRIA PRIMERA.       *********************/
+.material-form-panel {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background-color: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.material-form-intro {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.material-form-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-lg);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 22px;
+}
+
+.material-edit-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    margin-left: auto;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.material-form-alert {
+    width: calc(100% - 48px);
+    margin: 20px 24px 0;
+}
+
+.material-form {
+    width: 100%;
+    padding: 26px 24px 24px;
+}
+
+.material-form-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 21px;
+}
+
+.material-form-field-full {
+    width: 100%;
+    grid-column: 1 / -1;
+}
+
+.character-counter {
+    padding: 5px 9px;
+    border-radius: 999px;
+    color: var(--muted);
+    background-color: var(--panel-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.counter-valid {
+    color: var(--green-text);
+    background-color: var(--green-soft);
+}
+
+.counter-limit {
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+}
+
+.material-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 22px;
+    margin-top: 25px;
+    border-top: 1px solid var(--border);
+}
+
+
+/*********************       .RESPONSIVE MATÈRIES PRIMERES.       *********************/
+@media (max-width: 1280px) {
+    .materials-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .materials-filter-row {
+        justify-content: flex-start;
+    }
+
+    .materials-list-head,
+    .material-row {
+        grid-template-columns: 68px minmax(170px, 1fr) minmax(170px, 1fr) 116px 176px;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 980px) {
+    .materials-list-head {
+        display: none;
+    }
+
+    .material-row {
+        grid-template-columns: 62px 1fr 112px;
+        grid-template-areas:
+            "id main status"
+            "description description description"
+            "actions actions actions";
+        gap: 9px 12px;
+        padding: 12px;
+    }
+
+    .material-row-id {
+        grid-area: id;
+    }
+
+    .material-row-main {
+        grid-area: main;
+    }
+
+    .material-row-description {
+        grid-area: description;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+    }
+
+    .material-row-status {
+        grid-area: status;
+    }
+
+    .material-status-badge {
+        min-width: 100px;
+    }
+
+    .material-row-actions {
+        grid-area: actions;
+        padding-top: 9px;
+        border-top: 1px solid var(--border);
+    }
+}
+
+@media (max-width: 700px) {
+    .materials-toolbar {
+        padding: 20px 18px;
+    }
+
+    .materials-filter,
+    .materials-filter-row {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-field,
+    .order-field,
+    .order-direction-field {
+        width: 100%;
+    }
+
+    .materials-filter-row .btn {
+        width: 100%;
+    }
+
+    .materials-list {
+        padding: 12px;
+    }
+
+    .material-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "id status"
+            "main main"
+            "description description"
+            "actions actions";
+    }
+
+    .material-row-actions {
+        flex-direction: column;
+    }
+
+    .row-action,
+    .row-delete-form {
+        width: 100%;
+    }
+
+    .material-form-intro {
+        padding: 20px 18px;
+    }
+
+    .material-edit-badge {
+        margin-left: 0;
+    }
+
+    .material-form {
+        padding: 20px 18px;
+    }
+
+    .material-form-alert {
+        width: calc(100% - 36px);
+        margin: 18px 18px 0;
+    }
+
+    .material-form-actions {
+        flex-direction: column;
+    }
+
+    .material-form-actions .btn {
+        width: 100%;
+    }
+}

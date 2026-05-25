@@ -25,7 +25,7 @@ public class LiniaProduccio {
     private Producte producte;
 
     @ManyToOne
-    @JoinColumn(name = "operari_id")
+    @JoinColumn(name = "operari_id", nullable = false)
     private Usuari operari;
 
     @ManyToOne

@@ -1,8 +1,11 @@
 package cat.copernic.easytraza.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cat.copernic.easytraza.entities.MateriaPrimera;
 import cat.copernic.easytraza.service.MateriaPrimeraService;
@@ -22,10 +25,21 @@ public class MateriaPrimeraWebController {
     // LLISTAR MATÈRIES PRIMERES
     @GetMapping("/list")
     public String llistarMateriesPrimeres(@RequestParam(required = false) String nomMateria,
+                                          @RequestParam(required = false, defaultValue = "nomMateria") String ordre,
+                                          @RequestParam(required = false, defaultValue = "asc") String direccio,
                                           Model model) {
 
-        model.addAttribute("materiesPrimeres", materiaPrimeraService.getMateriesPrimeresLlistat(nomMateria));
+        List<MateriaPrimera> materiesPrimeres = materiaPrimeraService.getMateriesPrimeresLlistat(
+            nomMateria,
+            ordre,
+            direccio
+        );
+
+        model.addAttribute("materiesPrimeres", materiesPrimeres);
+        model.addAttribute("materiesEnUs", materiaPrimeraService.getIdsMateriesPrimeresEnUs(materiesPrimeres));
         model.addAttribute("nomMateria", nomMateria);
+        model.addAttribute("ordre", ordre);
+        model.addAttribute("direccio", direccio);
 
         return "materiesPrimeres/llistarMateriesPrimeres";
     }
@@ -45,7 +59,8 @@ public class MateriaPrimeraWebController {
     @PostMapping("/save")
     public String guardarMateriaPrimera(@ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
                                         @RequestParam(value = "popup", defaultValue = "false") boolean popup,
-                                        Model model) {
+                                        Model model,
+                                        RedirectAttributes redirectAttributes) {
         try {
             materiaPrimeraService.createMateriaPrimera(materiaPrimera);
 
@@ -53,6 +68,11 @@ public class MateriaPrimeraWebController {
                 model.addAttribute("missatge", "Matèria primera creada correctament.");
                 return "layout/tancarFinestra";
             }
+
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "La matèria primera s'ha creat correctament."
+            );
 
             return "redirect:/materies-primeres/list";
         }
@@ -87,18 +107,34 @@ public class MateriaPrimeraWebController {
     public String updateMateriaPrimera(@PathVariable Long id,
                                        @ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
                                        @RequestParam(value = "popup", defaultValue = "false") boolean popup,
-                                       Model model) {
+                                       Model model,
+                                       RedirectAttributes redirectAttributes) {
         try {
-            materiaPrimeraService.updateMateriaPrimera(id, materiaPrimera);
+            MateriaPrimera materiaActualitzada = materiaPrimeraService.updateMateriaPrimera(id, materiaPrimera);
+
+            if (materiaActualitzada == null) {
+                redirectAttributes.addFlashAttribute(
+                    "error",
+                    "No s'ha trobat la matèria primera que vols modificar."
+                );
+
+                return "redirect:/materies-primeres/list";
+            }
 
             if (popup) {
                 model.addAttribute("missatge", "Matèria primera actualitzada correctament.");
                 return "layout/tancarFinestra";
             }
 
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "La matèria primera s'ha actualitzat correctament."
+            );
+
             return "redirect:/materies-primeres/list";
         }
         catch (RuntimeException e) {
+            materiaPrimera.setId(id);
             model.addAttribute("error", e.getMessage());
             model.addAttribute("materiaPrimera", materiaPrimera);
             model.addAttribute("popup", popup);
@@ -108,9 +144,21 @@ public class MateriaPrimeraWebController {
 
 
     // ELIMINAR MATÈRIA PRIMERA
-    @GetMapping("/delete/{id}")
-    public String deleteMateriaPrimera(@PathVariable Long id) {
-        materiaPrimeraService.deleteMateriaPrimera(id);
+    @PostMapping("/delete/{id}")
+    public String deleteMateriaPrimera(@PathVariable Long id,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            materiaPrimeraService.deleteMateriaPrimera(id);
+
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "La matèria primera s'ha eliminat correctament."
+            );
+        }
+        catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
         return "redirect:/materies-primeres/list";
     }
 }

@@ -1,5 +1,7 @@
 package cat.copernic.easytraza.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +29,13 @@ public class ProveidorService {
     }
 
 
-    // PREPARAR LLISTAT WEB DE PROVEÏDORS AMB FILTRES OPCIONALS
-    public List<Proveidor> getProveidorsLlistat(String nomProveidor, String cif) {
+    // PREPARAR LLISTAT WEB DE PROVEÏDORS AMB FILTRES I ORDENACIÓ OPCIONALS
+    public List<Proveidor> getProveidorsLlistat(String nomProveidor,
+                                                String cif,
+                                                String ordre,
+                                                String direccio) {
 
-        List<Proveidor> proveidors = new java.util.ArrayList<>(proveidorRepository.findAll());
+        List<Proveidor> proveidors = new ArrayList<>(proveidorRepository.findAll());
 
         if (nomProveidor != null && !nomProveidor.isBlank()) {
             proveidors.removeIf(proveidor -> !conteText(proveidor.getNomProveidor(), nomProveidor));
@@ -39,6 +44,8 @@ public class ProveidorService {
         if (cif != null && !cif.isBlank()) {
             proveidors.removeIf(proveidor -> !conteText(proveidor.getCif(), cif));
         }
+
+        ordenarProveidors(proveidors, ordre, direccio);
 
         return proveidors;
     }
@@ -81,7 +88,7 @@ public class ProveidorService {
             validarDadesProveidor(proveidor);
 
             proveidorActual.setNomProveidor(proveidor.getNomProveidor().trim());
-            proveidorActual.setAdreca(proveidor.getAdreca() != null ? proveidor.getAdreca().trim() : null);
+            proveidorActual.setAdreca(proveidor.getAdreca().trim());
             proveidorActual.setDescripcio(proveidor.getDescripcio() != null ? proveidor.getDescripcio().trim() : null);
 
             return proveidorRepository.save(proveidorActual);
@@ -128,9 +135,80 @@ public class ProveidorService {
             throw new RuntimeException("El nom del proveïdor és obligatori.");
         }
 
+        if (proveidor.getAdreca() == null || proveidor.getAdreca().isBlank()) {
+            throw new RuntimeException("L'adreça del proveïdor és obligatòria.");
+        }
+
         if (proveidor.getDescripcio() != null && proveidor.getDescripcio().length() > 50) {
             throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
         }
+    }
+
+
+    // ORDENAR PROVEÏDORS PEL CAMP SELECCIONAT
+    private void ordenarProveidors(List<Proveidor> proveidors, String ordre, String direccio) {
+
+        String campOrdre = ordre != null && !ordre.isBlank() ? ordre : "nomProveidor";
+
+        Comparator<Proveidor> comparator;
+
+        switch (campOrdre) {
+            case "cif":
+                comparator = Comparator.comparing(
+                    proveidor -> valorText(proveidor.getCif()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "adreca":
+                comparator = Comparator.comparing(
+                    proveidor -> valorText(proveidor.getAdreca()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "descripcio":
+                comparator = Comparator.comparing(
+                    proveidor -> valorText(proveidor.getDescripcio()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "nomProveidor":
+            default:
+                comparator = Comparator.comparing(
+                    proveidor -> valorText(proveidor.getNomProveidor()),
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+        }
+
+        if ("desc".equalsIgnoreCase(direccio)) {
+            comparator = comparator.reversed();
+        }
+
+        proveidors.sort(comparator.thenComparing(Proveidor::getId));
+    }
+
+
+    // RETORNAR TEXT SEGUR PER A L'ORDENACIÓ
+    private String valorText(String valor) {
+        return valor != null ? valor : "";
+    }
+
+
+    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    private boolean conteText(String valor, String filtre) {
+
+        if (filtre == null || filtre.isBlank()) {
+            return true;
+        }
+
+        if (valor == null) {
+            return false;
+        }
+
+        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 
 
@@ -151,7 +229,7 @@ public class ProveidorService {
             String lletres = "TRWAGMYFPDXBNJZSQVHLCKE"; // Taula de lletres del DNI
 
             // Extreiem la part numèrica i calculem la lletra amb el mòdul 23
-            int numero = Integer.parseInt(valor.substring(0, 8)); 
+            int numero = Integer.parseInt(valor.substring(0, 8));
             char lletraCorrecta = lletres.charAt(numero % 23);
 
             return valor.charAt(8) == lletraCorrecta; // Comparem la lletra introduïda amb la calculada
@@ -215,22 +293,7 @@ public class ProveidorService {
             return control == Character.forDigit(digitControl, 10) || control == lletraControl;
         }
 
-        // Si no compleix cap dels formats anteriors → no vàlid
+        // Si no encaixa ni amb DNI ni amb CIF → no vàlid
         return false;
-    }
-
-
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
-    private boolean conteText(String valor, String filtre) {
-
-        if (filtre == null || filtre.isBlank()) {
-            return true;
-        }
-
-        if (valor == null) {
-            return false;
-        }
-
-        return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 }
