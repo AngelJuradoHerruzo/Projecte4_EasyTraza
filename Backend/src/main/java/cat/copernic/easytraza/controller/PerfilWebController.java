@@ -1,8 +1,13 @@
 package cat.copernic.easytraza.controller;
 
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.service.UsuariService;
@@ -31,16 +36,9 @@ public class PerfilWebController {
     @GetMapping
     public String veurePerfil(Model model, HttpSession session) {
 
-        Long usuariId = (Long) session.getAttribute("usuariId");
-
-        if (usuariId == null) {
-            return "redirect:/login";
-        }
-
-        Usuari usuari = usuariService.getUsuariById(usuariId);
+        Usuari usuari = obtenirUsuariSessio(session);
 
         if (usuari == null) {
-            session.invalidate();
             return "redirect:/login";
         }
 
@@ -50,20 +48,40 @@ public class PerfilWebController {
     }
 
 
+    // MOSTRAR AVATAR DE L'USUARI AUTENTICAT
+    @GetMapping("/avatar")
+    @ResponseBody
+    public ResponseEntity<byte[]> mostrarAvatarPerfil(HttpSession session) {
+
+        Usuari usuari = obtenirUsuariSessio(session);
+
+        if (usuari == null || usuari.getAvatar() == null || usuari.getAvatar().length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        MediaType tipusContingut;
+
+        try {
+            tipusContingut = MediaType.parseMediaType(usuari.getAvatarTipusContingut());
+        }
+        catch (RuntimeException e) {
+            tipusContingut = MediaType.APPLICATION_OCTET_STREAM;
+        }
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .contentType(tipusContingut)
+                .body(usuari.getAvatar());
+    }
+
+
     // FORMULARI D'EDICIÓ DEL PERFIL
     @GetMapping("/edit")
     public String editarPerfil(Model model, HttpSession session) {
 
-        Long usuariId = (Long) session.getAttribute("usuariId");
-
-        if (usuariId == null) {
-            return "redirect:/login";
-        }
-
-        Usuari usuari = usuariService.getUsuariById(usuariId);
+        Usuari usuari = obtenirUsuariSessio(session);
 
         if (usuari == null) {
-            session.invalidate();
             return "redirect:/login";
         }
 
@@ -78,29 +96,67 @@ public class PerfilWebController {
     // ACTUALITZAR PERFIL
     @PostMapping("/update")
     public String updatePerfil(@ModelAttribute("usuari") Usuari usuari,
+                               @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
                                Model model,
-                               HttpSession session) {
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+
+        Long usuariId = (Long) session.getAttribute("usuariId");
+
+        if (usuariId == null) {
+            return "redirect:/login";
+        }
 
         try {
-            Long usuariId = (Long) session.getAttribute("usuariId");
-
-            if (usuariId == null) {
-                return "redirect:/login";
-            }
-
-            Usuari usuariActualitzat = usuariService.updatePerfilUsuari(usuariId, usuari);
+            Usuari usuariActualitzat = usuariService.updatePerfilUsuari(usuariId, usuari, avatarFile);
 
             session.setAttribute("usuariNom", usuariActualitzat.getNomComplet());
             session.setAttribute("usuariEmail", usuariActualitzat.getEmail());
             session.setAttribute("usuariRol", usuariActualitzat.getRolUsuari());
 
-            return "redirect:/perfil?success=true";
+            redirectAttributes.addFlashAttribute(
+                "missatge",
+                "El perfil s'ha actualitzat correctament."
+            );
+
+            return "redirect:/perfil";
         }
         catch (RuntimeException e) {
+            Usuari usuariActual = usuariService.getUsuariById(usuariId);
+
+            usuari.setId(usuariId);
+
+            if (usuariActual != null) {
+                usuari.setDni(usuariActual.getDni());
+                usuari.setRolUsuari(usuariActual.getRolUsuari());
+                usuari.setAvatar(usuariActual.getAvatar());
+                usuari.setAvatarTipusContingut(usuariActual.getAvatarTipusContingut());
+                usuari.setAvatarNomFitxer(usuariActual.getAvatarNomFitxer());
+            }
+
             model.addAttribute("error", e.getMessage());
             model.addAttribute("usuari", usuari);
 
             return "perfil/formPerfil";
         }
+    }
+
+
+    // OBTENIR USUARI AUTENTICAT DE LA SESSIÓ
+    private Usuari obtenirUsuariSessio(HttpSession session) {
+
+        Long usuariId = (Long) session.getAttribute("usuariId");
+
+        if (usuariId == null) {
+            return null;
+        }
+
+        Usuari usuari = usuariService.getUsuariById(usuariId);
+
+        if (usuari == null) {
+            session.invalidate();
+        }
+
+        return usuari;
     }
 }

@@ -50,7 +50,6 @@ public class SecurityConfig {
 
                 // Rutes públiques
                 .requestMatchers(
-                    "/",
                     "/login",
                     "/error",
                     "/error/**",
@@ -70,10 +69,31 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
 
-                // Només els administradors poden accedir a la gestió d'usuaris
-                .requestMatchers("/usuaris/**").hasRole("ADMIN")
+                // Rutes inicials i perfil accessibles per qualsevol usuari autenticat
+                .requestMatchers(
+                    "/",
+                    "/perfil/**"
+                ).hasAnyRole("ADMIN", "OPERARI")
 
-                // La resta de rutes requereixen autenticació
+                // Manteniments administratius exclusius de l'administrador
+                .requestMatchers(
+                    "/productes/**",
+                    "/usuaris/**",
+                    "/proveidors/**",
+                    "/materies-primeres/**",
+                    "/clients/**"
+                ).hasRole("ADMIN")
+
+                // Operacions accessibles per administradors i operaris
+                .requestMatchers(
+                    "/albarans-proveidor/**",
+                    "/albarans-client/**",
+                    "/lots/**",
+                    "/tracabilitat/**",
+                    "/unitats-mesura/**"
+                ).hasAnyRole("ADMIN", "OPERARI")
+
+                // Qualsevol altra ruta requereix autenticació
                 .anyRequest().authenticated()
             )
 

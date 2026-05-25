@@ -138,7 +138,7 @@ public class UsuariService {
 
 
     // ACTUALITZAR PERFIL D'USUARI
-    public Usuari updatePerfilUsuari(Long id, Usuari usuari) {
+    public Usuari updatePerfilUsuari(Long id, Usuari usuari, MultipartFile avatarFile) {
 
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
 
@@ -155,6 +155,7 @@ public class UsuariService {
         usuari.setRolUsuari(usuariActual.getRolUsuari());
 
         validarDadesUsuari(usuari, id);
+        validarAvatar(avatarFile, usuariActual.getAvatar() == null || usuariActual.getAvatar().length == 0);
 
         usuariActual.setNomComplet(usuari.getNomComplet().trim());
         usuariActual.setEmail(usuari.getEmail().trim().toLowerCase());
@@ -162,6 +163,11 @@ public class UsuariService {
         // Només actualitza la contrasenya si s'ha introduït
         if (usuari.getPassword() != null && !usuari.getPassword().trim().isEmpty()) {
             usuariActual.setPassword(passwordEncoder.encode(usuari.getPassword().trim()));
+        }
+
+        // Només actualitza l'avatar si s'ha seleccionat un fitxer nou
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            guardarAvatar(usuariActual, avatarFile);
         }
 
         return usuariRepository.save(usuariActual);
