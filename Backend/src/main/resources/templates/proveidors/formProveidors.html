@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Formulari Proveïdor - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/proveidors.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -14,146 +16,211 @@
 <div class="app-layout">
 
     <!-- SIDEBAR -->
-    <div th:replace="~{layout/sidebar :: sidebar('proveidors')}"></div>
+    <div th:unless="${popup}" th:replace="~{layout/sidebar :: sidebar('proveidors')}"></div>
 
-    <main class="main">
+    <main class="main" th:classappend="${popup} ? ' popup-main' : ''">
 
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow">Administració · Proveïdors</p>
 
                 <h1 class="page-heading"
                     th:text="${proveidor.id != null} ? 'Editar proveïdor' : 'Nou proveïdor'">
-                    Formulari
+                    Formulari proveïdor
                 </h1>
 
                 <p class="page-description">
-                    Introdueix o modifica les dades del proveïdor.
+                    Gestiona les dades identificatives i administratives del proveïdor.
                 </p>
             </div>
 
             <div class="page-top-actions">
-                <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-primary">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Tornar</span>
+                <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span>Tornar al llistat</span>
                 </a>
-                <button th:if="${popup}" type="button" class="btn btn-primary" onclick="window.close();">
-                    <i class="bi bi-x-lg"></i>
+
+                <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
                     <span>Tancar</span>
                 </button>
             </div>
         </section>
 
         <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
-        <section class="content-card">
+        <section class="supplier-form-panel">
 
-            <!----------------------- TOOLBAR SUPERIOR ----------------------->
-            <div class="content-toolbar">
+            <!----------------------- PRESENTACIÓ FORMULARI ----------------------->
+            <div class="supplier-form-intro">
 
-                <div class="toolbar-block">
-                    <h2 class="content-title">Dades del proveïdor</h2>
-                    <p class="content-subtitle">
-                        Completa els camps següents.
+                <div class="supplier-form-icon">
+                    <i class="bi bi-truck" aria-hidden="true"></i>
+                </div>
+
+                <div>
+                    <h2 class="section-title">Dades del proveïdor</h2>
+
+                    <p class="section-subtitle">
+                        El CIF o DNI, el nom i l'adreça són dades obligatòries.
                     </p>
                 </div>
 
-                <div th:if="${error}" class="form-error">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <span th:text="${error}"></span>
-                </div>
+                <span th:if="${proveidor.id != null}"
+                      class="supplier-edit-badge"
+                      th:text="|ID #${proveidor.id}|">
+                    ID #1
+                </span>
 
             </div>
 
+            <!----------------------- MISSATGE D'ERROR ----------------------->
+            <div th:if="${error}" class="alert alert-error supplier-form-alert" role="alert">
+                <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                <span th:text="${error}"></span>
+            </div>
+
             <!----------------------- COS DEL FORMULARI ----------------------->
-            <div style="padding: 20px 24px;">
+            <form id="proveidorForm"
+                  class="supplier-form"
+                  th:action="${proveidor.id != null} ? @{/proveidors/update/{id}(id=${proveidor.id})} : @{/proveidors/save}"
+                  th:object="${proveidor}"
+                  method="post">
 
-                <form id="proveidorForm"
-                      th:action="${proveidor.id != null} ? @{/proveidors/update/{id}(id=${proveidor.id})} : @{/proveidors/save}"
-                      th:object="${proveidor}"
-                      method="post">
+                <input type="hidden" name="popup" th:value="${popup != null and popup}">
 
-                    <input type="hidden" name="popup" th:value="${popup != null and popup}">
+                <div class="supplier-form-grid">
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;">
+                    <!----------------------- CIF / DNI ----------------------->
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label class="form-label" for="cif">
+                                CIF / DNI
+                                <span class="required-mark">*</span>
+                            </label>
 
-                        <!----------------------- CIF / DNI ----------------------->
-                        <div class="form-group">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <label class="form-label" for="cif">CIF / DNI</label>
-                                <span id="tipusDocument" class="content-subtitle"></span>
-                            </div>
+                            <span id="tipusDocument" class="document-type-badge"></span>
+                        </div>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-upc-scan form-input-icon" aria-hidden="true"></i>
 
                             <input id="cif"
                                    type="text"
                                    th:field="*{cif}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
                                    th:classappend="${proveidor.id != null} ? ' input-readonly' : ''"
                                    required
                                    maxlength="9"
                                    pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"
-                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid"
+                                   autocomplete="off"
+                                   placeholder="A1234567B"
+                                   title="Introdueix un DNI o CIF vàlid"
                                    th:readonly="${proveidor.id != null}">
                         </div>
 
-                        <!----------------------- NOM PROVEÏDOR ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="nomProveidor">Nom proveïdor</label>
+                        <p class="form-help" th:if="${proveidor.id != null}">
+                            El CIF o DNI no es pot modificar després de crear el proveïdor.
+                        </p>
+                    </div>
+
+                    <!----------------------- NOM PROVEÏDOR ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="nomProveidor">
+                            Nom proveïdor
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-building form-input-icon" aria-hidden="true"></i>
+
                             <input id="nomProveidor"
                                    type="text"
                                    th:field="*{nomProveidor}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
                                    required
+                                   autocomplete="off"
+                                   placeholder="Nom del proveïdor"
                                    title="Introdueix el nom del proveïdor">
                         </div>
+                    </div>
 
-                        <!----------------------- ADREÇA ----------------------->
-                        <div class="form-group">
-                            <label class="form-label" for="adreca">Adreça</label>
+                    <!----------------------- ADREÇA ----------------------->
+                    <div class="form-group">
+                        <label class="form-label" for="adreca">
+                            Adreça
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-geo-alt form-input-icon" aria-hidden="true"></i>
+
                             <input id="adreca"
                                    type="text"
                                    th:field="*{adreca}"
-                                   class="form-input"
+                                   class="form-input form-input-with-icon"
+                                   required
+                                   autocomplete="off"
+                                   placeholder="Adreça del proveïdor"
                                    title="Introdueix l'adreça del proveïdor">
                         </div>
+                    </div>
 
-                        <!----------------------- DESCRIPCIÓ ----------------------->
-                        <div class="form-group">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <label class="form-label" for="descripcio">Descripció</label>
-                                <span id="descripcioCounter" style="font-size:13px;">0/50</span>
-                            </div>
+                    <!----------------------- DESCRIPCIÓ ----------------------->
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label class="form-label" for="descripcio">
+                                Descripció
+                            </label>
+
+                            <span id="descripcioCounter" class="character-counter">
+                                0/50
+                            </span>
+                        </div>
+
+                        <div class="form-input-wrapper">
+                            <i class="bi bi-card-text form-input-icon" aria-hidden="true"></i>
 
                             <input id="descripcio"
                                    type="text"
                                    th:field="*{descripcio}"
-                                   class="form-input"
-                                   title="La descripció és vàlida entre 0 i 50 caràcters, amb un màxim d'entrada de 100">
+                                   class="form-input form-input-with-icon"
+                                   maxlength="50"
+                                   autocomplete="off"
+                                   placeholder="Descripció breu opcional"
+                                   title="La descripció pot tenir un màxim de 50 caràcters">
                         </div>
 
+                        <p class="form-help">
+                            Camp opcional. Màxim 50 caràcters.
+                        </p>
                     </div>
 
-                    <!----------------------- BOTONS D'ACCIÓ ----------------------->
-                    <div style="margin-top:25px; display:flex; gap:10px;">
+                </div>
 
-                        <button type="submit" class="btn btn-soft">
-                            <i class="bi bi-save"></i>
-                            <span>Guardar</span>
-                        </button>
+                <!----------------------- BOTONS D'ACCIÓ ----------------------->
+                <div class="supplier-form-actions">
 
-                        <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-secondary">
-                            Cancel·lar
-                        </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        <span th:text="${proveidor.id != null} ? 'Guardar canvis' : 'Crear proveïdor'">
+                            Guardar
+                        </span>
+                    </button>
 
-                        <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
-                            Cancel·lar
-                        </button>
+                    <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-secondary">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        <span>Cancel·lar</span>
+                    </a>
 
-                    </div>
+                    <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        <span>Cancel·lar</span>
+                    </button>
 
-                </form>
+                </div>
 
-            </div>
+            </form>
 
         </section>
 
@@ -161,7 +228,7 @@
 
 </div>
 
-<!----------------------- SCRIPT JS ----------------------->
+<!----------------------- SCRIPT DEL MÒDUL DE PROVEÏDORS ----------------------->
 <script th:src="@{/js/proveidors.js}"></script>
 
 </body>
