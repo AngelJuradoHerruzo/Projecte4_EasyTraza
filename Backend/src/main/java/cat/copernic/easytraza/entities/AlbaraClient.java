@@ -1,8 +1,10 @@
 package cat.copernic.easytraza.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import cat.copernic.easytraza.enums.EstatAlbaraClient;
 import jakarta.persistence.*;
@@ -23,7 +25,8 @@ public class AlbaraClient {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate dataAlbara;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime dataAlbara;
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
@@ -48,7 +51,7 @@ public class AlbaraClient {
     /*********************       .CONSTRUCTORS.       *********************/
     public AlbaraClient() { }
 
-    public AlbaraClient(Long id, LocalDate dataAlbara, Client client,
+    public AlbaraClient(Long id, LocalDateTime dataAlbara, Client client,
                         EstatAlbaraClient estat, List<LiniaProduccio> liniesProduccio,
                         List<LotProveidor> lotsAssociats) {
         this.id = id;
@@ -65,9 +68,9 @@ public class AlbaraClient {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    // ─────── DATA ALBARÀ ───────
-    public LocalDate getDataAlbara() { return dataAlbara; }
-    public void setDataAlbara(LocalDate dataAlbara) { this.dataAlbara = dataAlbara; }
+    // ───── DATA I HORA ALBARÀ ─────
+    public LocalDateTime getDataAlbara() { return dataAlbara; }
+    public void setDataAlbara(LocalDateTime dataAlbara) { this.dataAlbara = dataAlbara; }
 
     // ────────── CLIENT ──────────
     public Client getClient() { return client; }

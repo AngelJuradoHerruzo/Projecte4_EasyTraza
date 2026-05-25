@@ -1,203 +1,131 @@
+/*********************       .ELEMENTS DEL FORMULARI.       *********************/
 const form = document.getElementById('albaraClientForm');
-
-const dataInput = document.getElementById('dataAlbara');
-const clientInput = document.getElementById('client');
 const liniesContainer = document.getElementById('liniesContainer');
 const addLiniaBtn = document.getElementById('addLiniaBtn');
 
 
-/*----------------------- FUNCIONS ESTAT -----------------------*/
-function clearState(field) {
-    field.classList.remove('field-valid', 'field-invalid');
-}
+/*********************       .SUPORT VISUAL DE LES LÍNIES.       *********************/
+if (form && liniesContainer && addLiniaBtn) {
 
-function markValid(field) {
-    field.classList.remove('field-invalid');
-    field.classList.add('field-valid');
-}
+    // ACTUALITZAR ELS ÍNDEXS DELS CAMPS DINÀMICS I LA NUMERACIÓ VISUAL
+    function reindexarLinies() {
+        const linies = liniesContainer.querySelectorAll('.linia-row');
 
-function markInvalid(field) {
-    field.classList.remove('field-valid');
-    field.classList.add('field-invalid');
-}
+        linies.forEach((linia, index) => {
+            const numero = linia.querySelector('.linia-number-value');
 
+            if (numero) {
+                numero.textContent = index + 1;
+            }
 
-/*----------------------- VALIDACIÓ -----------------------*/
-function validateField(field) {
-    const value = field.value.trim();
+            linia.querySelectorAll('input, select').forEach(camp => {
+                const name = camp.getAttribute('name');
+                const id = camp.getAttribute('id');
 
-    if (value === '') {
-        clearState(field);
-        return !field.hasAttribute('required');
+                if (name) {
+                    camp.setAttribute(
+                        'name',
+                        name.replace(/liniesProduccio\[\d+\]/, `liniesProduccio[${index}]`)
+                    );
+                }
+
+                if (id) {
+                    camp.setAttribute(
+                        'id',
+                        id.replace(/liniesProduccio\d+/, `liniesProduccio${index}`)
+                    );
+                }
+            });
+        });
+
+        actualitzarBotonsEliminar();
     }
 
-    if (field.checkValidity()) {
-        markValid(field);
-        return true;
+
+    // ACTIVAR O DESACTIVAR L'ELIMINACIÓ SEGONS EL NOMBRE DE LÍNIES VISIBLES
+    function actualitzarBotonsEliminar() {
+        const linies = liniesContainer.querySelectorAll('.linia-row');
+        const unaSolaLinia = linies.length === 1;
+
+        linies.forEach(linia => {
+            const boto = linia.querySelector('.remove-linia-btn');
+
+            if (boto) {
+                boto.disabled = unaSolaLinia;
+            }
+        });
     }
 
-    markInvalid(field);
-    return false;
-}
 
-
-/*----------------------- CAMPS -----------------------*/
-function getAllFields() {
-    return [
-        dataInput,
-        clientInput,
-        ...document.querySelectorAll('.producteInput'),
-        ...document.querySelectorAll('.quantitatInput')
-    ].filter(field => field != null);
-}
-
-
-/*----------------------- PRODUCTES SELECCIONATS -----------------------*/
-function updateProductOptions() {
-    const productSelects = document.querySelectorAll('.producteInput');
-    const selectedValues = [];
-
-    productSelects.forEach(select => {
-        if (select.value !== '') {
-            selectedValues.push(select.value);
+    // MOSTRAR L'ESTAT VISUAL DEL CAMP A PARTIR DE LES VALIDACIONS HTML
+    function actualitzarEstatVisual(camp) {
+        if (!camp || camp.value.trim() === '') {
+            camp.classList.remove('field-valid', 'field-invalid');
+            return;
         }
-    });
 
-    productSelects.forEach(select => {
-        const currentValue = select.value;
+        if (camp.checkValidity()) {
+            camp.classList.remove('field-invalid');
+            camp.classList.add('field-valid');
+        }
+        else {
+            camp.classList.remove('field-valid');
+            camp.classList.add('field-invalid');
+        }
+    }
 
-        select.querySelectorAll('option').forEach(option => {
-            if (option.value === '') {
-                option.hidden = false;
-                option.disabled = false;
-                return;
-            }
 
-            if (option.value === currentValue) {
-                option.hidden = false;
-                option.disabled = false;
-                return;
-            }
+    // CONNECTAR EL RETORN VISUAL DELS CAMPS DE CADA LÍNIA
+    function vincularCampsVisuals() {
+        liniesContainer.querySelectorAll('select, input[type="number"]').forEach(camp => {
+            camp.onchange = function () {
+                actualitzarEstatVisual(this);
+            };
 
-            if (selectedValues.includes(option.value)) {
-                option.hidden = true;
-                option.disabled = true;
-            }
-            else {
-                option.hidden = false;
-                option.disabled = false;
-            }
+            camp.oninput = function () {
+                actualitzarEstatVisual(this);
+            };
         });
-    });
-}
+    }
 
 
-/*----------------------- EVENTS VALIDACIÓ -----------------------*/
-function bindValidationEvents() {
-    getAllFields().forEach(field => {
-        field.oninput = () => {
-            validateField(field);
+    // CONNECTAR ELS BOTONS D'ELIMINACIÓ DE CADA LÍNIA
+    function vincularBotonsEliminar() {
+        liniesContainer.querySelectorAll('.remove-linia-btn').forEach(boto => {
+            boto.onclick = function () {
+                const linies = liniesContainer.querySelectorAll('.linia-row');
 
-            if (field.classList.contains('producteInput')) {
-                updateProductOptions();
-            }
-        };
-
-        field.onchange = () => {
-            validateField(field);
-
-            if (field.classList.contains('producteInput')) {
-                updateProductOptions();
-            }
-        };
-    });
-}
-
-if (form) {
-    bindValidationEvents();
-    updateProductOptions();
-}
-
-
-/*----------------------- REINDEXAR LÍNIES -----------------------*/
-function reindexLinies() {
-    const rows = document.querySelectorAll('.linia-row');
-
-    rows.forEach((row, index) => {
-        row.querySelectorAll('input, select').forEach(field => {
-            const name = field.getAttribute('name');
-
-            if (name) {
-                field.setAttribute('name', name.replace(/liniesProduccio\[\d+]/, 'liniesProduccio[' + index + ']'));
-            }
-
-            const id = field.getAttribute('id');
-
-            if (id) {
-                field.setAttribute('id', id.replace(/liniesProduccio\d+/, 'liniesProduccio' + index));
-            }
+                if (linies.length > 1) {
+                    this.closest('.linia-row').remove();
+                    reindexarLinies();
+                    vincularBotonsEliminar();
+                    vincularCampsVisuals();
+                }
+            };
         });
-    });
-}
+    }
 
 
-/*----------------------- ELIMINAR LÍNIA -----------------------*/
-function bindRemoveButtons() {
-    document.querySelectorAll('.remove-linia-btn').forEach(button => {
-        button.onclick = function () {
-            const rows = document.querySelectorAll('.linia-row');
-
-            if (rows.length > 1) {
-                this.closest('.linia-row').remove();
-
-                reindexLinies();
-                bindValidationEvents();
-                updateProductOptions();
-            }
-        };
-    });
-}
-
-bindRemoveButtons();
-
-
-/*----------------------- AFEGIR LÍNIA -----------------------*/
-if (addLiniaBtn) {
+    // AFEGIR UNA NOVA LÍNIA VISUAL AL FORMULARI
     addLiniaBtn.addEventListener('click', function () {
-        const rows = document.querySelectorAll('.linia-row');
-        const newRow = rows[rows.length - 1].cloneNode(true);
+        const linies = liniesContainer.querySelectorAll('.linia-row');
+        const novaLinia = linies[linies.length - 1].cloneNode(true);
 
-        newRow.querySelectorAll('input, select').forEach(field => {
-            field.value = '';
-            clearState(field);
+        novaLinia.querySelectorAll('input, select').forEach(camp => {
+            camp.value = '';
+            camp.classList.remove('field-valid', 'field-invalid');
         });
 
-        liniesContainer.appendChild(newRow);
+        liniesContainer.appendChild(novaLinia);
 
-        reindexLinies();
-        bindRemoveButtons();
-        bindValidationEvents();
-        updateProductOptions();
+        reindexarLinies();
+        vincularBotonsEliminar();
+        vincularCampsVisuals();
     });
-}
 
 
-/*----------------------- SUBMIT -----------------------*/
-if (form) {
-    form.addEventListener('submit', function (event) {
-
-        let valid = true;
-
-        getAllFields().forEach(field => {
-            const ok = validateField(field);
-
-            if (!ok) {
-                valid = false;
-            }
-        });
-
-        if (!valid) {
-            event.preventDefault();
-        }
-    });
+    // INICIALITZAR COMPORTAMENTS VISUALS DEL FORMULARI
+    reindexarLinies();
+    vincularBotonsEliminar();
+    vincularCampsVisuals();
 }

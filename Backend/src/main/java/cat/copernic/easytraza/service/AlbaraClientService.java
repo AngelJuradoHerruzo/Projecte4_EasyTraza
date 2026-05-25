@@ -1,7 +1,8 @@
 package cat.copernic.easytraza.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 import cat.copernic.easytraza.entities.AlbaraClient;
 import cat.copernic.easytraza.entities.LiniaProduccio;
 import cat.copernic.easytraza.entities.LotProveidor;
+import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.enums.EstatAlbaraClient;
 import cat.copernic.easytraza.enums.EstatLot;
+import cat.copernic.easytraza.enums.RolUsuari;
 import cat.copernic.easytraza.repository.AlbaraClientRepository;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
+import cat.copernic.easytraza.repository.UsuariRepository;
 
 @Service
 @Transactional
@@ -23,32 +27,42 @@ public class AlbaraClientService {
     // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
     private final AlbaraClientRepository albaraClientRepository;
     private final LotProveidorRepository lotProveidorRepository;
+    private final UsuariRepository usuariRepository;
 
     public AlbaraClientService(AlbaraClientRepository albaraClientRepository,
-                               LotProveidorRepository lotProveidorRepository) {
+                               LotProveidorRepository lotProveidorRepository,
+                               UsuariRepository usuariRepository) {
         this.albaraClientRepository = albaraClientRepository;
         this.lotProveidorRepository = lotProveidorRepository;
+        this.usuariRepository = usuariRepository;
     }
 
 
-    // OBTENIR TOTS ELS ALBARANS DE CLIENT ORDENATS
+    // OBTENIR TOTS ELS ALBARANS DE CLIENT ORDENATS PER DATA I HORA
     public List<AlbaraClient> getAllAlbaransClient() {
         return albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc();
     }
 
 
-    // PREPARAR LLISTAT WEB D'ALBARANS DE CLIENT AMB FILTRES OPCIONALS
-    public List<AlbaraClient> getAlbaransClientLlistat(Long clientId, String numeroAlbara) {
+    // PREPARAR LLISTAT WEB D'ALBARANS DE CLIENT AMB FILTRES I ORDENACIÓ OPCIONALS
+    public List<AlbaraClient> getAlbaransClientLlistat(Long clientId,
+                                                        String numeroAlbara,
+                                                        String ordre,
+                                                        String direccio) {
 
-        List<AlbaraClient> albarans = new java.util.ArrayList<>(albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc());
+        List<AlbaraClient> albarans = new ArrayList<>(albaraClientRepository.findAll());
 
         if (clientId != null) {
-            albarans.removeIf(albara -> albara.getClient() == null || !clientId.equals(albara.getClient().getId()));
+            albarans.removeIf(albara -> albara.getClient() == null
+                    || !clientId.equals(albara.getClient().getId()));
         }
 
         if (numeroAlbara != null && !numeroAlbara.isBlank()) {
-            albarans.removeIf(albara -> albara.getId() == null || !String.valueOf(albara.getId()).contains(numeroAlbara.trim()));
+            albarans.removeIf(albara -> albara.getId() == null
+                    || !String.valueOf(albara.getId()).contains(numeroAlbara.trim()));
         }
+
+        ordenarAlbarans(albarans, ordre, direccio);
 
         return albarans;
     }
@@ -78,6 +92,10 @@ public class AlbaraClientService {
                 if (liniaProduccio.getProducte() != null) {
                     liniaProduccio.getProducte().getId();
                 }
+
+                if (liniaProduccio.getOperari() != null) {
+                    liniaProduccio.getOperari().getId();
+                }
             }
         }
 
@@ -101,7 +119,7 @@ public class AlbaraClientService {
     public AlbaraClient createAlbaraClient(AlbaraClient albaraClient) {
 
         if (albaraClient.getDataAlbara() == null) {
-            albaraClient.setDataAlbara(LocalDate.now());
+            albaraClient.setDataAlbara(dataHoraActual());
         }
 
         albaraClient.setEstat(EstatAlbaraClient.PENDENT_LLIURAR);
@@ -127,7 +145,7 @@ public class AlbaraClientService {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
         if (albaraClientOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de client no trobat");
+            throw new RuntimeException("Albarà de client no trobat.");
         }
 
         AlbaraClient albaraClientActual = albaraClientOpt.get();
@@ -161,7 +179,7 @@ public class AlbaraClientService {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
         if (albaraClientOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de client no trobat");
+            throw new RuntimeException("Albarà de client no trobat.");
         }
 
         validarAlbaraClientModificable(albaraClientOpt.get());
@@ -176,7 +194,7 @@ public class AlbaraClientService {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
         if (albaraClientOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de client no trobat");
+            throw new RuntimeException("Albarà de client no trobat.");
         }
 
         AlbaraClient albaraClientActual = albaraClientOpt.get();
@@ -193,15 +211,15 @@ public class AlbaraClientService {
     private void validarDadesAlbaraClient(AlbaraClient albaraClient) {
 
         if (albaraClient.getDataAlbara() == null) {
-            throw new RuntimeException("La data de l'albarà és obligatòria");
+            throw new RuntimeException("La data i hora de l'albarà són obligatòries.");
         }
 
         if (albaraClient.getClient() == null || albaraClient.getClient().getId() == null) {
-            throw new RuntimeException("El client és obligatori");
+            throw new RuntimeException("El client és obligatori.");
         }
 
         if (albaraClient.getLiniesProduccio() == null || albaraClient.getLiniesProduccio().isEmpty()) {
-            throw new RuntimeException("L'albarà ha de tenir com a mínim una línia de producció");
+            throw new RuntimeException("L'albarà ha de tenir com a mínim una línia de producció.");
         }
     }
 
@@ -210,16 +228,29 @@ public class AlbaraClientService {
     private void validarDadesLiniaProduccio(LiniaProduccio liniaProduccio) {
 
         if (liniaProduccio.getProducte() == null || liniaProduccio.getProducte().getId() == null) {
-            throw new RuntimeException("El producte és obligatori");
+            throw new RuntimeException("El producte és obligatori a totes les línies.");
         }
 
         if (liniaProduccio.getQuantitat() == null) {
-            throw new RuntimeException("La quantitat és obligatòria");
+            throw new RuntimeException("La quantitat és obligatòria a totes les línies.");
         }
 
         if (liniaProduccio.getQuantitat() <= 0) {
-            throw new RuntimeException("La quantitat ha de ser superior a zero");
+            throw new RuntimeException("La quantitat ha de ser superior a zero.");
         }
+
+        if (liniaProduccio.getOperari() == null || liniaProduccio.getOperari().getId() == null) {
+            throw new RuntimeException("L'operari és obligatori a totes les línies.");
+        }
+
+        Usuari operari = usuariRepository.findById(liniaProduccio.getOperari().getId())
+                .orElseThrow(() -> new RuntimeException("L'operari seleccionat no existeix."));
+
+        if (operari.getRolUsuari() != RolUsuari.OPERARI) {
+            throw new RuntimeException("L'usuari seleccionat a la línia ha de tenir rol OPERARI.");
+        }
+
+        liniaProduccio.setOperari(operari);
     }
 
 
@@ -243,7 +274,7 @@ public class AlbaraClientService {
                 }
 
                 if (producteActualId.equals(liniaComparada.getProducte().getId())) {
-                    throw new RuntimeException("No es pot repetir el mateix producte dins d'un albarà");
+                    throw new RuntimeException("No es pot repetir el mateix producte dins d'un albarà.");
                 }
             }
         }
@@ -254,7 +285,65 @@ public class AlbaraClientService {
     private void validarAlbaraClientModificable(AlbaraClient albaraClient) {
 
         if (albaraClient.getEstat() == EstatAlbaraClient.LLIURAT) {
-            throw new RuntimeException("No es pot modificar ni eliminar un albarà de client lliurat");
+            throw new RuntimeException("No es pot modificar ni eliminar un albarà de client lliurat.");
         }
+    }
+
+
+    // ORDENAR ALBARANS PEL CAMP SELECCIONAT
+    private void ordenarAlbarans(List<AlbaraClient> albarans, String ordre, String direccio) {
+
+        String campOrdre = ordre != null && !ordre.isBlank() ? ordre : "dataAlbara";
+        Comparator<AlbaraClient> comparator;
+
+        switch (campOrdre) {
+            case "id":
+                comparator = Comparator.comparing(AlbaraClient::getId, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+
+            case "client":
+                comparator = Comparator.comparing(
+                    albara -> albara.getClient() != null && albara.getClient().getNomComplet() != null
+                        ? albara.getClient().getNomComplet() : "",
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "estat":
+                comparator = Comparator.comparing(
+                    albara -> albara.getEstat() != null ? albara.getEstat().name() : "",
+                    String.CASE_INSENSITIVE_ORDER
+                );
+                break;
+
+            case "linies":
+                comparator = Comparator.comparingInt(
+                    albara -> albara.getLiniesProduccio() != null ? albara.getLiniesProduccio().size() : 0
+                );
+                break;
+
+            case "dataAlbara":
+            default:
+                comparator = Comparator.comparing(
+                    AlbaraClient::getDataAlbara,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+                );
+                break;
+        }
+
+        if (!"asc".equalsIgnoreCase(direccio)) {
+            comparator = comparator.reversed();
+        }
+
+        albarans.sort(comparator.thenComparing(
+            AlbaraClient::getId,
+            Comparator.nullsLast(Comparator.reverseOrder())
+        ));
+    }
+
+
+    // OBTENIR DATA I HORA ACTUAL SENSE SEGONS
+    private LocalDateTime dataHoraActual() {
+        return LocalDateTime.now().withSecond(0).withNano(0);
     }
 }

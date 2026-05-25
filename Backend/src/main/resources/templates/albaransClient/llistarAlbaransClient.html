@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <title>Albarans de client - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/albaransClient.css}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -13,6 +15,7 @@
 
 <div class="app-layout">
 
+    <!-- SIDEBAR -->
     <div th:replace="~{layout/sidebar :: sidebar('albaransClient')}"></div>
 
     <main class="main">
@@ -21,216 +24,247 @@
         <section class="page-top">
             <div class="page-top-left">
                 <p class="page-eyebrow">Lliuraments</p>
+
                 <h1 class="page-heading">Albarans de client</h1>
+
                 <p class="page-description">
-                    Gestiona els albarans de client, les línies de producció i els lots associats.
+                    Gestiona els lliuraments de productes i les línies de producció associades.
                 </p>
             </div>
 
             <div class="page-top-actions">
                 <a th:href="@{/albarans-client/new}" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i>
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
                     <span>Nou albarà</span>
                 </a>
             </div>
         </section>
 
-        <!----------------------- CONTINGUT ----------------------->
-        <section class="content-card">
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
 
-            <!----------------------- TOOLBAR ----------------------->
-            <div class="content-toolbar">
-                <div class="toolbar-block">
-                    <div th:if="${error}" class="form-error">
-                        <i class="bi bi-exclamation-circle"></i>
-                        <span th:text="${error}"></span>
+        <div th:if="${error}" class="alert alert-error" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!----------------------- PANELL PRINCIPAL ----------------------->
+        <section class="deliveries-panel">
+
+            <!----------------------- TOOLBAR I FILTRES ----------------------->
+            <div class="deliveries-toolbar">
+
+                <div class="deliveries-toolbar-info">
+                    <div class="deliveries-title-row">
+                        <h2 class="section-title">Llistat d'albarans</h2>
+
+                        <span class="deliveries-counter"
+                              th:text="|${#lists.size(albarans)} albarans|">
+                            0 albarans
+                        </span>
                     </div>
 
-                    <h2 class="content-title">Llistat d'albarans</h2>
-                    <p class="content-subtitle">
-                        Filtra per client o número d'albarà.
+                    <p class="section-subtitle">
+                        Només els albarans pendents es poden editar, eliminar o lliurar.
                     </p>
                 </div>
 
                 <form th:action="@{/albarans-client/list}"
                       method="get"
-                      style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                      class="deliveries-filter">
 
-                    <div class="search-field" style="width:270px;">
-                        <i class="bi bi-person-vcard"></i>
-                        <select name="clientId"
-                                style="width:100%; border:none; outline:none; background:transparent; color:#3c2f28; font-size:14px;">
-                            <option value="">Tots els clients</option>
-                            <option th:each="client : ${clients}"
-                                    th:value="${client.id}"
-                                    th:selected="${clientId != null && clientId == client.id}"
-                                    th:text="${client.nomComplet}">
-                                Client
-                            </option>
-                        </select>
-                    </div>
+                    <div class="deliveries-filter-row">
 
-                    <div class="search-field" style="width:220px;">
-                        <i class="bi bi-receipt-cutoff"></i>
-                        <input name="numeroAlbara" type="text" th:value="${numeroAlbara}" placeholder="Número albarà...">
-                    </div>
+                        <label for="clientId" class="sr-only">Filtrar per client</label>
 
-                    <button type="submit" class="btn btn-primary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
+                        <div class="filter-field">
+                            <i class="bi bi-person" aria-hidden="true"></i>
 
-                    <a th:href="@{/albarans-client/list}" class="btn btn-secondary" style="height:46px; padding:0 16px;">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Neteja</span>
-                    </a>
-                </form>
-            </div>
-
-            <!----------------------- TARGETES ----------------------->
-            <div class="cards-grid" id="albaransContainer" style="align-items:stretch;">
-
-                <article th:each="albara : ${albarans}"
-                         class="info-card albara-card"
-                         style="height:100%; display:flex; flex-direction:column; gap:14px;">
-
-                    <!----------------------- HEADER ----------------------->
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
-
-                        <div>
-                            <h3 class="info-card-title" style="margin-bottom:4px;">
-                                <span>Albarà #</span>
-                                <span th:text="${albara.id}">1</span>
-                            </h3>
-
-                            <p class="info-card-description"
-                               th:text="${#temporals.format(albara.dataAlbara, 'dd/MM/yyyy')}">
-                                01/01/2026
-                            </p>
+                            <select id="clientId" name="clientId">
+                                <option value="">Tots els clients</option>
+                                <option th:each="client : ${clients}"
+                                        th:value="${client.id}"
+                                        th:selected="${clientId != null && clientId == client.id}"
+                                        th:text="${client.nomComplet}">
+                                    Client
+                                </option>
+                            </select>
                         </div>
 
-                        <span class="status-badge"
+                        <label for="numeroAlbara" class="sr-only">Filtrar per número d'albarà</label>
+
+                        <div class="search-field search-field-small">
+                            <i class="bi bi-receipt" aria-hidden="true"></i>
+
+                            <input id="numeroAlbara"
+                                   name="numeroAlbara"
+                                   type="text"
+                                   th:value="${numeroAlbara}"
+                                   placeholder="Núm. albarà..."
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="order-field">
+                            <label for="ordre">Ordenar per</label>
+
+                            <select id="ordre" name="ordre" class="form-select">
+                                <option value="dataAlbara" th:selected="${ordre == 'dataAlbara'}">Data i hora</option>
+                                <option value="id" th:selected="${ordre == 'id'}">ID</option>
+                                <option value="client" th:selected="${ordre == 'client'}">Client</option>
+                                <option value="estat" th:selected="${ordre == 'estat'}">Estat</option>
+                                <option value="linies" th:selected="${ordre == 'linies'}">Línies</option>
+                            </select>
+                        </div>
+
+                        <div class="order-field order-direction-field">
+                            <label for="direccio">Direcció</label>
+
+                            <select id="direccio" name="direccio" class="form-select">
+                                <option value="asc" th:selected="${direccio == 'asc'}">Ascendent</option>
+                                <option value="desc" th:selected="${direccio == 'desc'}">Descendent</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-icon"
+                                aria-label="Aplicar filtres i ordenació d'albarans de client">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+
+                        <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            <span>Netejar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!----------------------- TARGETES D'ALBARANS ----------------------->
+            <div class="deliveries-grid">
+
+                <article th:each="albara : ${albarans}" class="delivery-card">
+
+                    <!----------------------- IDENTIFICACIÓ ----------------------->
+                    <header class="delivery-card-header">
+
+                        <div class="delivery-card-reference">
+                            <div class="delivery-card-icon">
+                                <i class="bi bi-receipt" aria-hidden="true"></i>
+                            </div>
+
+                            <div>
+                                <p class="delivery-card-type">Albarà client</p>
+
+                                <h3 class="delivery-card-title">
+                                    <span>#</span><span th:text="${albara.id}">1</span>
+                                </h3>
+                            </div>
+                        </div>
+
+                        <span class="delivery-status"
                               th:classappend="${albara.estat.name() == 'PENDENT_LLIURAR'} ? ' status-pendent' : ' status-lliurat'"
                               th:text="${albara.estat.name() == 'PENDENT_LLIURAR'} ? 'Pendent' : 'Lliurat'">
                             Estat
                         </span>
 
-                    </div>
+                    </header>
 
-                    <!----------------------- CLIENT I RESUM ----------------------->
-                    <div style="padding:12px 14px; border:1px solid #f0e6dc; border-radius:16px; background:#fffaf5; display:flex; flex-direction:column; gap:10px;">
+                    <!----------------------- DADES PRINCIPALS ----------------------->
+                    <div class="delivery-card-data">
 
-                        <div style="display:grid; grid-template-columns:80px 1fr; gap:10px; align-items:center;">
-                            <span class="info-card-meta-label">Client</span>
-                            <span class="info-card-meta-value"
-                                  th:text="${albara.client.nomComplet}">
-                                Hotel Centre
-                            </span>
+                        <div class="delivery-client">
+                            <span class="delivery-label">Client</span>
+                            <span class="delivery-client-name" th:text="${albara.client.nomComplet}">Client</span>
                         </div>
 
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-
-                            <div style="display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center; padding:8px 10px; border:1px solid #f0e6dc; border-radius:12px; background:white;">
-                                <span class="info-card-meta-label">Línies</span>
-                                <span class="info-card-meta-value" style="text-align:right;"
-                                      th:text="${albara.liniesProduccio != null ? #lists.size(albara.liniesProduccio) : 0}">
-                                    0
-                                </span>
+                        <div class="delivery-metadata">
+                            <div class="delivery-data-item">
+                                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                <div>
+                                    <span class="delivery-label">Data i hora</span>
+                                    <span class="delivery-value"
+                                          th:text="${#temporals.format(albara.dataAlbara, 'dd/MM/yyyy HH:mm')}">
+                                        01/01/2026 10:00
+                                    </span>
+                                </div>
                             </div>
 
-                            <div style="display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center; padding:8px 10px; border:1px solid #f0e6dc; border-radius:12px; background:white;">
-                                <span class="info-card-meta-label">Lots</span>
-                                <span class="info-card-meta-value" style="text-align:right;"
-                                      th:text="${albara.lotsAssociats != null ? #lists.size(albara.lotsAssociats) : 0}">
-                                    0
-                                </span>
+                            <div class="delivery-data-item">
+                                <i class="bi bi-list-check" aria-hidden="true"></i>
+                                <div>
+                                    <span class="delivery-label">Línies</span>
+                                    <span class="delivery-value"
+                                          th:text="${albara.liniesProduccio != null ? #lists.size(albara.liniesProduccio) : 0}">
+                                        0
+                                    </span>
+                                </div>
                             </div>
-
                         </div>
-
-                    </div>
-
-                    <!----------------------- PRODUCTES ----------------------->
-                    <div style="flex:1; padding:14px; border:1px solid #f0e6dc; border-radius:16px; background:#fff;">
-
-                        <span class="info-card-meta-label">Productes</span>
-
-                        <div th:if="${albara.liniesProduccio != null and !albara.liniesProduccio.isEmpty()}"
-                             style="margin-top:10px; display:flex; flex-direction:column; gap:7px;">
-
-                            <div th:each="linia : ${albara.liniesProduccio}"
-                                 style="display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center;">
-
-                                <span class="info-card-meta-value"
-                                      th:text="${linia.producte.descripcio}">
-                                    Producte
-                                </span>
-
-                                <span class="info-card-meta-value" style="white-space:nowrap; text-align:right;">
-                                    <span th:text="${linia.quantitat}">1</span>
-                                    <span> unitats</span>
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <p th:if="${albara.liniesProduccio == null or albara.liniesProduccio.isEmpty()}"
-                           class="content-subtitle"
-                           style="margin-top:8px;">
-                            Sense línies registrades.
-                        </p>
 
                     </div>
 
-                    <!----------------------- LLIURAR DESTACAT ----------------------->
-                    <a th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
-                       th:href="@{/albarans-client/lliurar/{id}(id=${albara.id})}"
-                       class="btn-table btn-action-deliver"
-                       style="width:100%; justify-content:center; padding:10px 12px;"
-                       onclick="return confirm('Segur que vols marcar aquest albarà com a lliurat?')">
-                        <i class="bi bi-check2-circle"></i>
-                        <span>Marcar com a lliurat</span>
-                    </a>
-
-                    <!----------------------- ACCIONS SECUNDÀRIES ----------------------->
-                    <div style="margin-top:auto; padding-top:14px; border-top:1px solid #f0e6dc; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                    <!----------------------- ACCIONS ----------------------->
+                    <footer class="delivery-card-actions">
 
                         <a th:href="@{/albarans-client/detail/{id}(id=${albara.id})}"
-                           class="btn-table btn-action-view"
-                           style="justify-content:center;">
-                            <i class="bi bi-eye"></i>
+                           class="card-action card-action-view">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
                             <span>Veure</span>
                         </a>
 
                         <a th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
                            th:href="@{/albarans-client/edit/{id}(id=${albara.id})}"
-                           class="btn-table btn-action-edit"
-                           style="justify-content:center;">
-                            <i class="bi bi-pencil-square"></i>
+                           class="card-action card-action-edit">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
                             <span>Editar</span>
                         </a>
 
-                        <span th:if="${albara.estat.name() == 'LLIURAT'}"></span>
+                        <form th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
+                              th:action="@{/albarans-client/lliurar/{id}(id=${albara.id})}"
+                              method="post"
+                              class="card-action-form"
+                              onsubmit="return confirm('Segur que vols marcar aquest albarà com a lliurat?');">
+                            <button type="submit" class="card-action card-action-deliver">
+                                <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                                <span>Lliurar</span>
+                            </button>
+                        </form>
 
-                        <a th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
-                           th:href="@{/albarans-client/delete/{id}(id=${albara.id})}"
-                           class="btn-table btn-action-delete"
-                           style="justify-content:center;"
-                           onclick="return confirm('Segur que vols eliminar aquest albarà?')">
-                            <i class="bi bi-trash3"></i>
-                            <span>Eliminar</span>
-                        </a>
+                        <form th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
+                              th:action="@{/albarans-client/delete/{id}(id=${albara.id})}"
+                              method="post"
+                              class="card-action-form"
+                              onsubmit="return confirm('Segur que vols eliminar aquest albarà?');">
+                            <button type="submit" class="card-action card-action-delete">
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                <span>Eliminar</span>
+                            </button>
+                        </form>
 
-                    </div>
+                    </footer>
 
                 </article>
 
                 <!----------------------- ESTAT BUIT ----------------------->
-                <div th:if="${#lists.isEmpty(albarans)}" class="empty-state" style="grid-column:1 / -1;">
-                    <div class="empty-box">
-                        <i class="bi bi-receipt-cutoff"></i>
-                        <p>No hi ha albarans de client que coincideixin amb els filtres.</p>
+                <div th:if="${#lists.isEmpty(albarans)}" class="deliveries-empty-state">
+                    <div class="deliveries-empty-icon">
+                        <i class="bi bi-receipt" aria-hidden="true"></i>
                     </div>
+
+                    <h3>No s'han trobat albarans</h3>
+
+                    <p>No hi ha albarans de client que coincideixin amb els filtres seleccionats.</p>
+
+                    <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span>Veure tots els albarans</span>
+                    </a>
                 </div>
 
             </div>
@@ -240,8 +274,6 @@
     </main>
 
 </div>
-
-<script th:src="@{/js/albaransClient.js}"></script>
 
 </body>
 </html>
