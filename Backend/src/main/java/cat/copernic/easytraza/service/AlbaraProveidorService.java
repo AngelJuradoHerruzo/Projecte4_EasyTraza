@@ -19,6 +19,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +52,7 @@ public class AlbaraProveidorService {
     private final ProveidorService proveidorService;
     private final MateriaPrimeraService materiaPrimeraService;
     private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
+    private final MessageSource messageSource;
 
     @Value("${ocr.documents.final-path:backend/uploads/albarans-proveidor}")
     private String directoriFitxers;
@@ -61,13 +64,15 @@ public class AlbaraProveidorService {
                                   UnitatMesuraService unitatMesuraService,
                                   ProveidorService proveidorService,
                                   MateriaPrimeraService materiaPrimeraService,
-                                  OcrAlbaraProveidorService ocrAlbaraProveidorService) {
+                                  OcrAlbaraProveidorService ocrAlbaraProveidorService,
+                                  MessageSource messageSource) {
         this.albaraProveidorRepository = albaraProveidorRepository;
         this.usuariRepository = usuariRepository;
         this.unitatMesuraService = unitatMesuraService;
         this.proveidorService = proveidorService;
         this.materiaPrimeraService = materiaPrimeraService;
         this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
+        this.messageSource = messageSource;
     }
 
 
@@ -124,7 +129,7 @@ public class AlbaraProveidorService {
 
         for (AlbaraProveidor albara : albarans) {
 
-            String nomProveidor = "Sense proveïdor";
+            String nomProveidor = missatge("service.albaraProveidor.senseProveidor");
 
             if (albara.getProveidor() != null && albara.getProveidor().getNomProveidor() != null) {
                 nomProveidor = albara.getProveidor().getNomProveidor();
@@ -293,7 +298,7 @@ public class AlbaraProveidorService {
     public void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
 
         if (!esModificable(albaraProveidor)) {
-            throw new RuntimeException("No es pot modificar o eliminar aquest albarà perquè té algun lot que no està en estoc.");
+            throw new RuntimeException(missatge("service.albaraProveidor.lotsNoEstoc"));
         }
     }
 
@@ -418,7 +423,7 @@ public class AlbaraProveidorService {
         pendent.setProveidorTrobat(false);
 
         if (pendent.getProveidorDetectat() != null && !pendent.getProveidorDetectat().isBlank()) {
-            pendent.afegirAvis("Proveïdor detectat per OCR no trobat a la base de dades: " + pendent.getProveidorDetectat());
+            pendent.afegirAvis(missatge("service.albaraProveidor.ocr.proveidorNoTrobat", pendent.getProveidorDetectat()));
         }
     }
 
@@ -442,7 +447,7 @@ public class AlbaraProveidorService {
             linia.setMateriaPrimeraTrobada(false);
 
             if (linia.getMateriaPrimeraDetectada() != null && !linia.getMateriaPrimeraDetectada().isBlank()) {
-                linia.afegirAvis("Matèria primera no trobada. OCR: " + linia.getMateriaPrimeraDetectada());
+                linia.afegirAvis(missatge("service.albaraProveidor.ocr.materiaNoTrobada", linia.getMateriaPrimeraDetectada()));
             }
         }
     }
@@ -724,7 +729,7 @@ public class AlbaraProveidorService {
         Long usuariId = session == null ? null : (Long) session.getAttribute("usuariId");
 
         if (usuariId == null) {
-            throw new RuntimeException("No s'ha trobat cap usuari autenticat a la sessió.");
+            throw new RuntimeException(missatge("service.albaraProveidor.usuariSessioNoTrobat"));
         }
 
         return usuariRepository.findById(usuariId)
@@ -736,23 +741,23 @@ public class AlbaraProveidorService {
     private void validarDadesAlbaraProveidor(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor.getDataRecepcio() == null) {
-            throw new RuntimeException("La data de recepció és obligatòria.");
+            throw new RuntimeException(missatge("service.albaraProveidor.dataRecepcioObligatoria"));
         }
 
         if (albaraProveidor.getNumeroAlbara() == null || albaraProveidor.getNumeroAlbara().isBlank()) {
-            throw new RuntimeException("El número d'albarà és obligatori.");
+            throw new RuntimeException(missatge("service.albaraProveidor.numeroObligatori"));
         }
 
         if (albaraProveidor.getProveidor() == null || albaraProveidor.getProveidor().getId() == null) {
-            throw new RuntimeException("El proveïdor és obligatori.");
+            throw new RuntimeException(missatge("service.albaraProveidor.proveidorObligatori"));
         }
 
         if (albaraProveidor.getUsuariReceptor() == null || albaraProveidor.getUsuariReceptor().getId() == null) {
-            throw new RuntimeException("L'usuari receptor no s'ha pogut assignar des de la sessió.");
+            throw new RuntimeException(missatge("service.albaraProveidor.receptorNoAssignat"));
         }
 
         if (albaraProveidor.getLots() == null || albaraProveidor.getLots().isEmpty()) {
-            throw new RuntimeException("L'albarà ha de tenir com a mínim un lot.");
+            throw new RuntimeException(missatge("service.albaraProveidor.lotMinim"));
         }
     }
 
@@ -761,29 +766,29 @@ public class AlbaraProveidorService {
     private void validarDadesLotProveidor(LotProveidor lotProveidor) {
 
         if (lotProveidor.getIdentificadorLot() == null || lotProveidor.getIdentificadorLot().isBlank()) {
-            throw new RuntimeException("L'identificador del lot és obligatori.");
+            throw new RuntimeException(missatge("service.albaraProveidor.identificadorLotObligatori"));
         }
 
         if (lotProveidor.getMateriaPrimera() == null || lotProveidor.getMateriaPrimera().getId() == null) {
-            throw new RuntimeException("La matèria primera és obligatòria.");
+            throw new RuntimeException(missatge("service.albaraProveidor.materiaObligatoria"));
         }
 
         if (lotProveidor.getQuantitat() == null) {
-            throw new RuntimeException("La quantitat és obligatòria.");
+            throw new RuntimeException(missatge("service.albaraProveidor.quantitatObligatoria"));
         }
 
         if (lotProveidor.getQuantitat() <= 0) {
-            throw new RuntimeException("La quantitat ha de ser superior a zero.");
+            throw new RuntimeException(missatge("service.albaraProveidor.quantitatPositiva"));
         }
 
         lotProveidor.setUnitats(unitatMesuraService.normalitzarNom(lotProveidor.getUnitats()));
 
         if (lotProveidor.getUnitats() == null || lotProveidor.getUnitats().isBlank()) {
-            throw new RuntimeException("Les unitats són obligatòries.");
+            throw new RuntimeException(missatge("service.albaraProveidor.unitatsObligatories"));
         }
 
         if (!unitatMesuraService.existsByNom(lotProveidor.getUnitats())) {
-            throw new RuntimeException("La unitat de mesura seleccionada no existeix.");
+            throw new RuntimeException(missatge("service.albaraProveidor.unitatNoExisteix"));
         }
     }
 
@@ -824,7 +829,7 @@ public class AlbaraProveidorService {
         }
         catch (IOException e) {
             LOGGER.error("No s'ha pogut guardar el fitxer de l'albarà.", e);
-            throw new RuntimeException("No s'ha pogut guardar el fitxer de l'albarà.");
+            throw new RuntimeException(missatge("service.albaraProveidor.guardarFitxer"));
         }
     }
 
@@ -855,7 +860,7 @@ public class AlbaraProveidorService {
         }
         catch (IOException e) {
             LOGGER.error("No s'ha pogut guardar el document OCR de l'albarà.", e);
-            throw new RuntimeException("No s'ha pogut guardar el document OCR de l'albarà.");
+            throw new RuntimeException(missatge("service.albaraProveidor.guardarDocumentOcr"));
         }
     }
 
@@ -893,4 +898,9 @@ public class AlbaraProveidorService {
 
         return extensio;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

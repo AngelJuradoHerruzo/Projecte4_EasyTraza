@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +30,16 @@ public class AlbaraClientService {
     private final AlbaraClientRepository albaraClientRepository;
     private final LotProveidorRepository lotProveidorRepository;
     private final UsuariRepository usuariRepository;
+    private final MessageSource messageSource;
 
     public AlbaraClientService(AlbaraClientRepository albaraClientRepository,
                                LotProveidorRepository lotProveidorRepository,
-                               UsuariRepository usuariRepository) {
+                               UsuariRepository usuariRepository,
+                               MessageSource messageSource) {
         this.albaraClientRepository = albaraClientRepository;
         this.lotProveidorRepository = lotProveidorRepository;
         this.usuariRepository = usuariRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -145,7 +150,7 @@ public class AlbaraClientService {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
         if (albaraClientOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de client no trobat.");
+            throw new RuntimeException(missatge("service.albaraClient.noTrobat"));
         }
 
         AlbaraClient albaraClientActual = albaraClientOpt.get();
@@ -179,7 +184,7 @@ public class AlbaraClientService {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
         if (albaraClientOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de client no trobat.");
+            throw new RuntimeException(missatge("service.albaraClient.noTrobat"));
         }
 
         validarAlbaraClientModificable(albaraClientOpt.get());
@@ -194,7 +199,7 @@ public class AlbaraClientService {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
         if (albaraClientOpt.isEmpty()) {
-            throw new RuntimeException("Albarà de client no trobat.");
+            throw new RuntimeException(missatge("service.albaraClient.noTrobat"));
         }
 
         AlbaraClient albaraClientActual = albaraClientOpt.get();
@@ -211,15 +216,15 @@ public class AlbaraClientService {
     private void validarDadesAlbaraClient(AlbaraClient albaraClient) {
 
         if (albaraClient.getDataAlbara() == null) {
-            throw new RuntimeException("La data i hora de l'albarà són obligatòries.");
+            throw new RuntimeException(missatge("service.albaraClient.dataHoraObligatoria"));
         }
 
         if (albaraClient.getClient() == null || albaraClient.getClient().getId() == null) {
-            throw new RuntimeException("El client és obligatori.");
+            throw new RuntimeException(missatge("service.albaraClient.clientObligatori"));
         }
 
         if (albaraClient.getLiniesProduccio() == null || albaraClient.getLiniesProduccio().isEmpty()) {
-            throw new RuntimeException("L'albarà ha de tenir com a mínim una línia de producció.");
+            throw new RuntimeException(missatge("service.albaraClient.liniaMinima"));
         }
     }
 
@@ -228,26 +233,26 @@ public class AlbaraClientService {
     private void validarDadesLiniaProduccio(LiniaProduccio liniaProduccio) {
 
         if (liniaProduccio.getProducte() == null || liniaProduccio.getProducte().getId() == null) {
-            throw new RuntimeException("El producte és obligatori a totes les línies.");
+            throw new RuntimeException(missatge("service.albaraClient.producteObligatori"));
         }
 
         if (liniaProduccio.getQuantitat() == null) {
-            throw new RuntimeException("La quantitat és obligatòria a totes les línies.");
+            throw new RuntimeException(missatge("service.albaraClient.quantitatObligatoria"));
         }
 
         if (liniaProduccio.getQuantitat() <= 0) {
-            throw new RuntimeException("La quantitat ha de ser superior a zero.");
+            throw new RuntimeException(missatge("service.albaraClient.quantitatPositiva"));
         }
 
         if (liniaProduccio.getOperari() == null || liniaProduccio.getOperari().getId() == null) {
-            throw new RuntimeException("L'operari és obligatori a totes les línies.");
+            throw new RuntimeException(missatge("service.albaraClient.operariObligatori"));
         }
 
         Usuari operari = usuariRepository.findById(liniaProduccio.getOperari().getId())
                 .orElseThrow(() -> new RuntimeException("L'operari seleccionat no existeix."));
 
         if (operari.getRolUsuari() != RolUsuari.OPERARI) {
-            throw new RuntimeException("L'usuari seleccionat a la línia ha de tenir rol OPERARI.");
+            throw new RuntimeException(missatge("service.albaraClient.rolOperari"));
         }
 
         liniaProduccio.setOperari(operari);
@@ -274,7 +279,7 @@ public class AlbaraClientService {
                 }
 
                 if (producteActualId.equals(liniaComparada.getProducte().getId())) {
-                    throw new RuntimeException("No es pot repetir el mateix producte dins d'un albarà.");
+                    throw new RuntimeException(missatge("service.albaraClient.producteRepetit"));
                 }
             }
         }
@@ -285,7 +290,7 @@ public class AlbaraClientService {
     private void validarAlbaraClientModificable(AlbaraClient albaraClient) {
 
         if (albaraClient.getEstat() == EstatAlbaraClient.LLIURAT) {
-            throw new RuntimeException("No es pot modificar ni eliminar un albarà de client lliurat.");
+            throw new RuntimeException(missatge("service.albaraClient.lliuratNoModificable"));
         }
     }
 
@@ -346,4 +351,9 @@ public class AlbaraClientService {
     private LocalDateTime dataHoraActual() {
         return LocalDateTime.now().withSecond(0).withNano(0);
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +23,14 @@ public class LotProveidorService {
     // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
     private final LotProveidorRepository lotProveidorRepository;
     private final MateriaPrimeraRepository materiaPrimeraRepository;
+    private final MessageSource messageSource;
 
     public LotProveidorService(LotProveidorRepository lotProveidorRepository,
-                               MateriaPrimeraRepository materiaPrimeraRepository) {
+                               MateriaPrimeraRepository materiaPrimeraRepository,
+                               MessageSource messageSource) {
         this.lotProveidorRepository = lotProveidorRepository;
         this.materiaPrimeraRepository = materiaPrimeraRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -114,7 +119,7 @@ public class LotProveidorService {
 
         if (lotObertOpt.isPresent()) {
             if (!confirmarFinalitzacioAnterior) {
-                throw new RuntimeException("Ja hi ha un lot obert per aquesta matèria primera.");
+                throw new RuntimeException(missatge("service.lot.duplicatObert"));
             }
 
             LotProveidor lotObertAnterior = lotObertOpt.get();
@@ -150,7 +155,7 @@ public class LotProveidorService {
         Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
 
         if (lotProveidorOpt.isEmpty()) {
-            throw new RuntimeException("Lot no trobat.");
+            throw new RuntimeException(missatge("service.lot.noTrobat"));
         }
 
         return lotProveidorOpt.get();
@@ -161,15 +166,15 @@ public class LotProveidorService {
     private void validarLotPerIniciar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getMateriaPrimera() == null) {
-            throw new RuntimeException("La matèria primera del lot és obligatòria.");
+            throw new RuntimeException(missatge("service.lot.materiaObligatoria"));
         }
 
         if (lotProveidor.getEstat() == null) {
-            throw new RuntimeException("L'estat del lot és obligatori.");
+            throw new RuntimeException(missatge("service.lot.estatObligatori"));
         }
 
         if (lotProveidor.getEstat() != EstatLot.EN_ESTOC) {
-            throw new RuntimeException("Només es poden iniciar lots en estoc.");
+            throw new RuntimeException(missatge("service.lot.iniciarEstoc"));
         }
     }
 
@@ -178,11 +183,11 @@ public class LotProveidorService {
     private void validarLotPerFinalitzar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getEstat() == null) {
-            throw new RuntimeException("L'estat del lot és obligatori.");
+            throw new RuntimeException(missatge("service.lot.estatObligatori"));
         }
 
         if (lotProveidor.getEstat() != EstatLot.OBERT) {
-            throw new RuntimeException("Només es poden finalitzar lots oberts.");
+            throw new RuntimeException(missatge("service.lot.finalitzarObert"));
         }
     }
 
@@ -200,4 +205,9 @@ public class LotProveidorService {
 
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

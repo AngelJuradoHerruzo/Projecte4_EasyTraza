@@ -28,6 +28,8 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +46,7 @@ public class OcrAlbaraProveidorService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrAlbaraProveidorService.class);
 
     private final List<OcrParserProveidor> parsers;
+    private final MessageSource messageSource;
 
     @Value("${ocr.tessdata.path}")
     private String tessdataPath;
@@ -54,8 +57,9 @@ public class OcrAlbaraProveidorService {
     @Value("${ocr.documents.temp-path:backend/uploads/ocr-temp}")
     private String documentsTempPath;
 
-    public OcrAlbaraProveidorService(List<OcrParserProveidor> parsers) {
+    public OcrAlbaraProveidorService(List<OcrParserProveidor> parsers, MessageSource messageSource) {
         this.parsers = parsers;
+        this.messageSource = messageSource;
     }
 
 
@@ -147,7 +151,7 @@ public class OcrAlbaraProveidorService {
         resultat.setOcrDocumentUrlTemporal("/uploads/ocr-temp/" + documentTemporal.nomGuardat());
 
         if (proveidorDetectat == null) {
-            resultat.afegirAvis("No s'ha pogut detectar cap proveïdor suportat a partir del document OCR.");
+            resultat.afegirAvis(missatge("ocr.avis.proveidorNoDetectat"));
         }
 
         return resultat;
@@ -771,7 +775,7 @@ public class OcrAlbaraProveidorService {
 
         if (proveidorDetectat == null) {
             OcrAlbaraPendent pendent = new OcrAlbaraPendent();
-            pendent.afegirAvis("Proveïdor no detectat. Revisa el document i selecciona el proveïdor manualment.");
+            pendent.afegirAvis(missatge("ocr.avis.proveidorManual"));
             pendent.setDataAlbara(OcrUtils.extreurePrimeraDataNormalitzada(textOcrNormalitzat));
 
             return pendent;
@@ -793,7 +797,7 @@ public class OcrAlbaraProveidorService {
         pendent.setProveidorDetectat(proveidorDetectat.getNomVisible());
         pendent.setProveidorCifDetectat(proveidorDetectat.getCifHabitual());
         pendent.setDataAlbara(OcrUtils.extreurePrimeraDataNormalitzada(textOcrNormalitzat));
-        pendent.afegirAvis("No s'ha trobat cap parser OCR configurat per a " + proveidorDetectat.getNomVisible() + ".");
+        pendent.afegirAvis(missatge("ocr.avis.parserNoTrobat", proveidorDetectat.getNomVisible()));
 
         return pendent;
     }
@@ -838,4 +842,9 @@ public class OcrAlbaraProveidorService {
             Path ruta
     ) {
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

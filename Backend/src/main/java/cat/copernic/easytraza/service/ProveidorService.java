@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +19,11 @@ public class ProveidorService {
 
     // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
     private final ProveidorRepository proveidorRepository;
+    private final MessageSource messageSource;
 
-    public ProveidorService(ProveidorRepository proveidorRepository) {
+    public ProveidorService(ProveidorRepository proveidorRepository, MessageSource messageSource) {
         this.proveidorRepository = proveidorRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -64,7 +68,7 @@ public class ProveidorService {
 
         Optional<Proveidor> proveidorExistent = proveidorRepository.findByCif(proveidor.getCif());
         if (proveidorExistent.isPresent()) {
-            throw new RuntimeException("Ja existeix un proveïdor amb aquest CIF o DNI.");
+            throw new RuntimeException(missatge("service.proveidor.cifDuplicat"));
         }
 
         return proveidorRepository.save(proveidor);
@@ -124,23 +128,23 @@ public class ProveidorService {
         }
 
         if (proveidor.getCif() == null || proveidor.getCif().isBlank()) {
-            throw new RuntimeException("El CIF o DNI és obligatori.");
+            throw new RuntimeException(missatge("service.proveidor.cifObligatori"));
         }
 
         if (!esCifNifValid(proveidor.getCif())) {
-            throw new RuntimeException("El CIF o DNI no és correcte.");
+            throw new RuntimeException(missatge("service.proveidor.cifIncorrecte"));
         }
 
         if (proveidor.getNomProveidor() == null || proveidor.getNomProveidor().isBlank()) {
-            throw new RuntimeException("El nom del proveïdor és obligatori.");
+            throw new RuntimeException(missatge("service.proveidor.nomObligatori"));
         }
 
         if (proveidor.getAdreca() == null || proveidor.getAdreca().isBlank()) {
-            throw new RuntimeException("L'adreça del proveïdor és obligatòria.");
+            throw new RuntimeException(missatge("service.proveidor.adrecaObligatoria"));
         }
 
         if (proveidor.getDescripcio() != null && proveidor.getDescripcio().length() > 50) {
-            throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
+            throw new RuntimeException(missatge("service.proveidor.descripcioMax"));
         }
     }
 
@@ -296,4 +300,9 @@ public class ProveidorService {
         // Si no encaixa ni amb DNI ni amb CIF → no vàlid
         return false;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

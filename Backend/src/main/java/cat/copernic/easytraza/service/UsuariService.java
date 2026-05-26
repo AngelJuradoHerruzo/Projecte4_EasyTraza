@@ -11,6 +11,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,10 +39,12 @@ public class UsuariService {
     // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
     private final UsuariRepository usuariRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
-    public UsuariService(UsuariRepository usuariRepository, PasswordEncoder passwordEncoder) {
+    public UsuariService(UsuariRepository usuariRepository, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.usuariRepository = usuariRepository;
         this.passwordEncoder = passwordEncoder;
+        this.messageSource = messageSource;
     }
 
 
@@ -110,7 +114,7 @@ public class UsuariService {
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
 
         if (usuariOpt.isEmpty()) {
-            throw new RuntimeException("Usuari no trobat");
+            throw new RuntimeException(missatge("service.usuari.noTrobat"));
         }
 
         Usuari usuariActual = usuariOpt.get();
@@ -147,7 +151,7 @@ public class UsuariService {
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
 
         if (usuariOpt.isEmpty()) {
-            throw new RuntimeException("Usuari no trobat");
+            throw new RuntimeException(missatge("service.usuari.noTrobat"));
         }
 
         Usuari usuariActual = usuariOpt.get();
@@ -200,49 +204,49 @@ public class UsuariService {
         }
 
         if (usuari.getDni() == null || usuari.getDni().isBlank()) {
-            throw new RuntimeException("El DNI és obligatori");
+            throw new RuntimeException(missatge("service.usuari.dniObligatori"));
         }
 
         if (!usuari.getDni().matches("\\d{8}[A-Z]")) {
-            throw new RuntimeException("El DNI ha de tenir el format 12345678A");
+            throw new RuntimeException(missatge("service.usuari.dniFormat"));
         }
 
         Optional<Usuari> usuariAmbMateixDni = usuariRepository.findByDni(usuari.getDni());
 
         if (usuariAmbMateixDni.isPresent()
                 && (id == null || !usuariAmbMateixDni.get().getId().equals(id))) {
-            throw new RuntimeException("Aquest DNI ja està en ús");
+            throw new RuntimeException(missatge("service.usuari.dniUs"));
         }
 
         if (usuari.getNomComplet() == null || usuari.getNomComplet().isBlank()) {
-            throw new RuntimeException("El nom complet és obligatori");
+            throw new RuntimeException(missatge("service.usuari.nomObligatori"));
         }
 
         if (!usuari.getNomComplet().matches("^[A-Za-zÀ-ÿ]+(?:\\s+[A-Za-zÀ-ÿ]+)+$")) {
-            throw new RuntimeException("El nom complet ha d'incloure nom i almenys un cognom");
+            throw new RuntimeException(missatge("service.usuari.nomCognom"));
         }
 
         if (usuari.getEmail() == null || usuari.getEmail().isBlank()) {
-            throw new RuntimeException("El correu electrònic és obligatori");
+            throw new RuntimeException(missatge("service.usuari.emailObligatori"));
         }
 
         if (!usuari.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new RuntimeException("El format del correu és incorrecte");
+            throw new RuntimeException(missatge("service.usuari.emailFormat"));
         }
 
         if (usuari.getRolUsuari() == null) {
-            throw new RuntimeException("El rol és obligatori");
+            throw new RuntimeException(missatge("service.usuari.rolObligatori"));
         }
 
         if (id == null && (usuari.getPassword() == null || usuari.getPassword().trim().isEmpty())) {
-            throw new RuntimeException("La contrasenya és obligatòria");
+            throw new RuntimeException(missatge("service.usuari.passwordObligatoria"));
         }
 
         Optional<Usuari> usuariAmbMateixEmail = usuariRepository.findByEmail(usuari.getEmail());
 
         if (usuariAmbMateixEmail.isPresent()
                 && (id == null || !usuariAmbMateixEmail.get().getId().equals(id))) {
-            throw new RuntimeException("El correu electrònic ja està en ús");
+            throw new RuntimeException(missatge("service.usuari.emailUs"));
         }
     }
 
@@ -254,21 +258,21 @@ public class UsuariService {
 
         if (avatarBuit) {
             if (obligatori) {
-                throw new RuntimeException("La foto o avatar és obligatori");
+                throw new RuntimeException(missatge("service.usuari.avatarObligatori"));
             }
 
             return;
         }
 
         if (avatarFile.getSize() > MIDA_MAXIMA_AVATAR) {
-            throw new RuntimeException("La foto o avatar no pot superar els 5 MB");
+            throw new RuntimeException(missatge("service.usuari.avatarMax"));
         }
 
         String tipusContingut = avatarFile.getContentType();
 
         if (tipusContingut == null
                 || !TIPUS_AVATAR_PERMESOS.contains(tipusContingut.toLowerCase(Locale.ROOT))) {
-            throw new RuntimeException("La foto o avatar ha de ser una imatge JPG, PNG o WEBP");
+            throw new RuntimeException(missatge("service.usuari.avatarTipus"));
         }
     }
 
@@ -282,7 +286,7 @@ public class UsuariService {
         }
         catch (IOException e) {
             LOGGER.error("No s'ha pogut guardar la foto o avatar.", e);
-            throw new RuntimeException("No s'ha pogut guardar la foto o avatar");
+            throw new RuntimeException(missatge("service.usuari.avatarGuardar"));
         }
     }
 
@@ -356,4 +360,9 @@ public class UsuariService {
 
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +19,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OcrTalComPintaService implements OcrParserProveidor {
+
+    private final MessageSource messageSource;
+
+    public OcrTalComPintaService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     private static final Pattern PATRON_NUMERO_ENTREGA = Pattern.compile(
             "\\b([0-9OIL]{6,10})\\b",
@@ -424,34 +432,39 @@ public class OcrTalComPintaService implements OcrParserProveidor {
 
     private void afegirAvisosLinia(OcrLiniaDto linia) {
         if (linia.getMateriaPrimeraDetectada() == null || linia.getMateriaPrimeraDetectada().isBlank()) {
-            linia.afegirAvis("No s'ha pogut detectar la matèria primera.");
+            linia.afegirAvis(missatge("ocr.avis.materiaNoDetectada"));
         }
 
         if (!lotValido(linia.getIdentificadorLot())) {
             linia.setIdentificadorLot("-");
-            linia.afegirAvis("No s'ha pogut detectar correctament el lot.");
+            linia.afegirAvis(missatge("ocr.avis.lotNoDetectat"));
         }
 
         if (linia.getQuantitat() == null || linia.getQuantitat() <= 0) {
-            linia.afegirAvis("No s'ha pogut detectar correctament la quantitat.");
+            linia.afegirAvis(missatge("ocr.avis.quantitatNoDetectada"));
         }
     }
 
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar el número d'albarà de TAL COM PINTA.");
+            resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "TAL COM PINTA"));
         }
 
         if (resultat.getDataAlbara() == null || resultat.getDataAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar la data de l'albarà de TAL COM PINTA.");
+            resultat.afegirAvis(missatge("ocr.avis.dataAlbaraNoDetectada", "TAL COM PINTA"));
         }
 
         if (resultat.getLinies() == null || resultat.getLinies().isEmpty()) {
-            resultat.afegirAvis("No s'ha pogut detectar cap línia de producte de TAL COM PINTA.");
+            resultat.afegirAvis(missatge("ocr.avis.capLiniaProducte", "TAL COM PINTA"));
         }
     }
 
     private <T> T obtenirValor(List<T> valors, int index) {
         return valors != null && index >= 0 && index < valors.size() ? valors.get(index) : null;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

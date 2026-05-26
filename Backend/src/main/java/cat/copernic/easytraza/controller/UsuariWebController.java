@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +24,11 @@ public class UsuariWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final UsuariService usuariService;
+    private final MessageSource messageSource;
 
-    public UsuariWebController(UsuariService usuariService) {
+    public UsuariWebController(UsuariService usuariService, MessageSource messageSource) {
         this.usuariService = usuariService;
+        this.messageSource = messageSource;
     }
 
 
@@ -102,7 +106,7 @@ public class UsuariWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'usuari s'ha creat correctament."
+                missatge("usuaris.missatge.creat")
             );
 
             return "redirect:/usuaris/list";
@@ -144,7 +148,7 @@ public class UsuariWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'usuari s'ha actualitzat correctament."
+                missatge("usuaris.missatge.actualitzat")
             );
 
             return "redirect:/usuaris/list";
@@ -180,17 +184,22 @@ public class UsuariWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'usuari s'ha eliminat correctament."
+                missatge("usuaris.missatge.eliminat")
             );
         }
         catch (RuntimeException e) {
             LOGGER.warn("No s'ha pogut eliminar l'usuari amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute(
                 "error",
-                "No es pot eliminar l'usuari perquè està relacionat amb altres dades."
+                missatge("usuaris.error.eliminarRelacionat")
             );
         }
 
         return "redirect:/usuaris/list";
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

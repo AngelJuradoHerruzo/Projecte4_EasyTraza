@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +32,11 @@ public class PerfilWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final UsuariService usuariService;
+    private final MessageSource messageSource;
 
-    public PerfilWebController(UsuariService usuariService) {
+    public PerfilWebController(UsuariService usuariService, MessageSource messageSource) {
         this.usuariService = usuariService;
+        this.messageSource = messageSource;
     }
 
 
@@ -122,7 +126,7 @@ public class PerfilWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El perfil s'ha actualitzat correctament."
+                missatge("perfil.missatge.actualitzat")
             );
 
             return "redirect:/perfil";
@@ -166,4 +170,9 @@ public class PerfilWebController {
 
         return usuari;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

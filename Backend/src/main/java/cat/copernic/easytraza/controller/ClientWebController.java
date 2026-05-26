@@ -2,6 +2,8 @@ package cat.copernic.easytraza.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,11 @@ public class ClientWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final ClientService clientService;
+    private final MessageSource messageSource;
 
-    public ClientWebController(ClientService clientService) {
+    public ClientWebController(ClientService clientService, MessageSource messageSource) {
         this.clientService = clientService;
+        this.messageSource = messageSource;
     }
 
 
@@ -68,7 +72,7 @@ public class ClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El client s'ha creat correctament."
+                missatge("clients.missatge.creat")
             );
 
             return "redirect:/clients/list";
@@ -109,7 +113,7 @@ public class ClientWebController {
             if (clientActualitzat == null) {
                 redirectAttributes.addFlashAttribute(
                     "error",
-                    "No s'ha trobat el client que vols modificar."
+                    missatge("clients.error.noTrobatModificar")
                 );
 
                 return "redirect:/clients/list";
@@ -117,7 +121,7 @@ public class ClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El client s'ha actualitzat correctament."
+                missatge("clients.missatge.actualitzat")
             );
 
             return "redirect:/clients/list";
@@ -142,7 +146,7 @@ public class ClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El client s'ha eliminat correctament."
+                missatge("clients.missatge.eliminat")
             );
         }
         catch (RuntimeException e) {
@@ -152,4 +156,9 @@ public class ClientWebController {
 
         return "redirect:/clients/list";
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

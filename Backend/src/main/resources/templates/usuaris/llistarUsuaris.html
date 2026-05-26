@@ -211,7 +211,7 @@
 
                         <span class="badge-role"
                               th:classappend="${usuari.rolUsuari.name() == 'OPERARI'} ? ' operari' : ' admin'"
-                              th:text="${usuari.rolUsuari}">
+                              th:text="${usuari.rolUsuari.name() == 'ADMIN'} ? #{sidebar.rol.admin} : #{sidebar.rol.operari}">
                             OPERARI
                         </span>
 

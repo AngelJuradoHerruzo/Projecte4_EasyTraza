@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +23,14 @@ public class MateriaPrimeraService {
     // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
     private final MateriaPrimeraRepository materiaPrimeraRepository;
     private final LotProveidorRepository lotProveidorRepository;
+    private final MessageSource messageSource;
 
     public MateriaPrimeraService(MateriaPrimeraRepository materiaPrimeraRepository,
-                                 LotProveidorRepository lotProveidorRepository) {
+                                 LotProveidorRepository lotProveidorRepository,
+                                 MessageSource messageSource) {
         this.materiaPrimeraRepository = materiaPrimeraRepository;
         this.lotProveidorRepository = lotProveidorRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -108,11 +113,11 @@ public class MateriaPrimeraService {
     public void deleteMateriaPrimera(Long id) {
 
         if (!materiaPrimeraRepository.existsById(id)) {
-            throw new RuntimeException("No s'ha trobat la matèria primera que vols eliminar.");
+            throw new RuntimeException(missatge("service.materia.noTrobadaEliminar"));
         }
 
         if (lotProveidorRepository.existsByMateriaPrimeraId(id)) {
-            throw new RuntimeException("No es pot eliminar la matèria primera perquè està associada a un o més lots.");
+            throw new RuntimeException(missatge("service.materia.eliminarLots"));
         }
 
         materiaPrimeraRepository.deleteById(id);
@@ -131,18 +136,18 @@ public class MateriaPrimeraService {
         }
 
         if (materiaPrimera.getNomMateria() == null || materiaPrimera.getNomMateria().isBlank()) {
-            throw new RuntimeException("El nom de la matèria primera és obligatori.");
+            throw new RuntimeException(missatge("service.materia.nomObligatori"));
         }
 
         Optional<MateriaPrimera> materiaPrimeraExistent = materiaPrimeraRepository.findByNomMateria(materiaPrimera.getNomMateria());
 
         if (materiaPrimeraExistent.isPresent()
                 && !materiaPrimeraExistent.get().getId().equals(materiaPrimera.getId())) {
-            throw new RuntimeException("Ja existeix una matèria primera amb aquest nom.");
+            throw new RuntimeException(missatge("service.materia.nomDuplicat"));
         }
 
         if (materiaPrimera.getDescripcio() != null && materiaPrimera.getDescripcio().length() > 50) {
-            throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
+            throw new RuntimeException(missatge("service.materia.descripcioMax"));
         }
     }
 
@@ -204,4 +209,9 @@ public class MateriaPrimeraService {
 
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

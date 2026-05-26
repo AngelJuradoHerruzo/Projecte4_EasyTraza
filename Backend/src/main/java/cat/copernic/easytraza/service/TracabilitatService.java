@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,17 +40,20 @@ public class TracabilitatService {
     private final MateriaPrimeraRepository materiaPrimeraRepository;
     private final ProveidorRepository proveidorRepository;
     private final ProducteRepository producteRepository;
+    private final MessageSource messageSource;
 
     public TracabilitatService(LotProveidorRepository lotProveidorRepository,
                                AlbaraClientRepository albaraClientRepository,
                                MateriaPrimeraRepository materiaPrimeraRepository,
                                ProveidorRepository proveidorRepository,
-                               ProducteRepository producteRepository) {
+                               ProducteRepository producteRepository,
+                               MessageSource messageSource) {
         this.lotProveidorRepository = lotProveidorRepository;
         this.albaraClientRepository = albaraClientRepository;
         this.materiaPrimeraRepository = materiaPrimeraRepository;
         this.proveidorRepository = proveidorRepository;
         this.producteRepository = producteRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -190,7 +195,7 @@ public class TracabilitatService {
         Optional<LotProveidor> lotOpt = lotProveidorRepository.findById(lotId);
 
         if (lotOpt.isEmpty()) {
-            throw new RuntimeException("Lot no trobat.");
+            throw new RuntimeException(missatge("service.tracabilitat.lotNoTrobat"));
         }
 
         return lotOpt.get();
@@ -358,7 +363,7 @@ public class TracabilitatService {
     private String obtenirLabelSerie(Long producteGraficId) {
 
         if (producteGraficId == null) {
-            return "Tots els productes";
+            return missatge("tracabilitat.grafic.totsProductes");
         }
 
         Optional<Producte> producteOpt = producteRepository.findById(producteGraficId);
@@ -367,7 +372,7 @@ public class TracabilitatService {
             return producteOpt.get().getNomProducte();
         }
 
-        return "Producte seleccionat";
+        return missatge("tracabilitat.grafic.producteSeleccionat");
     }
 
 
@@ -557,4 +562,9 @@ public class TracabilitatService {
 
         return valor;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const labelsDiesMes = JSON.parse(canvas.dataset.labels || "[]");
     const dadesVendesDiaries = JSON.parse(canvas.dataset.dades || "[]");
-    const labelSerie = canvas.dataset.serie || (document.documentElement.lang === "es" ? "Todos los productos" : "Tots els productes");
+    const labelSerie = canvas.dataset.serie;
 
     new Chart(canvas, {
         type: "line",

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,6 +24,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OcrLaMetaService implements OcrParserProveidor {
+
+    private final MessageSource messageSource;
+
+    public OcrLaMetaService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     private static final Pattern PATRON_NUMERO_ALBARA = Pattern.compile(
             "\\b(AV[A-Z0-9]{5,12})\\b",
@@ -128,15 +136,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
             linia.setUnitat("SACOS");
 
             if (materia == null || materia.isBlank()) {
-                linia.afegirAvis("No s'ha pogut detectar la matèria primera.");
+                linia.afegirAvis(missatge("ocr.avis.materiaNoDetectada"));
             }
 
             if (lot == null || !OcrUtils.esLotValid(lot)) {
-                linia.afegirAvis("No s'ha pogut detectar correctament el lot.");
+                linia.afegirAvis(missatge("ocr.avis.lotNoDetectat"));
             }
 
             if (quantitat == null || quantitat <= 0) {
-                linia.afegirAvis("No s'ha pogut detectar correctament la quantitat.");
+                linia.afegirAvis(missatge("ocr.avis.quantitatNoDetectada"));
             }
 
             linies.add(linia);
@@ -302,19 +310,24 @@ public class OcrLaMetaService implements OcrParserProveidor {
 
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar el número d'albarà de LA META.");
+            resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "LA META"));
         }
 
         if (resultat.getDataAlbara() == null || resultat.getDataAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar la data de l'albarà de LA META.");
+            resultat.afegirAvis(missatge("ocr.avis.dataAlbaraNoDetectada", "LA META"));
         }
 
         if (resultat.getLinies() == null || resultat.getLinies().isEmpty()) {
-            resultat.afegirAvis("No s'ha pogut detectar cap línia de producte de LA META.");
+            resultat.afegirAvis(missatge("ocr.avis.capLiniaProducte", "LA META"));
         }
     }
 
     private <T> T obtenirValor(List<T> valors, int index) {
         return index >= 0 && index < valors.size() ? valors.get(index) : null;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

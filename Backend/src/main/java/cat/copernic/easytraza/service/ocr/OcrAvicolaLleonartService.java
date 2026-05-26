@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +19,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OcrAvicolaLleonartService implements OcrParserProveidor {
+
+    private final MessageSource messageSource;
+
+    public OcrAvicolaLleonartService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     private static final Pattern PATRON_NUMERO_ALBARA = Pattern.compile(
             "(?:NUM\\.?\\s*ALBAR[A-Z]*|ALBAR[A-Z]*)\\s*[:+\\-]?\\s*(\\d{3,12})\\b",
@@ -118,15 +126,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         linia.setIdentificadorLot(lot != null && OcrUtils.esLotValid(lot) ? lot : "-");
 
         if (materia == null || materia.isBlank()) {
-            linia.afegirAvis("No s'ha pogut detectar la matèria primera.");
+            linia.afegirAvis(missatge("ocr.avis.materiaNoDetectada"));
         }
 
         if (quantitat == null || quantitat <= 0) {
-            linia.afegirAvis("No s'ha pogut detectar correctament la quantitat.");
+            linia.afegirAvis(missatge("ocr.avis.quantitatNoDetectada"));
         }
 
         if (lot == null || !OcrUtils.esLotValid(lot)) {
-            linia.afegirAvis("No s'ha pogut detectar correctament el lot.");
+            linia.afegirAvis(missatge("ocr.avis.lotNoDetectat"));
         }
 
         linies.add(linia);
@@ -201,15 +209,20 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
 
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar el número d'albarà d'AVÍCOLA LLEONART.");
+            resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "AVÍCOLA LLEONART"));
         }
 
         if (resultat.getDataAlbara() == null || resultat.getDataAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar la data de l'albarà d'AVÍCOLA LLEONART.");
+            resultat.afegirAvis(missatge("ocr.avis.dataAlbaraNoDetectada", "AVÍCOLA LLEONART"));
         }
 
         if (resultat.getLinies() == null || resultat.getLinies().isEmpty()) {
-            resultat.afegirAvis("No s'ha pogut detectar cap línia de producte d'AVÍCOLA LLEONART.");
+            resultat.afegirAvis(missatge("ocr.avis.capLiniaProducte", "AVÍCOLA LLEONART"));
         }
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }
