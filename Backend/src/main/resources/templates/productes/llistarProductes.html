@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Productes - EasyTraza</title>
+    <title th:text="#{productes.llistat.titolPagina}">Productes - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,11 +23,11 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
 
-                <h1 class="page-heading">Productes</h1>
+                <h1 class="page-heading" th:text="#{sidebar.productes}">Productes</h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{productes.llistat.descripcioPagina}">
                     Gestiona el catàleg de productes finals disponibles per als albarans de client.
                 </p>
             </div>
@@ -35,7 +35,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/productes/new}" class="btn btn-primary">
                     <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    <span>Nou producte</span>
+                    <span th:text="#{productes.form.nou}">Nou producte</span>
                 </a>
             </div>
         </section>
@@ -59,15 +59,15 @@
 
                 <div class="products-toolbar-info">
                     <div class="products-title-row">
-                        <h2 class="section-title">Catàleg de productes</h2>
+                        <h2 class="section-title" th:text="#{productes.llistat.cataleg}">Catàleg de productes</h2>
 
                         <span class="products-counter"
-                              th:text="|${#lists.size(productes)} productes|">
+                              th:text="#{productes.llistat.comptador(${#lists.size(productes)})}">
                             0 productes
                         </span>
                     </div>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{productes.llistat.ordre}">
                         Ordenats alfabèticament pel nom del producte.
                     </p>
                 </div>
@@ -76,7 +76,7 @@
                       method="get"
                       class="products-filter">
 
-                    <label for="nomProducte" class="sr-only">
+                    <label for="nomProducte" class="sr-only" th:text="#{productes.llistat.filtrarNom}">
                         Filtrar productes per nom
                     </label>
 
@@ -88,20 +88,23 @@
                                type="text"
                                th:value="${nomProducte}"
                                placeholder="Cerca per nom..."
+                               th:placeholder="#{productes.llistat.cerca.placeholder}"
                                autocomplete="off">
                     </div>
 
                     <button type="submit"
                             class="btn btn-primary btn-icon"
-                            aria-label="Aplicar filtre de productes">
+                            aria-label="Aplicar filtre de productes"
+                            th:attr="aria-label=#{productes.llistat.aplicarFiltre}">
                         <i class="bi bi-search" aria-hidden="true"></i>
                     </button>
 
                     <a th:href="@{/productes/list}"
                        class="btn btn-secondary"
-                       aria-label="Netejar el filtre de productes">
+                       aria-label="Netejar el filtre de productes"
+                       th:attr="aria-label=#{productes.llistat.netejarFiltre}">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        <span>Netejar</span>
+                        <span th:text="#{comu.netejar}">Netejar</span>
                     </a>
                 </form>
 
@@ -120,7 +123,7 @@
                             <span th:text="${producte.id}">1</span>
                         </span>
 
-                        <span class="product-card-type">
+                        <span class="product-card-type" th:text="#{productes.llistat.tipus}">
                             Producte
                         </span>
 
@@ -141,7 +144,7 @@
                         </div>
 
                         <p class="product-card-description"
-                           th:text="${producte.descripcio != null && !#strings.isEmpty(producte.descripcio) ? producte.descripcio : 'Sense descripció registrada'}">
+                           th:text="${producte.descripcio != null && !#strings.isEmpty(producte.descripcio)} ? ${producte.descripcio} : #{productes.llistat.senseDescripcio}">
                             Descripció producte
                         </p>
 
@@ -153,18 +156,19 @@
                         <a th:href="@{/productes/edit/{id}(id=${producte.id})}"
                            class="card-action card-action-edit">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                            <span>Editar</span>
+                            <span th:text="#{comu.editar}">Editar</span>
                         </a>
 
                         <form th:action="@{/productes/delete/{id}(id=${producte.id})}"
                               method="post"
                               class="card-delete-form"
-                              onsubmit="return confirm('Segur que vols eliminar aquest producte?');">
+                              onsubmit="return confirm('Segur que vols eliminar aquest producte?');"
+                              th:onsubmit="'return confirm(\'' + #{productes.llistat.confirmarEliminar} + '\');'">
 
                             <button type="submit"
                                     class="card-action card-action-delete">
                                 <i class="bi bi-trash3" aria-hidden="true"></i>
-                                <span>Eliminar</span>
+                                <span th:text="#{comu.eliminar}">Eliminar</span>
                             </button>
 
                         </form>
@@ -180,15 +184,15 @@
                         <i class="bi bi-box-seam" aria-hidden="true"></i>
                     </div>
 
-                    <h3>No s'han trobat productes</h3>
+                    <h3 th:text="#{productes.llistat.buit.titol}">No s'han trobat productes</h3>
 
-                    <p>
+                    <p th:text="#{productes.llistat.buit.descripcio}">
                         No hi ha productes que coincideixin amb el filtre introduït.
                     </p>
 
                     <a th:href="@{/productes/list}" class="btn btn-secondary">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        <span>Veure tots els productes</span>
+                        <span th:text="#{productes.llistat.veureTots}">Veure tots els productes</span>
                     </a>
 
                 </div>

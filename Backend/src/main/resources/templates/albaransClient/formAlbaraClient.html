@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Formulari albarà client - EasyTraza</title>
+    <title th:text="#{albaransClient.form.titol}">Formulari albarà client - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,14 +23,14 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Lliuraments · Albarans client</p>
+                <p class="page-eyebrow" th:text="#{albaransClient.eyebrow}">Lliuraments · Albarans client</p>
 
                 <h1 class="page-heading"
-                    th:text="${albaraClient.id != null} ? 'Editar albarà de client' : 'Nou albarà de client'">
-                    Formulari albarà
+                    th:text="${albaraClient.id != null} ? #{albaransClient.form.editar} : #{albaransClient.form.nou}">
+                    <span th:text="#{albaransClient.form.heading}">Formulari albarà</span>
                 </h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{albaransClient.form.desc}">
                     Registra el client, la data i hora del lliurament i l'operari de cada línia.
                 </p>
             </div>
@@ -38,7 +38,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
             </div>
         </section>
@@ -53,8 +53,8 @@
                 </div>
 
                 <div>
-                    <h2 class="section-title">Dades de l'albarà</h2>
-                    <p class="section-subtitle">Les línies queden associades als lots oberts del moment del registre.</p>
+                    <h2 class="section-title" th:text="#{albaransClient.form.dades}">Dades de l'albarà</h2>
+                    <p class="section-subtitle" th:text="#{albaransClient.form.sub}">Les línies queden associades als lots oberts del moment del registre.</p>
                 </div>
 
                 <span th:if="${albaraClient.id != null}"
@@ -82,15 +82,15 @@
                 <!----------------------- DADES GENERALS ----------------------->
                 <section class="delivery-form-block">
                     <div class="delivery-block-header">
-                        <h3>Dades generals</h3>
-                        <p>Informació principal del lliurament.</p>
+                        <h3 th:text="#{comu.dadesGenerals}">Dades generals</h3>
+                        <p th:text="#{albaransClient.form.dadesDesc}">Informació principal del lliurament.</p>
                     </div>
 
                     <div class="delivery-general-grid">
 
                         <div class="form-group">
                             <label class="form-label" for="dataAlbara">
-                                Data i hora
+                                <span th:text="#{comu.dataHora}">Data i hora</span>
                                 <span class="required-mark">*</span>
                             </label>
 
@@ -106,7 +106,7 @@
 
                         <div class="form-group">
                             <label class="form-label" for="client">
-                                Client
+                                <span th:text="#{comu.client}">Client</span>
                                 <span class="required-mark">*</span>
                             </label>
 
@@ -116,11 +116,11 @@
                                         th:field="*{client.id}"
                                         class="form-select form-select-with-icon"
                                         required>
-                                    <option value="">-- Selecciona client --</option>
+                                    <option value="" th:text="#{albaransClient.form.seleccionaClient}">-- Selecciona client --</option>
                                     <option th:each="client : ${clients}"
                                             th:value="${client.id}"
                                             th:text="${client.nomComplet}">
-                                        Client
+                                        <span th:text="#{comu.client}">Client</span>
                                     </option>
                                 </select>
                             </div>
@@ -133,13 +133,13 @@
                 <section class="delivery-form-block production-lines-block">
                     <div class="delivery-lines-header">
                         <div class="delivery-block-header">
-                            <h3>Línies de producció</h3>
-                            <p>Assigna el producte, l'operari responsable i la quantitat lliurada.</p>
+                            <h3 th:text="#{albaransClient.liniesProduccio}">Línies de producció</h3>
+                            <p th:text="#{albaransClient.form.liniesDesc}">Assigna el producte, l'operari responsable i la quantitat lliurada.</p>
                         </div>
 
                         <button type="button" id="addLiniaBtn" class="btn btn-primary">
                             <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                            <span>Afegir línia</span>
+                            <span th:text="#{albaransClient.form.afegirLinia}">Afegir línia</span>
                         </button>
                     </div>
 
@@ -151,40 +151,40 @@
                             <input type="hidden" th:field="*{liniesProduccio[__${stat.index}__].id}">
 
                             <div class="linia-number">
-                                <span class="linia-number-label">Línia</span>
+                                <span class="linia-number-label" th:text="#{albaransClient.form.linia}">Línia</span>
                                 <span class="linia-number-value" th:text="${stat.count}">1</span>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Producte <span class="required-mark">*</span></label>
+                                <label class="form-label"><span th:text="#{comu.producte}">Producte</span> <span class="required-mark">*</span></label>
                                 <select th:field="*{liniesProduccio[__${stat.index}__].producte.id}"
                                         class="form-select producteInput"
                                         required>
-                                    <option value="">-- Selecciona producte --</option>
+                                    <option value="" th:text="#{albaransClient.form.seleccionaProducte}">-- Selecciona producte --</option>
                                     <option th:each="producte : ${productes}"
                                             th:value="${producte.id}"
                                             th:text="${producte.nomProducte}">
-                                        Producte
+                                        <span th:text="#{comu.producte}">Producte</span>
                                     </option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Operari <span class="required-mark">*</span></label>
+                                <label class="form-label"><span th:text="#{comu.operari}">Operari</span> <span class="required-mark">*</span></label>
                                 <select th:field="*{liniesProduccio[__${stat.index}__].operari.id}"
                                         class="form-select operariInput"
                                         required>
-                                    <option value="">-- Selecciona operari --</option>
+                                    <option value="" th:text="#{albaransClient.form.seleccionaOperari}">-- Selecciona operari --</option>
                                     <option th:each="operari : ${operaris}"
                                             th:value="${operari.id}"
                                             th:text="${operari.nomComplet}">
-                                        Operari
+                                        <span th:text="#{comu.operari}">Operari</span>
                                     </option>
                                 </select>
                             </div>
 
                             <div class="form-group quantity-field">
-                                <label class="form-label">Quantitat <span class="required-mark">*</span></label>
+                                <label class="form-label"><span th:text="#{comu.quantitat}">Quantitat</span> <span class="required-mark">*</span></label>
                                 <input type="number"
                                        th:field="*{liniesProduccio[__${stat.index}__].quantitat}"
                                        class="form-input quantitatInput"
@@ -195,7 +195,7 @@
 
                             <button type="button"
                                     class="remove-linia-btn"
-                                    aria-label="Eliminar línia de producció">
+                                    aria-label="Eliminar línia de producció" th:attr="aria-label=#{albaransClient.form.eliminarLinia}">
                                 <i class="bi bi-trash3" aria-hidden="true"></i>
                             </button>
 
@@ -208,12 +208,12 @@
                 <div class="delivery-form-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        <span th:text="${albaraClient.id != null} ? 'Guardar canvis' : 'Crear albarà'">Guardar</span>
+                        <span th:text="${albaraClient.id != null} ? #{comu.guardarCanvis} : #{albaransClient.form.crear}">Guardar</span>
                     </button>
 
                     <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </a>
                 </div>
 

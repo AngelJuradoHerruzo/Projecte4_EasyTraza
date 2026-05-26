@@ -43,7 +43,7 @@ if (btnEscanejarOcr) {
     btnEscanejarOcr.addEventListener('click', function () {
         setTimeout(() => {
             btnEscanejarOcr.disabled = true;
-            btnEscanejarOcr.innerHTML = '<i class="bi bi-hourglass-split"></i> Escanejant...';
+            btnEscanejarOcr.innerHTML = '<i class="bi bi-hourglass-split"></i> ' + btnEscanejarOcr.dataset.scanning;
         }, 0);
     });
 }
@@ -64,7 +64,7 @@ function mostrarDocumentSeleccionat(input) {
 
     if (!esImatge && !esPdf) {
         input.value = '';
-        alert('El fitxer seleccionat ha de ser una imatge o un PDF.');
+        alert(btnEscanejarOcr ? btnEscanejarOcr.dataset.invalidFile : '');
         restaurarVistaPreviaOriginal();
         return;
     }

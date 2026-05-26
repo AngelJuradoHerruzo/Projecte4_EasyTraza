@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Usuaris - EasyTraza</title>
+    <title th:text="#{usuaris.llistat.titolPagina}">Usuaris - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,11 +23,11 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
 
-                <h1 class="page-heading">Usuaris</h1>
+                <h1 class="page-heading" th:text="#{sidebar.usuaris}">Usuaris</h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{usuaris.llistat.descripcioPagina}">
                     Gestiona els administradors i operaris registrats al sistema EasyTraza.
                 </p>
             </div>
@@ -35,7 +35,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/usuaris/new}" class="btn btn-primary">
                     <i class="bi bi-person-plus" aria-hidden="true"></i>
-                    <span>Nou usuari</span>
+                    <span th:text="#{usuaris.form.nou}">Nou usuari</span>
                 </a>
             </div>
         </section>
@@ -59,15 +59,15 @@
 
                 <div class="users-toolbar-info">
                     <div class="users-title-row">
-                        <h2 class="section-title">Llistat d'usuaris</h2>
+                        <h2 class="section-title" th:text="#{usuaris.llistat.titol}">Llistat d'usuaris</h2>
 
                         <span class="users-counter"
-                              th:text="|${#lists.size(usuaris)} usuaris|">
+                              th:text="#{usuaris.llistat.comptador(${#lists.size(usuaris)})}">
                             0 usuaris
                         </span>
                     </div>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{usuaris.llistat.filtraOrdena}">
                         Filtra i ordena els usuaris pels camps visibles del llistat.
                     </p>
                 </div>
@@ -78,7 +78,7 @@
 
                     <div class="users-order-row">
 
-                        <label for="dni" class="sr-only">
+                        <label for="dni" class="sr-only" th:text="#{usuaris.llistat.filtrarDni}">
                             Filtrar usuaris per DNI
                         </label>
 
@@ -93,7 +93,7 @@
                                    autocomplete="off">
                         </div>
 
-                        <label for="nomComplet" class="sr-only">
+                        <label for="nomComplet" class="sr-only" th:text="#{usuaris.llistat.filtrarNom}">
                             Filtrar usuaris per nom complet
                         </label>
 
@@ -105,10 +105,11 @@
                                    type="text"
                                    th:value="${nomComplet}"
                                    placeholder="Nom complet..."
+                                   th:placeholder="#{usuaris.llistat.nom.placeholder}"
                                    autocomplete="off">
                         </div>
 
-                        <label for="email" class="sr-only">
+                        <label for="email" class="sr-only" th:text="#{usuaris.llistat.filtrarEmail}">
                             Filtrar usuaris per correu electrònic
                         </label>
 
@@ -120,15 +121,17 @@
                                    type="text"
                                    th:value="${email}"
                                    placeholder="Correu electrònic..."
+                                   th:placeholder="#{usuaris.llistat.email.placeholder}"
                                    autocomplete="off">
                         </div>
 
                         <div class="order-field">
-                            <label for="ordre">Ordenar per</label>
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
 
                             <select id="ordre" name="ordre" class="form-select">
                                 <option value="nomComplet"
-                                        th:selected="${ordre == 'nomComplet'}">
+                                        th:selected="${ordre == 'nomComplet'}"
+                                        th:text="#{usuaris.form.nomComplet}">
                                     Nom complet
                                 </option>
 
@@ -143,28 +146,32 @@
                                 </option>
 
                                 <option value="rolUsuari"
-                                        th:selected="${ordre == 'rolUsuari'}">
+                                        th:selected="${ordre == 'rolUsuari'}"
+                                        th:text="#{usuaris.form.rol}">
                                     Rol
                                 </option>
 
                                 <option value="email"
-                                        th:selected="${ordre == 'email'}">
+                                        th:selected="${ordre == 'email'}"
+                                        th:text="#{usuaris.form.email}">
                                     Correu electrònic
                                 </option>
                             </select>
                         </div>
 
                         <div class="order-field order-direction-field">
-                            <label for="direccio">Direcció</label>
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
 
                             <select id="direccio" name="direccio" class="form-select">
                                 <option value="asc"
-                                        th:selected="${direccio == 'asc'}">
+                                        th:selected="${direccio == 'asc'}"
+                                        th:text="#{comu.ascendent}">
                                     Ascendent
                                 </option>
 
                                 <option value="desc"
-                                        th:selected="${direccio == 'desc'}">
+                                        th:selected="${direccio == 'desc'}"
+                                        th:text="#{comu.descendent}">
                                     Descendent
                                 </option>
                             </select>
@@ -172,14 +179,15 @@
 
                         <button type="submit"
                                 class="btn btn-primary btn-icon"
-                                aria-label="Aplicar filtres i ordenació d'usuaris">
+                                aria-label="Aplicar filtres i ordenació d'usuaris"
+                                th:attr="aria-label=#{usuaris.llistat.aplicarFiltres}">
                             <i class="bi bi-search" aria-hidden="true"></i>
                         </button>
 
                         <a th:href="@{/usuaris/list}"
                            class="btn btn-secondary">
                             <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                            <span>Netejar</span>
+                            <span th:text="#{comu.netejar}">Netejar</span>
                         </a>
 
                     </div>
@@ -218,7 +226,7 @@
 
                                 <img th:if="${usuari.avatar != null}"
                                      th:src="@{/usuaris/avatar/{id}(id=${usuari.id})}"
-                                     th:alt="|Avatar de ${usuari.nomComplet}|">
+                                     th:alt="#{sidebar.avatar(${usuari.nomComplet})}">
 
                                 <i th:unless="${usuari.avatar != null}"
                                    class="bi bi-person-fill"
@@ -243,7 +251,7 @@
                         <div class="user-card-data">
 
                             <div class="user-data-item">
-                                <span class="user-data-label">Correu electrònic</span>
+                                <span class="user-data-label" th:text="#{usuaris.form.email}">Correu electrònic</span>
 
                                 <span class="user-data-value"
                                       th:text="${usuari.email}">
@@ -261,14 +269,15 @@
                         <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}"
                            class="card-action card-action-edit">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                            <span>Editar</span>
+                            <span th:text="#{comu.editar}">Editar</span>
                         </a>
 
                         <a th:href="@{/usuaris/delete/{id}(id=${usuari.id})}"
                            class="card-action card-action-delete"
-                           onclick="return confirm('Segur que vols eliminar aquest usuari?');">
+                           onclick="return confirm('Segur que vols eliminar aquest usuari?');"
+                           th:onclick="'return confirm(\'' + #{usuaris.llistat.confirmarEliminar} + '\');'">
                             <i class="bi bi-trash3" aria-hidden="true"></i>
-                            <span>Eliminar</span>
+                            <span th:text="#{comu.eliminar}">Eliminar</span>
                         </a>
 
                     </footer>
@@ -282,15 +291,15 @@
                         <i class="bi bi-people" aria-hidden="true"></i>
                     </div>
 
-                    <h3>No s'han trobat usuaris</h3>
+                    <h3 th:text="#{usuaris.llistat.buit.titol}">No s'han trobat usuaris</h3>
 
-                    <p>
+                    <p th:text="#{usuaris.llistat.buit.descripcio}">
                         No hi ha usuaris que coincideixin amb els filtres seleccionats.
                     </p>
 
                     <a th:href="@{/usuaris/list}" class="btn btn-secondary">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        <span>Veure tots els usuaris</span>
+                        <span th:text="#{usuaris.llistat.veureTots}">Veure tots els usuaris</span>
                     </a>
 
                 </div>

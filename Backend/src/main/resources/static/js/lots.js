@@ -66,9 +66,9 @@ if (modal) {
 if (conflictAction && conflictLot) {
     obrirModal(
         conflictAction.value,
-        'Finalitzar lot obert',
-        'Ja hi ha un lot obert per aquesta matèria primera. Si continues, es finalitzarà el lot anterior i s’iniciarà el lot ' + conflictLot.value + '.',
-        'Confirmar inici',
+        modal.dataset.conflictTitle,
+        modal.dataset.conflictBefore + conflictLot.value + modal.dataset.conflictAfter,
+        modal.dataset.conflictButton,
         'bi-exclamation-triangle'
     );
 }

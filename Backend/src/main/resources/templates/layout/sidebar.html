@@ -6,12 +6,12 @@
 
     <div class="sidebar-brand">
         <div class="sidebar-logo-box">
-            <img th:src="@{/img/Logo_EasyTraza.jpg}" alt="Logo EasyTraza" class="sidebar-logo">
+            <img th:src="@{/img/Logo_EasyTraza.jpg}" alt="Logo EasyTraza" th:alt="#{comu.logo.alt}" class="sidebar-logo">
         </div>
 
         <div class="sidebar-brand-text">
             <h1>EasyTraza</h1>
-            <p>Panaderia · Gestió web</p>
+            <p th:text="#{sidebar.subtitol}">Panaderia · Gestió web</p>
         </div>
     </div>
 
@@ -19,7 +19,8 @@
 
         <!----------------------- ADMINISTRACIÓ: NOMÉS ADMIN ----------------------->
         <p th:if="${session.usuariRol != null && session.usuariRol.name() == 'ADMIN'}"
-           class="sidebar-section">
+           class="sidebar-section"
+           th:text="#{sidebar.administracio}">
             Administració
         </p>
 
@@ -28,7 +29,7 @@
            class="sidebar-link"
            th:classappend="${activePage == 'productes'} ? ' active' : ''">
             <i class="bi bi-box-seam sidebar-icon" aria-hidden="true"></i>
-            <span>Productes</span>
+            <span th:text="#{sidebar.productes}">Productes</span>
         </a>
 
         <a th:if="${session.usuariRol != null && session.usuariRol.name() == 'ADMIN'}"
@@ -36,7 +37,7 @@
            class="sidebar-link"
            th:classappend="${activePage == 'usuaris'} ? ' active' : ''">
             <i class="bi bi-people sidebar-icon" aria-hidden="true"></i>
-            <span>Usuaris</span>
+            <span th:text="#{sidebar.usuaris}">Usuaris</span>
         </a>
 
         <a th:if="${session.usuariRol != null && session.usuariRol.name() == 'ADMIN'}"
@@ -44,7 +45,7 @@
            class="sidebar-link"
            th:classappend="${activePage == 'proveidors'} ? ' active' : ''">
             <i class="bi bi-truck sidebar-icon" aria-hidden="true"></i>
-            <span>Proveïdors</span>
+            <span th:text="#{sidebar.proveidors}">Proveïdors</span>
         </a>
 
         <a th:if="${session.usuariRol != null && session.usuariRol.name() == 'ADMIN'}"
@@ -52,7 +53,7 @@
            class="sidebar-link"
            th:classappend="${activePage == 'materies'} ? ' active' : ''">
             <i class="bi bi-flower1 sidebar-icon" aria-hidden="true"></i>
-            <span>Matèries primeres</span>
+            <span th:text="#{sidebar.materiesPrimeres}">Matèries primeres</span>
         </a>
 
         <a th:if="${session.usuariRol != null && session.usuariRol.name() == 'ADMIN'}"
@@ -60,38 +61,38 @@
            class="sidebar-link"
            th:classappend="${activePage == 'clients'} ? ' active' : ''">
             <i class="bi bi-person-vcard sidebar-icon" aria-hidden="true"></i>
-            <span>Clients</span>
+            <span th:text="#{sidebar.clients}">Clients</span>
         </a>
 
         <!----------------------- OPERACIONS: ADMIN I OPERARI ----------------------->
-        <p class="sidebar-section">Operacions</p>
+        <p class="sidebar-section" th:text="#{sidebar.operacions}">Operacions</p>
 
         <a th:href="@{/albarans-proveidor/list}"
            class="sidebar-link"
            th:classappend="${activePage == 'albaransProveidor'} ? ' active' : ''">
             <i class="bi bi-receipt sidebar-icon" aria-hidden="true"></i>
-            <span>Albarans proveïdor</span>
+            <span th:text="#{sidebar.albaransProveidor}">Albarans proveïdor</span>
         </a>
 
         <a th:href="@{/albarans-client/list}"
            class="sidebar-link"
            th:classappend="${activePage == 'albaransClient'} ? ' active' : ''">
             <i class="bi bi-receipt-cutoff sidebar-icon" aria-hidden="true"></i>
-            <span>Albarans client</span>
+            <span th:text="#{sidebar.albaransClient}">Albarans client</span>
         </a>
 
         <a th:href="@{/lots/list}"
            class="sidebar-link"
            th:classappend="${activePage == 'lots'} ? ' active' : ''">
             <i class="bi bi-archive sidebar-icon" aria-hidden="true"></i>
-            <span>Lots</span>
+            <span th:text="#{sidebar.lots}">Lots</span>
         </a>
 
         <a th:href="@{/tracabilitat/list}"
            class="sidebar-link"
            th:classappend="${activePage == 'tracabilitat'} ? ' active' : ''">
             <i class="bi bi-bar-chart-line sidebar-icon" aria-hidden="true"></i>
-            <span>Explotació de dades</span>
+            <span th:text="#{sidebar.explotacioDades}">Explotació de dades</span>
         </a>
 
     </nav>
@@ -102,21 +103,21 @@
            class="sidebar-link"
            th:classappend="${activePage == 'perfil'} ? ' active' : ''">
             <i class="bi bi-person-gear sidebar-icon" aria-hidden="true"></i>
-            <span>El meu perfil</span>
+            <span th:text="#{sidebar.perfil}">El meu perfil</span>
         </a>
 
         <a th:href="@{/logout}"
            class="sidebar-link"
            th:classappend="${activePage == 'logout'} ? ' active' : ''">
             <i class="bi bi-box-arrow-left sidebar-icon" aria-hidden="true"></i>
-            <span>Tancar sessió</span>
+            <span th:text="#{sidebar.tancarSessio}">Tancar sessió</span>
         </a>
 
         <div class="sidebar-user-bottom" th:if="${session.usuariId != null}">
 
             <div class="sidebar-user-avatar-bottom">
                 <img th:src="@{/perfil/avatar}"
-                     th:alt="|Avatar de ${session.usuariNom}|"
+                     th:alt="#{sidebar.avatar(${session.usuariNom})}"
                      style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
                      onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
             </div>
@@ -130,11 +131,24 @@
                     email@exemple.com
                 </p>
 
-                <p class="sidebar-user-role-bottom" th:text="${session.usuariRol}">
+                <p class="sidebar-user-role-bottom"
+                   th:text="${session.usuariRol.name() == 'ADMIN'} ? #{sidebar.rol.admin} : #{sidebar.rol.operari}">
                     ROL
                 </p>
             </div>
 
+        </div>
+
+        <div class="sidebar-language-switch" aria-label="Idioma">
+            <a href="?lang=ca"
+               class="sidebar-language-link"
+               th:classappend="${#locale.language == 'ca'} ? ' active' : ''"
+               th:text="#{idioma.catala}">Cat</a>
+
+            <a href="?lang=es"
+               class="sidebar-language-link"
+               th:classappend="${#locale.language == 'es'} ? ' active' : ''"
+               th:text="#{idioma.castella}">Es</a>
         </div>
 
     </div>

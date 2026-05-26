@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Formulari Proveïdor - EasyTraza</title>
+    <title th:text="#{proveidors.form.titolPagina}">Formulari Proveïdor - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,14 +23,14 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració · Proveïdors</p>
+                <p class="page-eyebrow" th:text="#{proveidors.form.eyebrow}">Administració · Proveïdors</p>
 
                 <h1 class="page-heading"
-                    th:text="${proveidor.id != null} ? 'Editar proveïdor' : 'Nou proveïdor'">
+                    th:text="${proveidor.id != null} ? #{proveidors.form.editar} : #{proveidors.form.nou}">
                     Formulari proveïdor
                 </h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{proveidors.form.descripcioPagina}">
                     Gestiona les dades identificatives i administratives del proveïdor.
                 </p>
             </div>
@@ -38,12 +38,12 @@
             <div class="page-top-actions">
                 <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
 
                 <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
                     <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    <span>Tancar</span>
+                    <span th:text="#{comu.tancar}">Tancar</span>
                 </button>
             </div>
         </section>
@@ -59,9 +59,9 @@
                 </div>
 
                 <div>
-                    <h2 class="section-title">Dades del proveïdor</h2>
+                    <h2 class="section-title" th:text="#{proveidors.form.dades}">Dades del proveïdor</h2>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{proveidors.form.obligatoris}">
                         El CIF o DNI, el nom i l'adreça són dades obligatòries.
                     </p>
                 </div>
@@ -116,10 +116,11 @@
                                    autocomplete="off"
                                    placeholder="A1234567B"
                                    title="Introdueix un DNI o CIF vàlid"
+                                   th:title="#{proveidors.form.cif.title}"
                                    th:readonly="${proveidor.id != null}">
                         </div>
 
-                        <p class="form-help" th:if="${proveidor.id != null}">
+                        <p class="form-help" th:if="${proveidor.id != null}" th:text="#{proveidors.form.cif.ajuda}">
                             El CIF o DNI no es pot modificar després de crear el proveïdor.
                         </p>
                     </div>
@@ -127,7 +128,7 @@
                     <!----------------------- NOM PROVEÏDOR ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="nomProveidor">
-                            Nom proveïdor
+                            <span th:text="#{proveidors.form.nom}">Nom proveïdor</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -141,14 +142,16 @@
                                    required
                                    autocomplete="off"
                                    placeholder="Nom del proveïdor"
-                                   title="Introdueix el nom del proveïdor">
+                                   th:placeholder="#{proveidors.form.nom.placeholder}"
+                                   title="Introdueix el nom del proveïdor"
+                                   th:title="#{proveidors.form.nom.title}">
                         </div>
                     </div>
 
                     <!----------------------- ADREÇA ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="adreca">
-                            Adreça
+                            <span th:text="#{comu.adreca}">Adreça</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -162,7 +165,9 @@
                                    required
                                    autocomplete="off"
                                    placeholder="Adreça del proveïdor"
-                                   title="Introdueix l'adreça del proveïdor">
+                                   th:placeholder="#{proveidors.form.adreca.placeholder}"
+                                   title="Introdueix l'adreça del proveïdor"
+                                   th:title="#{proveidors.form.adreca.title}">
                         </div>
                     </div>
 
@@ -170,7 +175,7 @@
                     <div class="form-group">
                         <div class="form-label-row">
                             <label class="form-label" for="descripcio">
-                                Descripció
+                                <span th:text="#{comu.descripcio}">Descripció</span>
                             </label>
 
                             <span id="descripcioCounter" class="character-counter">
@@ -188,10 +193,12 @@
                                    maxlength="50"
                                    autocomplete="off"
                                    placeholder="Descripció breu opcional"
-                                   title="La descripció pot tenir un màxim de 50 caràcters">
+                                   th:placeholder="#{proveidors.form.descripcio.placeholder}"
+                                   title="La descripció pot tenir un màxim de 50 caràcters"
+                                   th:title="#{proveidors.form.descripcio.title}">
                         </div>
 
-                        <p class="form-help">
+                        <p class="form-help" th:text="#{proveidors.form.descripcio.ajuda}">
                             Camp opcional. Màxim 50 caràcters.
                         </p>
                     </div>
@@ -203,19 +210,19 @@
 
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        <span th:text="${proveidor.id != null} ? 'Guardar canvis' : 'Crear proveïdor'">
+                        <span th:text="${proveidor.id != null} ? #{comu.guardarCanvis} : #{proveidors.form.crear}">
                             Guardar
                         </span>
                     </button>
 
                     <a th:if="${!popup}" th:href="@{/proveidors/list}" class="btn btn-secondary">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </a>
 
                     <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </button>
 
                 </div>

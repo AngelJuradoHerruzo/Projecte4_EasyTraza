@@ -28,7 +28,7 @@ if (perfilForm) {
 
             this.setAttribute(
                 'aria-label',
-                passwordVisible ? 'Mostrar la contrasenya' : 'Ocultar la contrasenya'
+                passwordVisible ? perfilForm.dataset.showPassword : perfilForm.dataset.hidePassword
             );
         });
     }
@@ -53,7 +53,7 @@ if (perfilForm) {
             if (!avatarPreviewImage) {
                 avatarPreviewImage = document.createElement('img');
                 avatarPreviewImage.id = 'avatarPreviewImage';
-                avatarPreviewImage.alt = 'Vista prèvia de l\'avatar';
+                avatarPreviewImage.alt = perfilForm.dataset.avatarPreview;
                 avatarPreview.appendChild(avatarPreviewImage);
             }
 

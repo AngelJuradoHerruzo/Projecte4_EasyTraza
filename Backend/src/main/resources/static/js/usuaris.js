@@ -34,7 +34,7 @@ if (form) {
 
             this.setAttribute(
                 'aria-label',
-                passwordVisible ? 'Mostrar la contrasenya' : 'Ocultar la contrasenya'
+                passwordVisible ? form.dataset.showPassword : form.dataset.hidePassword
             );
         });
     }
@@ -59,7 +59,7 @@ if (form) {
             if (!avatarPreviewImage) {
                 avatarPreviewImage = document.createElement('img');
                 avatarPreviewImage.id = 'avatarPreviewImage';
-                avatarPreviewImage.alt = 'Vista prèvia de l\'avatar';
+                avatarPreviewImage.alt = form.dataset.avatarPreview;
                 avatarPreview.appendChild(avatarPreviewImage);
             }
 

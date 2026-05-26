@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Formulari Usuari - EasyTraza</title>
+    <title th:text="#{usuaris.form.titolPagina}">Formulari Usuari - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,14 +23,14 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració · Usuaris</p>
+                <p class="page-eyebrow" th:text="#{usuaris.form.eyebrow}">Administració · Usuaris</p>
 
                 <h1 class="page-heading"
-                    th:text="${usuari.id != null} ? 'Editar usuari' : 'Nou usuari'">
+                    th:text="${usuari.id != null} ? #{usuaris.form.editar} : #{usuaris.form.nou}">
                     Formulari usuari
                 </h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{usuaris.form.descripcioPagina}">
                     Gestiona les dades personals, el rol d'accés i la foto identificativa de l'usuari.
                 </p>
             </div>
@@ -38,7 +38,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/usuaris/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
             </div>
         </section>
@@ -54,9 +54,9 @@
                 </div>
 
                 <div>
-                    <h2 class="section-title">Dades de l'usuari</h2>
+                    <h2 class="section-title" th:text="#{usuaris.form.dades}">Dades de l'usuari</h2>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{usuaris.form.avatarObligatori}">
                         Tots els usuaris han de disposar d'una foto o avatar identificatiu.
                     </p>
                 </div>
@@ -78,6 +78,7 @@
             <!----------------------- COS DEL FORMULARI ----------------------->
             <form id="usuariForm"
                   class="user-form"
+                  th:attr="data-show-password=#{js.contrasenya.mostrar},data-hide-password=#{js.contrasenya.ocultar},data-avatar-preview=#{js.avatar.preview}"
                   th:action="${usuari.id != null} ? @{/usuaris/update/{id}(id=${usuari.id})} : @{/usuaris/save}"
                   th:object="${usuari}"
                   method="post"
@@ -91,7 +92,8 @@
                         <img id="avatarPreviewImage"
                              th:if="${usuari.avatar != null}"
                              th:src="@{/usuaris/avatar/{id}(id=${usuari.id})}"
-                             alt="Vista prèvia de l'avatar">
+                             alt="Vista prèvia de l'avatar"
+                             th:alt="#{usuaris.form.avatarVistaPrevia}">
 
                         <i id="avatarPreviewIcon"
                            th:unless="${usuari.avatar != null}"
@@ -104,12 +106,13 @@
 
                         <div class="form-label-row">
                             <label class="form-label" for="avatarFile">
-                                Foto o avatar
+                                <span th:text="#{usuaris.form.avatar}">Foto o avatar</span>
                                 <span class="required-mark">*</span>
                             </label>
 
                             <span th:if="${usuari.id != null && usuari.avatar != null}"
-                                  class="avatar-current-badge">
+                                  class="avatar-current-badge"
+                                  th:text="#{usuaris.form.avatarActual}">
                                 Avatar actual guardat
                             </span>
                         </div>
@@ -122,8 +125,8 @@
                                th:required="${usuari.id == null || usuari.avatar == null}">
 
                         <p class="form-help">
-                            Imatge JPG, PNG o WEBP. Màxim 5 MB.
-                            <span th:if="${usuari.id != null && usuari.avatar != null}">
+                            <span th:text="#{usuaris.form.avatarAjuda}">Imatge JPG, PNG o WEBP. Màxim 5 MB.</span>
+                            <span th:if="${usuari.id != null && usuari.avatar != null}" th:text="#{usuaris.form.avatarConservar}">
                                 Si no selecciones cap imatge nova, es conservarà l'actual.
                             </span>
                         </p>
@@ -157,10 +160,11 @@
                                    autocomplete="off"
                                    placeholder="12345678A"
                                    title="Introdueix un DNI vàlid amb format 12345678A"
+                                   th:title="#{usuaris.form.dni.title}"
                                    th:readonly="${usuari.id != null}">
                         </div>
 
-                        <p class="form-help" th:if="${usuari.id != null}">
+                        <p class="form-help" th:if="${usuari.id != null}" th:text="#{usuaris.form.dni.ajuda}">
                             El DNI no es pot modificar després de crear l'usuari.
                         </p>
                     </div>
@@ -168,7 +172,7 @@
                     <!----------------------- NOM COMPLET ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="nomComplet">
-                            Nom complet
+                            <span th:text="#{usuaris.form.nomComplet}">Nom complet</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -185,14 +189,16 @@
                                    pattern="^[A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)+$"
                                    autocomplete="off"
                                    placeholder="Nom i cognoms"
-                                   title="Introdueix nom i cognoms, només amb lletres">
+                                   th:placeholder="#{usuaris.form.nomComplet.placeholder}"
+                                   title="Introdueix nom i cognoms, només amb lletres"
+                                   th:title="#{usuaris.form.nomComplet.title}">
                         </div>
                     </div>
 
                     <!----------------------- CORREU ELECTRÒNIC ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="email">
-                            Correu electrònic
+                            <span th:text="#{usuaris.form.email}">Correu electrònic</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -207,14 +213,16 @@
                                    maxlength="100"
                                    autocomplete="off"
                                    placeholder="usuari@easytraza.cat"
-                                   title="Introdueix un correu electrònic vàlid">
+                                   th:placeholder="#{usuaris.form.email.placeholder}"
+                                   title="Introdueix un correu electrònic vàlid"
+                                   th:title="#{usuaris.form.email.title}">
                         </div>
                     </div>
 
                     <!----------------------- ROL ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="rolUsuari">
-                            Rol
+                            <span th:text="#{usuaris.form.rol}">Rol</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -225,7 +233,7 @@
                                     th:field="*{rolUsuari}"
                                     class="form-select form-select-with-icon"
                                     required>
-                                <option value="">-- Selecciona rol --</option>
+                                <option value="" th:text="#{usuaris.form.rol.selecciona}">-- Selecciona rol --</option>
                                 <option value="ADMIN">ADMIN</option>
                                 <option value="OPERARI">OPERARI</option>
                             </select>
@@ -235,7 +243,7 @@
                     <!----------------------- CONTRASENYA ----------------------->
                     <div class="form-group user-form-field-full">
                         <label class="form-label" for="password">
-                            Contrasenya
+                            <span th:text="#{usuaris.form.contrasenya}">Contrasenya</span>
                             <span th:if="${usuari.id == null}" class="required-mark">*</span>
                         </label>
 
@@ -250,17 +258,18 @@
                                    minlength="6"
                                    maxlength="100"
                                    autocomplete="new-password"
-                                   th:placeholder="${usuari.id != null} ? 'Deixar en blanc per mantenir la contrasenya actual' : 'Mínim 6 caràcters'">
+                                   th:placeholder="${usuari.id != null} ? #{usuaris.form.contrasenya.mantenir} : #{usuaris.form.contrasenya.nova}">
 
                             <button type="button"
                                     class="toggle-password"
                                     id="togglePassword"
-                                    aria-label="Mostrar o ocultar la contrasenya">
+                                    aria-label="Mostrar o ocultar la contrasenya"
+                                    th:attr="aria-label=#{usuaris.form.contrasenya.mostrarOcultar}">
                                 <i class="bi bi-eye" aria-hidden="true"></i>
                             </button>
                         </div>
 
-                        <p class="form-help" th:if="${usuari.id != null}">
+                        <p class="form-help" th:if="${usuari.id != null}" th:text="#{usuaris.form.contrasenya.ajuda}">
                             Deixa aquest camp en blanc si no vols modificar la contrasenya.
                         </p>
                     </div>
@@ -272,14 +281,14 @@
 
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        <span th:text="${usuari.id != null} ? 'Guardar canvis' : 'Crear usuari'">
+                        <span th:text="${usuari.id != null} ? #{comu.guardarCanvis} : #{usuaris.form.crear}">
                             Guardar
                         </span>
                     </button>
 
                     <a th:href="@{/usuaris/list}" class="btn btn-secondary">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </a>
 
                 </div>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Formulari Client - EasyTraza</title>
+    <title th:text="#{clients.form.titol}">Formulari Client - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,22 +23,22 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració · Clients</p>
+                <p class="page-eyebrow" th:text="#{clients.eyebrow}">Administració · Clients</p>
 
                 <h1 class="page-heading"
-                    th:text="${client.id != null} ? 'Editar client' : 'Nou client'">
-                    Formulari client
+                    th:text="${client.id != null} ? #{clients.form.editar} : #{clients.form.nou}">
+                    <span th:text="#{clients.form.heading}">Formulari client</span>
                 </h1>
 
                 <p class="page-description">
-                    Gestiona les dades administratives i de contacte del client.
+                    <span th:text="#{clients.form.desc}">Gestiona les dades administratives i de contacte del client.</span>
                 </p>
             </div>
 
             <div class="page-top-actions">
                 <a th:href="@{/clients/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
             </div>
         </section>
@@ -54,10 +54,10 @@
                 </div>
 
                 <div>
-                    <h2 class="section-title">Dades del client</h2>
+                    <h2 class="section-title" th:text="#{clients.form.dades}">Dades del client</h2>
 
                     <p class="section-subtitle">
-                        El correu electrònic és obligatori per a tots els clients registrats.
+                        <span th:text="#{clients.form.sub}">El correu electrònic és obligatori per a tots els clients registrats.</span>
                     </p>
                 </div>
 
@@ -80,14 +80,15 @@
                   class="client-form"
                   th:action="${client.id != null} ? @{/clients/update/{id}(id=${client.id})} : @{/clients/save}"
                   th:object="${client}"
-                  method="post">
+                  method="post"
+                  th:attr="data-email-invalid=#{clients.validacio.email}">
 
                 <div class="client-form-grid">
 
                     <!----------------------- CIF / DNI ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="cif">
-                            CIF / DNI
+                            <span th:text="#{comu.cifDni}">CIF / DNI</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -102,20 +103,20 @@
                                    required
                                    maxlength="9"
                                    pattern="(^[0-9]{8}[A-Za-z]$)|(^[A-Za-z][0-9]{7}[A-Za-z0-9]$)"
-                                   placeholder="12345678Z o A1234567B"
-                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid"
+                                   placeholder="12345678Z o A1234567B" th:placeholder="#{clients.form.cifPlaceholder}"
+                                   title="Introdueix un DNI (12345678Z) o un CIF (A1234567B) vàlid" th:title="#{clients.form.cifTitle}"
                                    th:readonly="${client.id != null}">
                         </div>
 
                         <p class="form-help" th:if="${client.id != null}">
-                            El CIF o DNI no es pot modificar després de crear el client.
+                            <span th:text="#{clients.form.cifReadOnly}">El CIF o DNI no es pot modificar després de crear el client.</span>
                         </p>
                     </div>
 
                     <!----------------------- NOM COMPLET ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="nomComplet">
-                            Nom complet
+                            <span th:text="#{comu.nomComplet}">Nom complet</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -129,14 +130,15 @@
                                    required
                                    pattern="^[A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+)+$"
                                    placeholder="Nom i cognoms"
-                                   title="Introdueix nom i cognoms, només amb lletres">
+                                   th:placeholder="#{comu.placeholderNomCognoms}"
+                                   title="Introdueix nom i cognoms, només amb lletres" th:title="#{clients.form.nomTitle}">
                         </div>
                     </div>
 
                     <!----------------------- TELÈFON ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="telefon">
-                            Telèfon
+                            <span th:text="#{comu.telefon}">Telèfon</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -151,14 +153,14 @@
                                    maxlength="12"
                                    pattern="^[0-9]{3}\s[0-9]{2}\s[0-9]{2}\s[0-9]{2}$"
                                    placeholder="600 12 34 56"
-                                   title="El telèfon ha de tenir el format XXX XX XX XX">
+                                   title="El telèfon ha de tenir el format XXX XX XX XX" th:title="#{clients.form.telefonTitle}">
                         </div>
                     </div>
 
                     <!----------------------- CORREU ELECTRÒNIC ----------------------->
                     <div class="form-group">
                         <label class="form-label" for="email">
-                            Correu electrònic
+                            <span th:text="#{comu.correuElectronic}">Correu electrònic</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -171,15 +173,15 @@
                                    class="form-input form-input-with-icon"
                                    required
                                    pattern="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
-                                   placeholder="client@easytraza.cat"
-                                   title="Introdueix un correu electrònic vàlid, per exemple exemple@gmail.com">
+                                   placeholder="client@easytraza.cat" th:placeholder="#{clients.form.emailPlaceholder}"
+                                   title="Introdueix un correu electrònic vàlid, per exemple exemple@gmail.com" th:title="#{clients.form.emailTitle}">
                         </div>
                     </div>
 
                     <!----------------------- ADREÇA ----------------------->
                     <div class="form-group client-form-field-full">
                         <label class="form-label" for="adreca">
-                            Adreça
+                            <span th:text="#{comu.adreca}">Adreça</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -192,7 +194,8 @@
                                    class="form-input form-input-with-icon"
                                    required
                                    placeholder="Adreça del client"
-                                   title="Introdueix l'adreça del client">
+                                   th:placeholder="#{clients.form.adrecaPlaceholder}"
+                                   title="Introdueix l'adreça del client" th:title="#{clients.form.adrecaTitle}">
                         </div>
                     </div>
 
@@ -201,7 +204,7 @@
 
                         <div class="form-label-row">
                             <label class="form-label" for="observacions">
-                                Observacions
+                                <span th:text="#{comu.observacions}">Observacions</span>
                             </label>
 
                             <span id="observacionsCounter" class="character-counter">
@@ -218,11 +221,12 @@
                                       maxlength="100"
                                       rows="3"
                                       placeholder="Afegeix observacions sobre el client..."
-                                      title="Les observacions no poden superar els 50 caràcters"></textarea>
+                                      th:placeholder="#{clients.form.observacionsPlaceholder}"
+                                      title="Les observacions no poden superar els 50 caràcters" th:title="#{clients.form.observacionsTitle}"></textarea>
                         </div>
 
                         <p class="form-help">
-                            Camp opcional. Màxim 50 caràcters acceptats.
+                            <span th:text="#{clients.form.obsHelp}">Camp opcional. Màxim 50 caràcters acceptats.</span>
                         </p>
                     </div>
 
@@ -233,14 +237,14 @@
 
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        <span th:text="${client.id != null} ? 'Guardar canvis' : 'Crear client'">
-                            Guardar
+                        <span th:text="${client.id != null} ? #{comu.guardarCanvis} : #{clients.form.crear}">
+                            <span th:text="#{comu.guardar}">Guardar</span>
                         </span>
                     </button>
 
                     <a th:href="@{/clients/list}" class="btn btn-secondary">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </a>
 
                 </div>
