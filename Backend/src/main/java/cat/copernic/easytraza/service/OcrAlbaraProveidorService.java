@@ -213,14 +213,14 @@ public class OcrAlbaraProveidorService {
      */
     public Path obtenirRutaDocumentTemporal(String ocrDocumentTemporalId) {
         if (ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) {
-            throw new IllegalArgumentException("L'identificador del document OCR temporal és obligatori.");
+            throw new IllegalArgumentException(missatge("ocr.error.identificadorDocumentTemporalObligatori"));
         }
 
         Path directori = Paths.get(documentsTempPath).toAbsolutePath().normalize();
         Path document = directori.resolve(ocrDocumentTemporalId).normalize();
 
         if (!document.startsWith(directori)) {
-            throw new IllegalArgumentException("Identificador de document OCR temporal no vàlid.");
+            throw new IllegalArgumentException(missatge("ocr.error.identificadorDocumentTemporalNoValid"));
         }
 
         return document;
@@ -237,14 +237,14 @@ public class OcrAlbaraProveidorService {
      */
     private void validarFitxer(MultipartFile fitxer) {
         if (fitxer == null || fitxer.isEmpty()) {
-            throw new IllegalArgumentException("El document de l'albarà és obligatori per executar l'OCR.");
+            throw new IllegalArgumentException(missatge("ocr.error.documentObligatori"));
         }
 
         String nomOriginal = Optional.ofNullable(fitxer.getOriginalFilename()).orElse("");
         String extensio = obtenirExtensio(nomOriginal);
 
         if (!List.of(".pdf", ".png", ".jpg", ".jpeg").contains(extensio)) {
-            throw new IllegalArgumentException("El document OCR ha de ser una imatge JPG/PNG o un PDF.");
+            throw new IllegalArgumentException(missatge("ocr.error.formatDocumentNoValid"));
         }
     }
 
@@ -273,7 +273,7 @@ public class OcrAlbaraProveidorService {
             Path desti = directori.resolve(nomGuardat).normalize();
 
             if (!desti.startsWith(directori)) {
-                throw new IllegalStateException("Ruta de document OCR temporal no vàlida.");
+                throw new IllegalStateException(missatge("ocr.error.rutaDocumentTemporalNoValida"));
             }
 
             try (InputStream input = fitxer.getInputStream()) {
@@ -293,7 +293,7 @@ public class OcrAlbaraProveidorService {
 
         } catch (IOException ex) {
             LOGGER.error("No s'ha pogut guardar el document temporal OCR.", ex);
-            throw new IllegalStateException("No s'ha pogut guardar el document temporal OCR.", ex);
+            throw new IllegalStateException(missatge("ocr.error.guardarDocumentTemporal"), ex);
         }
     }
 
@@ -332,17 +332,17 @@ public class OcrAlbaraProveidorService {
             BufferedImage imatgeOriginal = ImageIO.read(rutaImatge.toFile());
 
             if (imatgeOriginal == null) {
-                throw new IllegalStateException("No s'ha pogut llegir la imatge enviada.");
+                throw new IllegalStateException(missatge("ocr.error.llegirImatgeEnviada"));
             }
 
             return crearTesseract().doOCR(prepararImatgePerOcr(imatgeOriginal));
 
         } catch (IOException ex) {
             LOGGER.error("Error en llegir una imatge d'albarà per OCR.", ex);
-            throw new IllegalStateException("Error llegint la imatge per OCR.", ex);
+            throw new IllegalStateException(missatge("ocr.error.llegirImatgeOcr"), ex);
         } catch (TesseractException ex) {
             LOGGER.error("Error en executar Tesseract sobre una imatge d'albarà.", ex);
-            throw new IllegalStateException("Error executant Tesseract OCR.", ex);
+            throw new IllegalStateException(missatge("ocr.error.executarTesseractImatge"), ex);
         }
     }
 
@@ -371,10 +371,10 @@ public class OcrAlbaraProveidorService {
 
         } catch (IOException ex) {
             LOGGER.error("Error en llegir un PDF d'albarà per OCR.", ex);
-            throw new IllegalStateException("Error llegint el PDF per OCR.", ex);
+            throw new IllegalStateException(missatge("ocr.error.llegirPdfOcr"), ex);
         } catch (TesseractException ex) {
             LOGGER.error("Error en executar Tesseract sobre un PDF d'albarà.", ex);
-            throw new IllegalStateException("Error executant Tesseract OCR sobre el PDF.", ex);
+            throw new IllegalStateException(missatge("ocr.error.executarTesseractPdf"), ex);
         }
     }
 
@@ -870,7 +870,7 @@ public class OcrAlbaraProveidorService {
      */
     private void validarConfiguracioTesseract() {
         if (tessdataPath == null || tessdataPath.isBlank()) {
-            throw new IllegalStateException("No s'ha configurat la ruta de tessdata: ocr.tessdata.path");
+            throw new IllegalStateException(missatge("ocr.error.rutaTessdataNoConfigurada"));
         }
 
         String idioma = tesseractLanguage == null || tesseractLanguage.isBlank()
@@ -883,7 +883,7 @@ public class OcrAlbaraProveidorService {
                 .normalize();
 
         if (!Files.exists(trainedData)) {
-            throw new IllegalStateException("No s'ha trobat el fitxer d'idioma OCR: " + trainedData);
+            throw new IllegalStateException(missatge("ocr.error.fitxerIdiomaNoTrobat", trainedData));
         }
     }
 
