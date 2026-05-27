@@ -61,8 +61,15 @@ val EasyButtonShape = RoundedCornerShape(12.dp)
 val EasyCardShape = RoundedCornerShape(18.dp)
 val EasySmallShape = RoundedCornerShape(12.dp)
 
+
 /**
- * Contenidor base perquè totes les pantalles mantinguin el mateix marge, fons i separació superior.
+ * CONTENIDOR DE PANTALLA.
+ *
+ * Mostrat el contenidor base que manté el fons, els marges
+ * i la separació comuna de les pantalles de l'aplicació.
+ *
+ * @param modifier modificador aplicat al contenidor principal
+ * @param content contingut que s'ha de mostrar dins de la pantalla
  */
 @Composable
 fun EasyScreen(
@@ -80,8 +87,20 @@ fun EasyScreen(
     )
 }
 
+
 /**
- * Capçalera comuna de les pantalles de l'app.
+ * CAPÇALERA DE PANTALLA.
+ *
+ * Mostrada la capçalera comuna amb el títol, el subtítol
+ * i les accions opcionals de retorn i configuració.
+ *
+ * @param title títol principal de la capçalera
+ * @param subtitle subtítol informatiu de la capçalera
+ * @param showConfig indicador que informa si es mostra l'accés a configuració
+ * @param showBack indicador que informa si es mostra l'acció de retorn
+ * @param onBackClick acció executada en prémer el botó de retorn
+ * @param onConfiguracioClick acció executada en prémer el botó de configuració
+ * @param actions accions addicionals mostrades a la capçalera
  */
 @Composable
 fun EasyHeader(
@@ -158,8 +177,15 @@ fun EasyHeader(
     }
 }
 
+
 /**
- * Targeta base comuna.
+ * TARGETA DE CONTINGUT.
+ *
+ * Mostrada una targeta base amb l'estil visual comú
+ * per agrupar informació a les pantalles de l'aplicació.
+ *
+ * @param modifier modificador aplicat a la targeta
+ * @param content contingut que s'ha de mostrar dins de la targeta
  */
 @Composable
 fun EasyCard(
@@ -181,8 +207,16 @@ fun EasyCard(
     }
 }
 
+
 /**
- * Botó principal comú.
+ * BOTÓ PRINCIPAL.
+ *
+ * Mostrat el botó d'acció principal amb l'estil
+ * i el comportament d'habilitació comuns de l'aplicació.
+ *
+ * @param text text visible del botó
+ * @param enabled indicador que informa si el botó està habilitat
+ * @param onClick acció executada en prémer el botó
  */
 @Composable
 fun Modifier.EasyPrimaryButton(
@@ -210,8 +244,16 @@ fun Modifier.EasyPrimaryButton(
     }
 }
 
+
 /**
- * Botó secundari comú.
+ * BOTÓ SECUNDARI.
+ *
+ * Mostrat el botó d'acció secundària amb el format
+ * de contorn utilitzat a la interfície de l'aplicació.
+ *
+ * @param text text visible del botó
+ * @param enabled indicador que informa si el botó està habilitat
+ * @param onClick acció executada en prémer el botó
  */
 @Composable
 fun Modifier.EasySecondaryButton(
@@ -238,8 +280,16 @@ fun Modifier.EasySecondaryButton(
     }
 }
 
+
 /**
- * Botó d'acció destructiva.
+ * BOTÓ D'ACCIÓ DESTRUCTIVA.
+ *
+ * Mostrat el botó destinat a les operacions destructives
+ * amb l'estil visual d'advertència corresponent.
+ *
+ * @param text text visible del botó
+ * @param enabled indicador que informa si el botó està habilitat
+ * @param onClick acció executada en prémer el botó
  */
 @Composable
 fun Modifier.EasyDangerButton(
@@ -267,8 +317,15 @@ fun Modifier.EasyDangerButton(
     }
 }
 
+
 /**
- * Missatge informatiu comú per errors i avisos.
+ * TARGETA DE MISSATGE.
+ *
+ * Mostrat un missatge informatiu o d'error amb
+ * l'aparença adequada segons el tipus d'avís rebut.
+ *
+ * @param text missatge que s'ha de mostrar
+ * @param isError indicador que informa si el missatge representa un error
  */
 @Composable
 fun EasyMessageCard(
@@ -298,8 +355,20 @@ fun EasyMessageCard(
     }
 }
 
+
 /**
- * Diàleg de confirmació amb estil comú.
+ * DIÀLEG DE CONFIRMACIÓ.
+ *
+ * Mostrat un diàleg comú per confirmar o cancel·lar
+ * una acció, aplicant l'estil d'advertència quan correspon.
+ *
+ * @param title títol visible del diàleg
+ * @param text missatge explicatiu del diàleg
+ * @param confirmText text visible del botó de confirmació
+ * @param dismissText text visible del botó de cancel·lació
+ * @param isDanger indicador que informa si la confirmació és destructiva
+ * @param onConfirm acció executada en confirmar l'operació
+ * @param onDismiss acció executada en cancel·lar o tancar el diàleg
  */
 @Composable
 fun EasyConfirmDialog(
@@ -353,8 +422,14 @@ fun EasyConfirmDialog(
     )
 }
 
+
 /**
- * Etiqueta d'estat dels lots.
+ * ETIQUETA D'ESTAT DEL LOT.
+ *
+ * Mostrada una etiqueta visual amb el text i els colors
+ * corresponents a l'estat actual del lot indicat.
+ *
+ * @param estat estat del lot que s'ha de representar
  */
 @Composable
 fun EasyStatusBadge(
