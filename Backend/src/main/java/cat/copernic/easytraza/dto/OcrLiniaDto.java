@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DTO temporal d'una línia detectada per OCR en un albarà de proveïdor.
+ * LÍNIA TEMPORAL DETECTADA PER OCR.
  *
- * No representa cap entitat persistent. Només transporta dades detectades perquè
- * el formulari web pugui mostrar-les i l'usuari les pugui revisar abans de
- * guardar l'albarà.
+ * Representades les dades d'una línia detectada en un albarà de proveïdor
+ * perquè puguin ser mostrades i revisades abans del guardat definitiu.
+ * Aquest objecte no es desa a la base de dades.
+ *
+ * @author Ángel Jurado Herruz
  */
 public class OcrLiniaDto {
 
@@ -29,79 +31,55 @@ public class OcrLiniaDto {
 
 
     /*********************       .MÈTODES DE SUPORT.       *********************/
+    /**
+     * INCORPORACIÓ D'UN AVÍS.
+     *
+     * Afegit un avís de validació a la línia temporal quan conté informació
+     * útil per mostrar a l'usuari.
+     *
+     * @param avis missatge d'avís que s'ha d'incorporar
+     */
     public void afegirAvis(String avis) {
         if (avis != null && !avis.isBlank()) {
             this.avisos.add(avis);
         }
     }
 
+    
+    /**
+     * COMPROVACIÓ D'AVISOS.
+     *
+     * Comprovat si la línia temporal conté avisos pendents de revisió.
+     *
+     * @return cert si existeix algun avís a la línia temporal
+     */
     public boolean teAvisos() {
         return avisos != null && !avisos.isEmpty();
     }
 
 
     /*********************       .GETTERS & SETTERS.       *********************/
-    public String getIdentificadorLot() {
-        return identificadorLot;
-    }
+    public String getIdentificadorLot() { return identificadorLot; }
+    public void setIdentificadorLot(String identificadorLot) { this.identificadorLot = identificadorLot; }
 
-    public void setIdentificadorLot(String identificadorLot) {
-        this.identificadorLot = identificadorLot;
-    }
+    public Double getQuantitat() { return quantitat; }
+    public void setQuantitat(Double quantitat) { this.quantitat = quantitat; }
 
-    public Double getQuantitat() {
-        return quantitat;
-    }
+    public String getUnitat() { return unitat; }
+    public void setUnitat(String unitat) { this.unitat = unitat; }
 
-    public void setQuantitat(Double quantitat) {
-        this.quantitat = quantitat;
-    }
+    public String getMateriaPrimeraDetectada() { return materiaPrimeraDetectada; }
+    public void setMateriaPrimeraDetectada(String materiaPrimeraDetectada) { this.materiaPrimeraDetectada = materiaPrimeraDetectada; }
 
-    public String getUnitat() {
-        return unitat;
-    }
+    public Long getMateriaPrimeraId() { return materiaPrimeraId; }
+    public void setMateriaPrimeraId(Long materiaPrimeraId) { this.materiaPrimeraId = materiaPrimeraId; }
 
-    public void setUnitat(String unitat) {
-        this.unitat = unitat;
-    }
+    public String getMateriaPrimeraNomAssociada() { return materiaPrimeraNomAssociada; }
+    public void setMateriaPrimeraNomAssociada(String materiaPrimeraNomAssociada) { this.materiaPrimeraNomAssociada = materiaPrimeraNomAssociada; }
 
-    public String getMateriaPrimeraDetectada() {
-        return materiaPrimeraDetectada;
-    }
+    public boolean isMateriaPrimeraTrobada() { return materiaPrimeraTrobada; }
+    public void setMateriaPrimeraTrobada(boolean materiaPrimeraTrobada) { this.materiaPrimeraTrobada = materiaPrimeraTrobada; }
 
-    public void setMateriaPrimeraDetectada(String materiaPrimeraDetectada) {
-        this.materiaPrimeraDetectada = materiaPrimeraDetectada;
-    }
-
-    public Long getMateriaPrimeraId() {
-        return materiaPrimeraId;
-    }
-
-    public void setMateriaPrimeraId(Long materiaPrimeraId) {
-        this.materiaPrimeraId = materiaPrimeraId;
-    }
-
-    public String getMateriaPrimeraNomAssociada() {
-        return materiaPrimeraNomAssociada;
-    }
-
-    public void setMateriaPrimeraNomAssociada(String materiaPrimeraNomAssociada) {
-        this.materiaPrimeraNomAssociada = materiaPrimeraNomAssociada;
-    }
-
-    public boolean isMateriaPrimeraTrobada() {
-        return materiaPrimeraTrobada;
-    }
-
-    public void setMateriaPrimeraTrobada(boolean materiaPrimeraTrobada) {
-        this.materiaPrimeraTrobada = materiaPrimeraTrobada;
-    }
-
-    public List<String> getAvisos() {
-        return avisos;
-    }
-
-    public void setAvisos(List<String> avisos) {
-        this.avisos = avisos != null ? avisos : new ArrayList<>();
-    }
+    public List<String> getAvisos() { return avisos; }
+    public void setAvisos(List<String> avisos) { this.avisos = avisos != null ? avisos : new ArrayList<>(); }
 }
