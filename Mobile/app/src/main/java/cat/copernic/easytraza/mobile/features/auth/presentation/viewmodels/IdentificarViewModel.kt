@@ -13,7 +13,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel de la pantalla d'identificació.
+ * IDENTIFICACIÓ DE L'USUARI SELECCIONAT.
+ *
+ * Executada la identificació de l'usuari seleccionat, desada la sessió
+ * local quan és correcta i notificat l'accés a la pantalla següent.
+ *
+ * @param usuari usuari seleccionat que s'ha d'identificar
+ * @param onSuccess acció executada quan la identificació finalitza correctament
  */
 class IdentificarViewModel(
     private val context: Context

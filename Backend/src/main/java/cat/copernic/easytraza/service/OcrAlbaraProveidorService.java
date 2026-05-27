@@ -34,11 +34,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Servei orquestrador de l'OCR d'albarans de proveïdor.
+ * SERVEI OCR D'ALBARANS DE PROVEÏDOR.
  *
- * Només extreu informació temporal del document i delega el parseig al servei
- * específic del proveïdor detectat. No desa albarans, no crea lots i no assigna
- * l'usuari receptor.
+ * Gestionat el processament OCR dels documents d'albarà de proveïdor.
+ * També controlats els fitxers temporals, l'extracció de text i la selecció del parser corresponent.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrAlbaraProveidorService {
@@ -63,7 +64,15 @@ public class OcrAlbaraProveidorService {
     }
 
 
-    /*********************       .API PÚBLICA.       *********************/
+    /**
+     * PROCESSAMENT DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param fitxer fitxer rebut per al procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrResultatAlbaraProveidorDto processarDocument(MultipartFile fitxer) {
         validarFitxer(fitxer);
 
@@ -113,12 +122,6 @@ public class OcrAlbaraProveidorService {
             }
         }
 
-        /*
-         * JOSE NOVAU es llegeix millor amb la pàgina completa i PSM 6:
-         * Tesseract conserva les quatre files com a línies completes.
-         * No es força una separació per columnes, que en aquest model és
-         * menys estable per l'amplada estreta d'ARTICLE i QUANTITAT.
-         */
         if (proveidorDetectat == OcrProveidorDetectat.JOSE_NOVAU) {
             String textJoseNovau = extreureTextJoseNovauPaginaCompleta(documentTemporal);
 
@@ -157,11 +160,31 @@ public class OcrAlbaraProveidorService {
         return resultat;
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param ocrDocumentTemporalId identificador utilitzat en l'operació
+     * @return text obtingut pel mètode
+     */
     public String obtenirUrlDocumentTemporal(String ocrDocumentTemporalId) {
         obtenirRutaDocumentTemporal(ocrDocumentTemporalId);
         return "/uploads/ocr-temp/" + ocrDocumentTemporalId;
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param ocrDocumentTemporalId identificador utilitzat en l'operació
+     * @return text obtingut pel mètode
+     */
     public String obtenirContentTypeDocumentTemporal(String ocrDocumentTemporalId) {
         Path ruta = obtenirRutaDocumentTemporal(ocrDocumentTemporalId);
 
@@ -171,13 +194,23 @@ public class OcrAlbaraProveidorService {
             if (contentType != null && !contentType.isBlank()) {
                 return contentType;
             }
-        } catch (IOException ignored) {
-            // Es fa servir la inferència per extensió.
+        } 
+        catch (IOException ignored) {
         }
 
         return inferirContentType(ocrDocumentTemporalId);
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param ocrDocumentTemporalId identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public Path obtenirRutaDocumentTemporal(String ocrDocumentTemporalId) {
         if (ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) {
             throw new IllegalArgumentException("L'identificador del document OCR temporal és obligatori.");
@@ -194,7 +227,14 @@ public class OcrAlbaraProveidorService {
     }
 
 
-    /*********************       .VALIDACIÓ I DOCUMENT TEMPORAL.       *********************/
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param fitxer fitxer rebut per al procés
+     */
     private void validarFitxer(MultipartFile fitxer) {
         if (fitxer == null || fitxer.isEmpty()) {
             throw new IllegalArgumentException("El document de l'albarà és obligatori per executar l'OCR.");
@@ -208,6 +248,16 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
+    /**
+     * GUARDAT DE DADES.
+     *
+     * Gestionat el fitxer o la dada associada al registre actual
+     * segons l'operació requerida.
+     *
+     * @param fitxer fitxer rebut per al procés
+     * @return resultat obtingut pel mètode
+     */
     private DocumentTemporalOcr guardarDocumentTemporal(MultipartFile fitxer) {
         String nomOriginal = Optional.ofNullable(fitxer.getOriginalFilename())
                 .filter(nom -> !nom.isBlank())
@@ -248,7 +298,15 @@ public class OcrAlbaraProveidorService {
     }
 
 
-    /*********************       .EXECUCIÓ TESSERACT.       *********************/
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String extreureTextOcr(DocumentTemporalOcr documentTemporal) {
         String nom = documentTemporal.nomGuardat().toLowerCase(Locale.ROOT);
 
@@ -259,6 +317,16 @@ public class OcrAlbaraProveidorService {
         return extreureTextImatge(documentTemporal.ruta());
     }
 
+
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param rutaImatge valor de rutaImatge utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String extreureTextImatge(Path rutaImatge) {
         try {
             BufferedImage imatgeOriginal = ImageIO.read(rutaImatge.toFile());
@@ -278,6 +346,16 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param rutaPdf valor de rutaPdf utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String extreureTextPdf(Path rutaPdf) {
         try (PDDocument document = Loader.loadPDF(rutaPdf.toFile())) {
             StringBuilder text = new StringBuilder();
@@ -300,9 +378,15 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
     /**
-     * Executa OCR per zones del model LA META, mantenint separades les columnes
-     * que el text complet tendeix a barrejar.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String extreureTextZonesLaMeta(DocumentTemporalOcr documentTemporal) {
         try {
@@ -335,8 +419,15 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
     /**
-     * Executa OCR sobre les zones pròpies d'ARTIPAS.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String extreureTextZonesArtipas(DocumentTemporalOcr documentTemporal) {
         try {
@@ -348,20 +439,8 @@ public class OcrAlbaraProveidorService {
 
             String info = executarOcrZona(imatge, 0.040, 0.285, 0.480, 0.135, 6);
 
-            /*
-             * Primera fila real de producte.
-             *
-             * La fila [N7K] queda just sota la capçalera de la taula. La zona
-             * anterior començava massa avall i capturava la fila següent.
-             */
             String primeraLinia = executarOcrZona(imatge, 0.030, 0.438, 0.850, 0.035, 7);
 
-            /*
-             * Taula principal completa.
-             *
-             * Es puja l'inici de la zona perquè inclogui la capçalera i la
-             * primera fila [N7K].
-             */
             String taula = executarOcrZona(imatge, 0.030, 0.415, 0.850, 0.225, 6);
 
             return """
@@ -380,10 +459,15 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
     /**
-     * Executa OCR sobre les zones pròpies d'AVÍCOLA LLEONART. Aquest model
-     * conté una única línia de recepció, amb el lot situat a la línia
-     * immediatament inferior a la descripció.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String extreureTextZonesAvicolaLleonart(DocumentTemporalOcr documentTemporal) {
         try {
@@ -393,16 +477,8 @@ public class OcrAlbaraProveidorService {
                 return "";
             }
 
-            /*
-             * Informació d'albarà: NUM. ALBARAN i FECHA ALBARAN.
-             */
             String info = executarOcrZona(imatge, 0.100, 0.320, 0.425, 0.095, 6);
 
-            /*
-             * Línia de producte, quantitat i lot. Es manté en un sol retall
-             * perquè la quantitat 60 està alineada amb la descripció i el lot
-             * apareix just sota la mateixa línia.
-             */
             String taula = executarOcrZona(imatge, 0.080, 0.402, 0.760, 0.115, 6);
 
             return """
@@ -419,12 +495,15 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
     /**
-     * Executa OCR per zones del model PASTISSA sense ampliar la imatge.
+     * EXTRACCIÓ DE DADES.
      *
-     * Aquest document té tipografia petita i regular; en ampliar el retall
-     * Tesseract pot deformar especialment el número d'albarà F - 813964.
-     * La resta de proveïdors continuen utilitzant l'escalat habitual.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String extreureTextZonesPastissa(DocumentTemporalOcr documentTemporal) {
         try {
@@ -434,19 +513,9 @@ public class OcrAlbaraProveidorService {
                 return "";
             }
 
-            /*
-            * Capçalera superior: número d'albarà i data.
-            * Es puja respecte de l'anterior perquè no capturi les primeres files
-            * de productes.
-            */
             String numeroAlbara = executarOcrZona(imatge, 0.120, 0.185, 0.175, 0.035, 7);
             String info = executarOcrZona(imatge, 0.040, 0.165, 0.390, 0.090, 6);
 
-            /*
-            * Taula completa de productes.
-            * Les zones anteriors començaven massa avall i per això només es detectaven
-            * les files a partir del quart producte.
-            */
             String materies = executarOcrZona(imatge, 0.050, 0.245, 0.470, 0.420, 6);
             String lots = executarOcrZona(imatge, 0.500, 0.245, 0.165, 0.420, 6);
             String quantitats = executarOcrZona(imatge, 0.635, 0.350, 0.075, 0.360, 6);
@@ -477,12 +546,15 @@ public class OcrAlbaraProveidorService {
         }
     }
 
+
     /**
-     * Executa OCR per zones del model TAL COM PINTA.
+     * EXTRACCIÓ DE DADES.
      *
-     * El model pot tenir més línies que l'exemple actual. Per això la zona de
-     * taula s'estén fins abans del bloc de totals i el parser filtra la part
-     * realment útil.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String extreureTextZonesTalComPinta(DocumentTemporalOcr documentTemporal) {
         try {
@@ -492,15 +564,8 @@ public class OcrAlbaraProveidorService {
                 return "";
             }
 
-            /*
-             * Capçalera amb número d'entrega i dates.
-             */
             String info = executarOcrZona(imatge, 0.045, 0.155, 0.470, 0.120, 6);
 
-            /*
-             * Taula de línies. Es deixa prou alta per suportar albarans amb
-             * més línies, però sense arribar al bloc inferior de totals.
-             */
             String taula = executarOcrZona(imatge, 0.045, 0.245, 0.830, 0.345, 6);
 
             LOGGER.info("=== OCR TAL COM PINTA - INFO ===\n{}", info);
@@ -522,11 +587,13 @@ public class OcrAlbaraProveidorService {
 
 
     /**
-     * Executa OCR de JOSE NOVAU sobre la pàgina completa amb PSM 6.
+     * EXTRACCIÓ DE DADES.
      *
-     * En aquest model, la lectura global conserva millor cada fila completa:
-     * ARTICLE + DESCRIPCIÓ + QUANTITAT. Això és més fiable que separar
-     * columnes petites per zones.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String extreureTextJoseNovauPaginaCompleta(DocumentTemporalOcr documentTemporal) {
         try {
@@ -578,6 +645,17 @@ public class OcrAlbaraProveidorService {
         return tesseract.doOCR(prepararImatgePerOcr(zona));
     }
 
+
+    /**
+     * LECTURA DEL DOCUMENT.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param documentTemporal valor de documentTemporal utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     * @throws IOException si es produeix un error durant el procés
+     */
     private BufferedImage llegirPrimeraImatgeDocument(DocumentTemporalOcr documentTemporal) throws IOException {
         String nom = documentTemporal.nomGuardat().toLowerCase(Locale.ROOT);
 
@@ -667,10 +745,32 @@ public class OcrAlbaraProveidorService {
         return imatge.getSubimage(cropX, cropY, cropWidth, cropHeight);
     }
 
+
+    /**
+     * LIMITACIÓ DEL VALOR.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @param minim valor de minim utilitzat pel mètode
+     * @param maxim valor de maxim utilitzat pel mètode
+     * @return valor numèric obtingut
+     */
     private int limitar(int valor, int minim, int maxim) {
         return Math.max(minim, Math.min(valor, maxim));
     }
 
+
+    /**
+     * PREPARACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param original valor de original utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private BufferedImage prepararImatgePerOcr(BufferedImage original) {
         int amplada = original.getWidth() * 2;
         int alcada = original.getHeight() * 2;
@@ -700,10 +800,15 @@ public class OcrAlbaraProveidorService {
         return escalada;
     }
 
+
     /**
-     * Converteix una zona a escala de grisos mantenint la mida original.
+     * CONVERSIÓ DE DADES.
      *
-     * No amplia la imatge. Actualment només s'utilitza a PASTISSA.
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param original valor de original utilitzat pel mètode
+     * @return resultat obtingut pel mètode
      */
     private BufferedImage convertirAGrisosSenseEscalar(BufferedImage original) {
         BufferedImage grisos = new BufferedImage(
@@ -734,6 +839,15 @@ public class OcrAlbaraProveidorService {
         return grisos;
     }
 
+
+    /**
+     * CREACIÓ DE DADES.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @return resultat obtingut pel mètode
+     */
     private Tesseract crearTesseract() {
         validarConfiguracioTesseract();
 
@@ -746,6 +860,14 @@ public class OcrAlbaraProveidorService {
         return tesseract;
     }
 
+
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     */
     private void validarConfiguracioTesseract() {
         if (tessdataPath == null || tessdataPath.isBlank()) {
             throw new IllegalStateException("No s'ha configurat la ruta de tessdata: ocr.tessdata.path");
@@ -803,7 +925,15 @@ public class OcrAlbaraProveidorService {
     }
 
 
-    /*********************       .SUPORT FITXERS.       *********************/
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param nomFitxer fitxer rebut per al procés
+     * @return text obtingut pel mètode
+     */
     private String obtenirExtensio(String nomFitxer) {
         String nom = nomFitxer == null ? "" : nomFitxer.trim();
         int index = nom.lastIndexOf('.');
@@ -817,6 +947,16 @@ public class OcrAlbaraProveidorService {
         return extensio.matches("\\.[a-z0-9]{1,8}") ? extensio : ".bin";
     }
 
+
+    /**
+     * DETECCIÓ DEL TIPUS.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param nomFitxer fitxer rebut per al procés
+     * @return text obtingut pel mètode
+     */
     private String inferirContentType(String nomFitxer) {
         String nom = nomFitxer == null ? "" : nomFitxer.toLowerCase(Locale.ROOT);
 
@@ -843,6 +983,17 @@ public class OcrAlbaraProveidorService {
     ) {
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

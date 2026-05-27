@@ -14,6 +14,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import cat.copernic.easytraza.entities.MateriaPrimera;
 import cat.copernic.easytraza.service.MateriaPrimeraService;
 
+/**
+ * CONTROLADOR WEB DE MATÈRIES PRIMERES.
+ *
+ * Gestionades les pantalles de consulta, creació, edició i eliminació
+ * de les matèries primeres de l'aplicació web.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/materies-primeres")
 public class MateriaPrimeraWebController {
@@ -30,7 +38,18 @@ public class MateriaPrimeraWebController {
     }
 
 
-    // LLISTAR MATÈRIES PRIMERES
+    /**
+     * LLISTAT DE MATÈRIES PRIMERES.
+     *
+     * Preparada la vista amb les matèries primeres filtrades i ordenades
+     * segons els criteris indicats.
+     *
+     * @param nomMateria nom de la matèria primera utilitzat com a filtre
+     * @param ordre camp utilitzat per ordenar el llistat
+     * @param direccio sentit de l'ordenació aplicada
+     * @param model model de dades de la vista
+     * @return vista del llistat de matèries primeres
+     */
     @GetMapping("/list")
     public String llistarMateriesPrimeres(@RequestParam(required = false) String nomMateria,
                                           @RequestParam(required = false, defaultValue = "nomMateria") String ordre,
@@ -53,7 +72,16 @@ public class MateriaPrimeraWebController {
     }
 
 
-    // FORMULARI CREAR MATÈRIA PRIMERA
+    /**
+     * FORMULARI DE CREACIÓ DE MATÈRIA PRIMERA.
+     *
+     * Preparat el formulari necessari per donar d'alta una nova matèria
+     * primera, també quan s'obre des d'una finestra emergent.
+     *
+     * @param popup indicador d'obertura del formulari en finestra emergent
+     * @param model model de dades de la vista
+     * @return vista del formulari de matèries primeres
+     */
     @GetMapping("/new")
     public String formCrearMateriaPrimera(@RequestParam(value = "popup", defaultValue = "false") boolean popup,
                                           Model model) {
@@ -63,7 +91,18 @@ public class MateriaPrimeraWebController {
     }
 
 
-    // GUARDAR MATÈRIA PRIMERA
+    /**
+     * GUARDAT D'UNA MATÈRIA PRIMERA.
+     *
+     * Processat el formulari de creació d'una matèria primera i mostrats
+     * els missatges corresponents segons el resultat de l'operació.
+     *
+     * @param materiaPrimera dades introduïdes al formulari
+     * @param popup indicador d'obertura del formulari en finestra emergent
+     * @param model model de dades de la vista
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/save")
     public String guardarMateriaPrimera(@ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
                                         @RequestParam(value = "popup", defaultValue = "false") boolean popup,
@@ -95,7 +134,17 @@ public class MateriaPrimeraWebController {
     }
 
 
-    // FORMULARI EDITAR MATÈRIA PRIMERA
+    /**
+     * FORMULARI D'EDICIÓ DE MATÈRIA PRIMERA.
+     *
+     * Carregada la matèria primera seleccionada per mostrar-ne les dades
+     * al formulari d'edició.
+     *
+     * @param id identificador de la matèria primera
+     * @param popup indicador d'obertura del formulari en finestra emergent
+     * @param model model de dades de la vista
+     * @return vista del formulari o redirecció al llistat
+     */
     @GetMapping("/edit/{id}")
     public String formEditarMateriaPrimera(@PathVariable Long id,
                                            @RequestParam(value = "popup", defaultValue = "false") boolean popup,
@@ -112,7 +161,19 @@ public class MateriaPrimeraWebController {
     }
 
 
-    // ACTUALITZAR MATÈRIA PRIMERA
+    /**
+     * ACTUALITZACIÓ D'UNA MATÈRIA PRIMERA.
+     *
+     * Processats els canvis de la matèria primera seleccionada i gestionats
+     * els missatges derivats del resultat de l'operació.
+     *
+     * @param id identificador de la matèria primera
+     * @param materiaPrimera dades actualitzades de la matèria primera
+     * @param popup indicador d'obertura del formulari en finestra emergent
+     * @param model model de dades de la vista
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/update/{id}")
     public String updateMateriaPrimera(@PathVariable Long id,
                                        @ModelAttribute("materiaPrimera") MateriaPrimera materiaPrimera,
@@ -155,7 +216,16 @@ public class MateriaPrimeraWebController {
     }
 
 
-    // ELIMINAR MATÈRIA PRIMERA
+    /**
+     * ELIMINACIÓ D'UNA MATÈRIA PRIMERA.
+     *
+     * Sol·licitada l'eliminació de la matèria primera seleccionada i informat
+     * l'usuari del resultat de l'operació.
+     *
+     * @param id identificador de la matèria primera
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat de matèries primeres
+     */
     @PostMapping("/delete/{id}")
     public String deleteMateriaPrimera(@PathVariable Long id,
                                        RedirectAttributes redirectAttributes) {
@@ -176,6 +246,17 @@ public class MateriaPrimeraWebController {
         return "redirect:/materies-primeres/list";
     }
 
+
+    /**
+     * OBTENCIÓ D'UN MISSATGE TRADUÏT.
+     *
+     * Recuperat el text corresponent al codi indicat segons l'idioma
+     * actiu de la interfície web.
+     *
+     * @param codi codi del missatge que s'ha de recuperar
+     * @param arguments valors incorporats al missatge
+     * @return missatge traduït a l'idioma actiu
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

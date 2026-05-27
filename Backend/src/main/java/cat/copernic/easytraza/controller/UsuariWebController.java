@@ -16,6 +16,14 @@ import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.service.UsuariService;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * CONTROLADOR WEB D'USUARIS.
+ *
+ * Gestionades les pantalles de consulta, creació, edició i eliminació
+ * dels usuaris de l'aplicació web, incloent-hi els seus avatars.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/usuaris")
 public class UsuariWebController {
@@ -32,7 +40,21 @@ public class UsuariWebController {
     }
 
 
-    // LLISTAR USUARIS
+    /**
+     * LLISTAT D'USUARIS.
+     *
+     * Preparada la vista amb els usuaris filtrats i ordenats segons
+     * els criteris indicats, incorporant l'usuari autenticat a la sessió.
+     *
+     * @param dni DNI de l'usuari utilitzat com a filtre
+     * @param nomComplet nom de l'usuari utilitzat com a filtre
+     * @param email correu electrònic utilitzat com a filtre
+     * @param ordre camp utilitzat per ordenar el llistat
+     * @param direccio sentit de l'ordenació aplicada
+     * @param model model de dades de la vista
+     * @param session sessió web de l'usuari
+     * @return vista del llistat d'usuaris
+     */
     @GetMapping("/list")
     public String llistarUsuaris(@RequestParam(required = false) String dni,
                                  @RequestParam(required = false) String nomComplet,
@@ -59,7 +81,15 @@ public class UsuariWebController {
     }
 
 
-    // MOSTRAR AVATAR D'UN USUARI
+    /**
+     * OBTENCIÓ DE L'AVATAR D'UN USUARI.
+     *
+     * Retornada la imatge de l'avatar de l'usuari seleccionat quan existeix
+     * i està disponible.
+     *
+     * @param id identificador de l'usuari
+     * @return resposta amb la imatge de l'avatar o resposta de recurs no trobat
+     */
     @GetMapping("/avatar/{id}")
     @ResponseBody
     public ResponseEntity<byte[]> mostrarAvatar(@PathVariable Long id) {
@@ -86,7 +116,14 @@ public class UsuariWebController {
     }
 
 
-    // FORMULARI CREAR USUARI
+    /**
+     * FORMULARI DE CREACIÓ D'USUARI.
+     *
+     * Preparat el formulari necessari per donar d'alta un usuari nou.
+     *
+     * @param model model de dades de la vista
+     * @return vista del formulari d'usuaris
+     */
     @GetMapping("/new")
     public String formCrearUsuari(Model model) {
         model.addAttribute("usuari", new Usuari());
@@ -94,7 +131,18 @@ public class UsuariWebController {
     }
 
 
-    // GUARDAR USUARI
+    /**
+     * GUARDAT D'UN USUARI.
+     *
+     * Processat el formulari de creació d'un usuari juntament amb el seu
+     * avatar i mostrats els missatges corresponents al resultat de l'operació.
+     *
+     * @param usuari dades de l'usuari introduïdes al formulari
+     * @param avatarFile imatge d'avatar adjuntada al formulari
+     * @param model model de dades de la vista
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/save")
     public String guardarUsuari(@ModelAttribute("usuari") Usuari usuari,
                                 @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
@@ -120,7 +168,16 @@ public class UsuariWebController {
     }
 
 
-    // FORMULARI EDITAR USUARI
+    /**
+     * FORMULARI D'EDICIÓ D'USUARI.
+     *
+     * Carregat l'usuari seleccionat per mostrar-ne les dades
+     * al formulari d'edició.
+     *
+     * @param id identificador de l'usuari
+     * @param model model de dades de la vista
+     * @return vista del formulari o redirecció al llistat
+     */
     @GetMapping("/edit/{id}")
     public String formEditarUsuari(@PathVariable Long id, Model model) {
 
@@ -135,7 +192,19 @@ public class UsuariWebController {
     }
 
 
-    // ACTUALITZAR USUARI
+    /**
+     * ACTUALITZACIÓ D'UN USUARI.
+     *
+     * Processats els canvis de l'usuari seleccionat i del seu avatar,
+     * gestionant els missatges derivats del resultat de l'operació.
+     *
+     * @param id identificador de l'usuari
+     * @param usuari dades actualitzades de l'usuari
+     * @param avatarFile imatge d'avatar adjuntada al formulari
+     * @param model model de dades de la vista
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/update/{id}")
     public String updateUsuari(@PathVariable Long id,
                                @ModelAttribute("usuari") Usuari usuari,
@@ -174,7 +243,16 @@ public class UsuariWebController {
     }
 
 
-    // ELIMINAR USUARI
+    /**
+     * ELIMINACIÓ D'UN USUARI.
+     *
+     * Sol·licitada l'eliminació de l'usuari seleccionat i informat l'usuari
+     * del resultat de l'operació.
+     *
+     * @param id identificador de l'usuari
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat d'usuaris
+     */
     @GetMapping("/delete/{id}")
     public String deleteUsuari(@PathVariable Long id,
                                RedirectAttributes redirectAttributes) {
@@ -198,6 +276,17 @@ public class UsuariWebController {
         return "redirect:/usuaris/list";
     }
 
+
+    /**
+     * OBTENCIÓ D'UN MISSATGE TRADUÏT.
+     *
+     * Recuperat el text corresponent al codi indicat segons l'idioma
+     * actiu de la interfície web.
+     *
+     * @param codi codi del missatge que s'ha de recuperar
+     * @param arguments valors incorporats al missatge
+     * @return missatge traduït a l'idioma actiu
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

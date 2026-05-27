@@ -11,16 +11,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * Parser OCR específic per al proveïdor LA META.
+ * PARSER OCR DE LA META.
  *
- * Aquest parser treballa amb les zones OCR generades per
- * OcrAlbaraProveidorService:
- * - informació general de l'albarà;
- * - matèries primeres;
- * - lots;
- * - quantitats en sacs.
+ * Interpretades les dades OCR dels albarans del proveïdor La Meta.
+ * També separades les matèries primeres, lots i quantitats detectades al document.
  *
- * Les línies es relacionen per la seva posició vertical dins del document.
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrLaMetaService implements OcrParserProveidor {
@@ -49,6 +45,18 @@ public class OcrLaMetaService implements OcrParserProveidor {
     }
 
     @Override
+
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param textOcrOriginal text utilitzat en el procés
+     * @param textOcrNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrAlbaraPendent parsejar(String textOcrOriginal, String textOcrNormalitzat) {
         OcrAlbaraPendent resultat = new OcrAlbaraPendent();
 
@@ -63,8 +71,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return resultat;
     }
 
+
     /**
-     * Extreu el número d'albarà des de la zona taronja.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureNumeroAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
@@ -85,8 +100,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return null;
     }
 
+
     /**
-     * Extreu la data de l'albarà des de la zona taronja.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureDataAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
@@ -104,8 +126,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return OcrUtils.extreurePrimeraDataNormalitzada(text);
     }
 
+
     /**
-     * Construeix les línies unint matèria, lot i quantitat per índex.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLinies(String text) {
         List<String> materies = extreureMateries(text);
@@ -153,11 +182,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return linies;
     }
 
+
     /**
-     * Extreu les matèries de la columna CONCEPTO.
+     * EXTRACCIÓ DE DADES.
      *
-     * Elimina els dos dígits de la data de consum que el retall anterior podia
-     * capturar al final de la línia.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<String> extreureMateries(String text) {
         String blocMateries = OcrUtils.extreureBlocEntreMarcadors(
@@ -189,11 +222,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return materies;
     }
 
+
     /**
-     * Extreu un lot per línia de la columna LOTE.
+     * EXTRACCIÓ DE DADES.
      *
-     * Corregeix lectures separades com "M1 983086" convertint-les a
-     * "M1983086" abans de validar-les.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<String> extreureLots(String text) {
         String blocLots = OcrUtils.extreureBlocEntreMarcadors(
@@ -234,11 +271,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return lots;
     }
 
+
     /**
-     * Extreu la quantitat de sacs.
+     * EXTRACCIÓ DE DADES.
      *
-     * Si Tesseract retorna una línia com "5 41", es pren sempre l'últim número,
-     * perquè el primer correspon al residu OCR de "Saco25".
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<Double> extreureQuantitats(String text) {
         String blocQuantitats = OcrUtils.extreureBlocEntreMarcadors(
@@ -277,10 +318,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return quantitats;
     }
 
+
     /**
-     * Neteja només errors reals observats a la zona de matèries.
+     * NETEJA DE DADES.
      *
-     * No introdueix matèries fixes ni assumeix el contingut de futurs albarans.
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
      */
     private String netejarMateria(String valor) {
         if (valor == null || valor.isBlank()) {
@@ -288,19 +334,13 @@ public class OcrLaMetaService implements OcrParserProveidor {
         }
 
         String materia = valor.trim()
-                /*
-                 * Dígits de la columna de data capturats accidentalment:
-                 * "HARINA PANIF.1956 07" -> "HARINA PANIF.1956".
-                 */
+                // Dígits de la columna de data capturats accidentalment: "HARINA PANIF.1956 07" -> "HARINA PANIF.1956".
                 .replaceAll("\\s+\\d{1,2}\\s*$", "")
-                /*
-                 * Lectura OCR del producte T80:
-                 * "T80O" -> "T80".
-                 */
+                
+                // Lectura OCR del producte T80: "T80O" -> "T80".
                 .replaceAll("(?i)\\bT80[O0]\\b", "T80")
-                /*
-                 * Espais i puntuació sobrants.
-                 */
+                
+                // Espais i puntuació sobrants.
                 .replaceAll("\\s+", " ")
                 .replaceAll("\\s*[,;]+\\s*$", "")
                 .trim();
@@ -308,6 +348,15 @@ public class OcrLaMetaService implements OcrParserProveidor {
         return materia.length() < 3 ? null : materia;
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultat valor de resultat utilitzat pel mètode
+     */
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
             resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "LA META"));
@@ -322,10 +371,32 @@ public class OcrLaMetaService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param valors valor que s'ha de processar
+     * @param index valor de index utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private <T> T obtenirValor(List<T> valors, int index) {
         return index >= 0 && index < valors.size() ? valors.get(index) : null;
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

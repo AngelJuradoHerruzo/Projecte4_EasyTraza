@@ -14,10 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * CONFIGURACIÓ DE SEGURETAT
+ * CONFIGURACIÓ DE SEGURETAT.
  *
- * Defineix la configuració d'autenticació, login, logout,
- * permisos d'accés i codificació de contrasenyes.
+ * Definida la configuració d'autenticació, inici i tancament de sessió,
+ * permisos d'accés i codificació de contrasenyes de l'aplicació.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Configuration
 public class SecurityConfig {
@@ -29,15 +31,31 @@ public class SecurityConfig {
     private UsuariRepository usuariRepository;
 
 
-    // ---------------------------- PASSWORD ENCODER ----------------------------
-    // Bean per codificar contrasenyes amb BCrypt
+    /**
+     * CODIFICACIÓ DE CONTRASENYES.
+     *
+     * Creat el codificador BCrypt utilitzat per protegir les contrasenyes
+     * dels usuaris durant els processos d'autenticació.
+     *
+     * @return codificador de contrasenyes basat en BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
 
-    // ---------------------------- CONFIGURACIÓ DE SEGURETAT ----------------------------
+    /**
+     * CADENA DE FILTRES DE SEGURETAT.
+     *
+     * Configurades les regles de seguretat web, els canals d'accés, les rutes
+     * autoritzades, el login, el logout, la caducitat de la sessió i la gestió
+     * dels accessos denegats.
+     *
+     * @param http configuració de seguretat HTTP de l'aplicació
+     * @return cadena de filtres de seguretat configurada
+     * @throws Exception si es produeix un error durant la configuració de seguretat
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 

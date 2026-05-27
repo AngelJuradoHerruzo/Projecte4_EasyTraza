@@ -28,6 +28,14 @@ import cat.copernic.easytraza.service.ProveidorService;
 import cat.copernic.easytraza.service.UnitatMesuraService;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * CONTROLADOR WEB D'ALBARANS DE PROVEÏDOR.
+ *
+ * Gestionades les pantalles i operacions dels albarans de proveïdor, incloent-hi
+ * la càrrega temporal de documents reconeguts mitjançant OCR.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/albarans-proveidor")
 public class AlbaraProveidorWebController {
@@ -59,7 +67,20 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // LLISTAR ALBARANS DE PROVEÏDOR
+    /**
+     * LLISTAT D'ALBARANS DE PROVEÏDOR.
+     *
+     * Preparada la vista amb els albarans de proveïdor filtrats pels criteris
+     * de cerca rebuts des del formulari.
+     *
+     * @param proveidor nom del proveïdor utilitzat com a filtre
+     * @param numeroAlbara número d'albarà utilitzat com a filtre
+     * @param identificadorLot identificador del lot utilitzat com a filtre
+     * @param dataRecepcio data de recepció utilitzada com a filtre
+     * @param receptor receptor utilitzat com a filtre
+     * @param model model de dades de la vista
+     * @return vista del llistat d'albarans de proveïdor
+     */
     @GetMapping("/list")
     public String llistarAlbaransProveidor(@RequestParam(value = "proveidor", required = false) String proveidor,
                                            @RequestParam(value = "numeroAlbara", required = false) String numeroAlbara,
@@ -86,7 +107,16 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // DETALL ALBARÀ DE PROVEÏDOR
+    /**
+     * DETALL D'UN ALBARÀ DE PROVEÏDOR.
+     *
+     * Carregades les dades d'un albarà de proveïdor per mostrar-ne el detall
+     * o redirigida la petició quan no existeix.
+     *
+     * @param id identificador de l'albarà de proveïdor
+     * @param model model de dades de la vista
+     * @return vista de detall o redirecció al llistat
+     */
     @GetMapping("/detail/{id}")
     public String detallAlbaraProveidor(@PathVariable Long id, Model model) {
         AlbaraProveidor albaraProveidor = albaraProveidorService.getAlbaraProveidorDetallById(id);
@@ -101,7 +131,16 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // FORMULARI CREAR ALBARÀ DE PROVEÏDOR
+    /**
+     * FORMULARI DE CREACIÓ D'ALBARÀ DE PROVEÏDOR.
+     *
+     * Preparat un albarà nou amb la data actual i una línia inicial,
+     * eliminant qualsevol resultat OCR temporal anterior de la sessió.
+     *
+     * @param model model de dades de la vista
+     * @param session sessió web de l'usuari
+     * @return vista del formulari d'albarans de proveïdor
+     */
     @GetMapping("/new")
     public String formCrearAlbaraProveidor(Model model, HttpSession session) {
         session.removeAttribute(SESSION_OCR_RESULTAT);
@@ -117,7 +156,17 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // ESCANEJAR OCR I RETORNAR EL MATEIX FORMULARI PREOMPLERT
+    /**
+     * ESCANEIG OCR DE L'ALBARÀ.
+     *
+     * Processat el document adjuntat, completades les associacions reconegudes
+     * i retornat el formulari amb les dades detectades per a la seva revisió.
+     *
+     * @param documentOcr document adjuntat per al reconeixement OCR
+     * @param session sessió web de l'usuari
+     * @param model model de dades de la vista
+     * @return vista del formulari amb les dades OCR o amb l'error detectat
+     */
     @PostMapping("/ocr")
     public String escanejarOcr(@RequestParam(value = "documentOcr", required = false) MultipartFile documentOcr,
                                HttpSession session,
@@ -155,7 +204,18 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // RECARREGAR LLISTES DEL FORMULARI SENSE PERDRE LES DADES ESCRITES
+    /**
+     * RECÀRREGA DEL FORMULARI.
+     *
+     * Recarregades les dades auxiliars del formulari sense perdre els valors
+     * introduïts ni la referència al document OCR temporal.
+     *
+     * @param albaraProveidor dades actuals de l'albarà introduïdes al formulari
+     * @param ocrDocumentTemporalId identificador del document OCR temporal
+     * @param session sessió web de l'usuari
+     * @param model model de dades de la vista
+     * @return vista del formulari d'albarans de proveïdor
+     */
     @PostMapping("/reload-form")
     public String recarregarFormulari(@ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
                                       @RequestParam(value = "ocrDocumentTemporalId", required = false) String ocrDocumentTemporalId,
@@ -183,7 +243,19 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // GUARDAR ALBARÀ DE PROVEÏDOR
+    /**
+     * GUARDAT D'UN ALBARÀ DE PROVEÏDOR.
+     *
+     * Processat el formulari de creació, el document adjunt i les dades OCR
+     * temporals per guardar l'albarà de proveïdor.
+     *
+     * @param albaraProveidor dades de l'albarà introduïdes al formulari
+     * @param imatgeAlbara document adjunt de l'albarà
+     * @param ocrDocumentTemporalId identificador del document OCR temporal
+     * @param session sessió web de l'usuari
+     * @param model model de dades de la vista
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/save")
     public String guardarAlbaraProveidor(@ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
                                          @RequestParam(value = "imatgeAlbara", required = false) MultipartFile imatgeAlbara,
@@ -212,7 +284,17 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // FORMULARI EDITAR ALBARÀ DE PROVEÏDOR
+    /**
+     * FORMULARI D'EDICIÓ D'ALBARÀ DE PROVEÏDOR.
+     *
+     * Carregat l'albarà seleccionat per editar-lo i netejat qualsevol resultat
+     * OCR temporal anterior de la sessió.
+     *
+     * @param id identificador de l'albarà de proveïdor
+     * @param model model de dades de la vista
+     * @param session sessió web de l'usuari
+     * @return vista del formulari o redirecció al llistat
+     */
     @GetMapping("/edit/{id}")
     public String formEditarAlbaraProveidor(@PathVariable Long id, Model model, HttpSession session) {
         session.removeAttribute(SESSION_OCR_RESULTAT);
@@ -243,7 +325,20 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // ACTUALITZAR ALBARÀ DE PROVEÏDOR
+    /**
+     * ACTUALITZACIÓ D'UN ALBARÀ DE PROVEÏDOR.
+     *
+     * Processats els canvis de l'albarà, el document adjunt i les dades OCR
+     * temporals per actualitzar el registre seleccionat.
+     *
+     * @param id identificador de l'albarà de proveïdor
+     * @param albaraProveidor dades actualitzades de l'albarà
+     * @param imatgeAlbara document adjunt de l'albarà
+     * @param ocrDocumentTemporalId identificador del document OCR temporal
+     * @param session sessió web de l'usuari
+     * @param model model de dades de la vista
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/update/{id}")
     public String updateAlbaraProveidor(@PathVariable Long id,
                                         @ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
@@ -274,7 +369,16 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // ELIMINAR ALBARÀ DE PROVEÏDOR
+    /**
+     * ELIMINACIÓ D'UN ALBARÀ DE PROVEÏDOR.
+     *
+     * Sol·licitada l'eliminació de l'albarà seleccionat i preparat el model
+     * amb l'error corresponent quan l'operació no és possible.
+     *
+     * @param id identificador de l'albarà de proveïdor
+     * @param model model de dades de la vista
+     * @return redirecció al llistat o vista de detall amb error
+     */
     @GetMapping("/delete/{id}")
     public String deleteAlbaraProveidor(@PathVariable Long id, Model model) {
         try {
@@ -294,7 +398,14 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // CARREGAR DADES COMUNES DEL FORMULARI
+    /**
+     * CÀRREGA DE DADES DEL FORMULARI.
+     *
+     * Afegides al model les dades comunes necessàries per emplenar
+     * un formulari d'albarà de proveïdor.
+     *
+     * @param model model de dades de la vista
+     */
     private void carregarDadesFormulari(Model model) {
         model.addAttribute("proveidors", proveidorService.getAllProveidors());
         model.addAttribute("materiesPrimeres", materiaPrimeraService.getAllMateriesPrimeres());
@@ -302,7 +413,15 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // AFEGIR DADES DE PREVISUALITZACIÓ DEL DOCUMENT OCR TEMPORAL
+    /**
+     * PREVISUALITZACIÓ DEL DOCUMENT OCR.
+     *
+     * Afegides al model les dades disponibles per mostrar el document OCR
+     * temporal sense tornar a carregar el fitxer original.
+     *
+     * @param model model de dades de la vista
+     * @param ocrDocumentTemporalId identificador del document OCR temporal
+     */
     private void afegirDadesDocumentTemporal(Model model, String ocrDocumentTemporalId) {
         if (ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) {
             return;
@@ -320,7 +439,15 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // OBTENIR RESULTAT OCR TEMPORAL CONSERVAT A LA SESSIÓ
+    /**
+     * OBTENCIÓ DEL RESULTAT OCR TEMPORAL.
+     *
+     * Recuperat el resultat OCR mantingut temporalment a la sessió
+     * durant l'edició de l'albarà.
+     *
+     * @param session sessió web de l'usuari
+     * @return resultat OCR temporal o valor nul si no existeix
+     */
     private OcrResultatAlbaraProveidorDto obtenirResultatOcrSessio(HttpSession session) {
         Object resultat = session.getAttribute(SESSION_OCR_RESULTAT);
         return resultat instanceof OcrResultatAlbaraProveidorDto
@@ -329,7 +456,16 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // RECUPERAR LA REFERÈNCIA LLEUGERA AL DOCUMENT OCR QUAN ES RECARREGA EL FORMULARI
+    /**
+     * OBTENCIÓ DE L'IDENTIFICADOR OCR.
+     *
+     * Recuperada la referència al document OCR temporal a partir del valor rebut
+     * o del resultat emmagatzemat a la sessió.
+     *
+     * @param ocrDocumentTemporalId identificador rebut des del formulari
+     * @param resultatOcr resultat OCR temporal disponible
+     * @return identificador del document OCR temporal o valor nul
+     */
     private String obtenirDocumentTemporalId(String ocrDocumentTemporalId, OcrResultatAlbaraProveidorDto resultatOcr) {
         if (ocrDocumentTemporalId != null && !ocrDocumentTemporalId.isBlank()) {
             return ocrDocumentTemporalId;
@@ -339,13 +475,31 @@ public class AlbaraProveidorWebController {
     }
 
 
-    // ASSEGURAR QUE EL FORMULARI TINGUI COM A MÍNIM UNA LÍNIA
+    /**
+     * PREPARACIÓ DE LES LÍNIES DEL FORMULARI.
+     *
+     * Garantida l'existència d'una línia inicial quan l'albarà rebut
+     * no conté lots per mostrar al formulari.
+     *
+     * @param albaraProveidor albarà que s'ha de mostrar al formulari
+     */
     private void assegurarLotsFormulari(AlbaraProveidor albaraProveidor) {
         if (albaraProveidor.getLots() == null || albaraProveidor.getLots().isEmpty()) {
             albaraProveidor.setLots(new ArrayList<>(List.of(new LotProveidor())));
         }
     }
 
+
+    /**
+     * OBTENCIÓ D'UN MISSATGE TRADUÏT.
+     *
+     * Recuperat el text corresponent al codi indicat segons l'idioma
+     * actiu de la interfície web.
+     *
+     * @param codi codi del missatge que s'ha de recuperar
+     * @param arguments valors incorporats al missatge
+     * @return missatge traduït a l'idioma actiu
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

@@ -1,7 +1,12 @@
 package cat.copernic.easytraza.mobile.features.auth.data.sources.remote
 
 /**
- * DTO de resposta de l'usuari identificat.
+ * RESPOSTA D'USUARI IDENTIFICAT.
+ *
+ * Representades les dades retornades pel backend quan un usuari
+ * ha estat identificat correctament des del client mòbil.
+ *
+ * @author Ángel Jurado Herruz
  */
 data class UsuariIdentificatResponse(
     val id: Long,

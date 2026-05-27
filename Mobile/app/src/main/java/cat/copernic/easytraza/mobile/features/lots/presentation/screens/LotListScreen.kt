@@ -76,8 +76,15 @@ private enum class LotSortOption(@StringRes val labelRes: Int) {
     DATA_CADUCITAT(R.string.lots_sort_expiration)
 }
 
+
 /**
- * Pantalla de llistat de lots amb filtres i ordenació.
+ * ELEMENT DEL LLISTAT DE LOTS.
+ *
+ * Mostrada la informació principal d'un lot i habilitada
+ * la selecció per accedir al seu detall.
+ *
+ * @param lot lot que s'ha de representar
+ * @param onClick acció executada en seleccionar el lot
  */
 @Composable
 fun LotListScreen(
@@ -248,6 +255,22 @@ fun LotListScreen(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * FILTRES DEL LLISTAT DE LOTS.
+ *
+ * Presentats els camps de cerca i selecció utilitzats per filtrar
+ * i ordenar els lots mostrats a la pantalla.
+ *
+ * @param searchText text utilitzat per filtrar els lots
+ * @param onSearchTextChange acció executada quan canvia el text de cerca
+ * @param selectedEstat estat seleccionat per filtrar els lots
+ * @param onEstatChange acció executada quan canvia l'estat seleccionat
+ * @param selectedMateria matèria primera seleccionada com a filtre
+ * @param onMateriaChange acció executada quan canvia la matèria seleccionada
+ * @param selectedOrder ordre seleccionat per presentar els lots
+ * @param onOrderChange acció executada quan canvia el criteri d'ordre
+ * @param materias llista de matèries primeres disponibles
+ */
 @Composable
 private fun LotFiltersCard(
     filtreIdentificador: String,
@@ -474,6 +497,7 @@ private fun LotFiltersCard(
     }
 }
 
+
 /**
  * Grup visual de lots associats a una matèria primera.
  */
@@ -554,6 +578,7 @@ fun LotMateriaGroupCard(
     }
 }
 
+
 /**
  * Fila d'un lot dins d'un grup de matèria primera.
  */
@@ -610,6 +635,15 @@ fun LotListItem(
     }
 }
 
+
+/**
+ * MISSATGE SENSE LOTS.
+ *
+ * Mostrat un missatge informatiu quan no existeixen lots
+ * disponibles per als criteris de consulta aplicats.
+ *
+ * @param text missatge que s'ha de presentar a l'usuari
+ */
 @Composable
 private fun ColumnScope.EmptyLotsMessage(text: String) {
     Box(
@@ -627,6 +661,17 @@ private fun ColumnScope.EmptyLotsMessage(text: String) {
     }
 }
 
+
+/**
+ * RESUM DELS FILTRES.
+ *
+ * Mostrat el resum dels criteris aplicats sobre el llistat
+ * per informar l'usuari de la consulta activa.
+ *
+ * @param total total de lots obtinguts amb els filtres actius
+ * @param estat estat seleccionat com a filtre
+ * @param materia matèria primera seleccionada com a filtre
+ */
 @Composable
 private fun resumFiltres(
     filtreIdentificador: String,
@@ -652,6 +697,16 @@ private fun resumFiltres(
     return stringResource(R.string.lots_summary, total, textFiltres, stringResource(ordre.labelRes))
 }
 
+
+/**
+ * ETIQUETA DE L'ESTAT.
+ *
+ * Obtingut el text traduït que correspon a l'estat intern
+ * utilitzat per representar un lot.
+ *
+ * @param estat estat intern del lot
+ * @return text visible associat a l'estat
+ */
 @Composable
 private fun estatLabel(estat: String): String = when (estat) {
     TOTS -> stringResource(R.string.lots_all_states)
@@ -661,6 +716,16 @@ private fun estatLabel(estat: String): String = when (estat) {
     else -> estat
 }
 
+
+/**
+ * ORDRE DELS ESTATS.
+ *
+ * Assignat un valor numèric a cada estat del lot
+ * per aplicar l'ordenació definida al llistat.
+ *
+ * @param estat estat intern del lot
+ * @return valor utilitzat per ordenar els estats
+ */
 private fun estatOrdre(estat: String): Int = when (estat) {
     "OBERT" -> 0
     "EN_ESTOC" -> 1

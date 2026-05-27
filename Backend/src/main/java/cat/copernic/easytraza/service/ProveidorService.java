@@ -13,6 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import cat.copernic.easytraza.entities.Proveidor;
 import cat.copernic.easytraza.repository.ProveidorRepository;
 
+/**
+ * SERVEI DE PROVEÏDORS.
+ *
+ * Gestionades les operacions de consulta, creació, modificació i eliminació dels proveïdors.
+ * També aplicats els filtres, ordenacions i validacions pròpies de les dades del proveïdor.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class ProveidorService {
@@ -27,7 +35,14 @@ public class ProveidorService {
     }
 
 
-    // OBTENIR TOTS ELS PROVEÏDORS
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<Proveidor> getAllProveidors() {
         return proveidorRepository.findAll();
     }
@@ -55,14 +70,30 @@ public class ProveidorService {
     }
 
 
-    // OBTENIR PROVEÏDOR PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public Proveidor getProveidorById(Long id) {
         Optional<Proveidor> proveidor = proveidorRepository.findById(id);
         return proveidor.orElse(null);
     }
 
 
-    // CREAR PROVEÏDOR
+    /**
+     * CREACIÓ DEL REGISTRE.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param proveidor valor de proveidor utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public Proveidor createProveidor(Proveidor proveidor) {
         validarDadesProveidor(proveidor);
 
@@ -75,7 +106,16 @@ public class ProveidorService {
     }
 
 
-    // ACTUALITZAR PROVEÏDOR
+    /**
+     * ACTUALITZACIÓ DEL REGISTRE.
+     *
+     * Actualitzat el registre indicat amb les dades rebudes, mantenint
+     * les validacions pròpies del servei.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param proveidor valor de proveidor utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public Proveidor updateProveidor(Long id, Proveidor proveidor) {
 
         Optional<Proveidor> proveidorOpt = proveidorRepository.findById(id);
@@ -102,13 +142,27 @@ public class ProveidorService {
     }
 
 
-    // ELIMINAR PROVEÏDOR
+    /**
+     * ELIMINACIÓ DEL REGISTRE.
+     *
+     * Eliminat el registre identificat quan el servei permet completar
+     * l'operació sol·licitada.
+     *
+     * @param id identificador utilitzat en l'operació
+     */
     public void deleteProveidor(Long id) {
         proveidorRepository.deleteById(id);
     }
 
 
-    // VALIDAR DADES DEL PROVEÏDOR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param proveidor valor de proveidor utilitzat pel mètode
+     */
     private void validarDadesProveidor(Proveidor proveidor) {
 
         if (proveidor.getCif() != null) {
@@ -149,7 +203,16 @@ public class ProveidorService {
     }
 
 
-    // ORDENAR PROVEÏDORS PEL CAMP SELECCIONAT
+    /**
+     * ORDENACIÓ DE DADES.
+     *
+     * Ordenada la llista rebuda segons el criteri indicat o segons
+     * l'ordre propi del servei.
+     *
+     * @param proveidors valor de proveidors utilitzat pel mètode
+     * @param ordre camp utilitzat per ordenar les dades
+     * @param direccio direcció de l'ordenació
+     */
     private void ordenarProveidors(List<Proveidor> proveidors, String ordre, String direccio) {
 
         String campOrdre = ordre != null && !ordre.isBlank() ? ordre : "nomProveidor";
@@ -195,13 +258,30 @@ public class ProveidorService {
     }
 
 
-    // RETORNAR TEXT SEGUR PER A L'ORDENACIÓ
+    /**
+     * NORMALITZACIÓ DEL VALOR.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String valorText(String valor) {
         return valor != null ? valor : "";
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String valor, String filtre) {
 
         if (filtre == null || filtre.isBlank()) {
@@ -216,8 +296,15 @@ public class ProveidorService {
     }
 
 
-    // VERIFICAR DNI: LA LLETRA HA DE COINCIDIR AMB EL NÚMERO MÒDUL 23
-    // VERIFICAR CIF: EL DÍGIT O LLETRA DE CONTROL HA DE COINCIDIR AMB EL CARÀCTER FINAL SEGONS EL TIPUS D’ENTITAT
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @return cert si es compleix la condició indicada
+     */
     private boolean esCifNifValid(String valor) {
 
         // Si és null o buit → no vàlid
@@ -301,6 +388,17 @@ public class ProveidorService {
         return false;
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

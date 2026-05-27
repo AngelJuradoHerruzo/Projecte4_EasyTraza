@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * SERVEI DE DETALLS D'USUARI
+ * SERVEI DE DETALLS D'USUARI.
  *
- * Carrega els usuaris de la base de dades perquè Spring Security pugui autenticar-los.
+ * Carregades les dades dels usuaris necessàries per a l'autenticació amb Spring Security.
+ * També adaptat el rol propi de l'aplicació al format utilitzat pel sistema de seguretat.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class UsuariDetailsService implements UserDetailsService {
@@ -29,7 +30,16 @@ public class UsuariDetailsService implements UserDetailsService {
     }
 
 
-    // CARREGAR USUARI PER CORREU ELECTRÒNIC
+    /**
+     * CÀRREGA DE L'USUARI.
+     *
+     * Carregades les dades de l'usuari a partir del correu electrònic
+     * per preparar la seva autenticació.
+     *
+     * @param email valor de email utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     * @throws UsernameNotFoundException si es produeix un error durant el procés
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 

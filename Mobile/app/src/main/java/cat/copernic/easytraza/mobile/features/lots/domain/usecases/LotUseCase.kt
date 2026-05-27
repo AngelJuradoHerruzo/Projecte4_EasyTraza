@@ -8,12 +8,25 @@ import cat.copernic.easytraza.mobile.features.lots.data.sources.remote.LotRespon
 import cat.copernic.easytraza.mobile.features.lots.domain.models.Lot
 
 /**
- * Casos d'ús de lots.
+ * RESULTAT D'INICI D'UN LOT.
+ *
+ * Representada la informació obtinguda en intentar iniciar un lot,
+ * incloent-hi la confirmació requerida, el missatge i el lot resultant.
+ *
+ * @author Ángel Jurado Herruz
  */
 class LotUseCase(
     private val context: Context
 ) {
 
+    /**
+     * OBTENCIÓ DE L'API DE LOTS.
+     *
+     * Preparat el servei remot de lots utilitzant
+     * la configuració actual del servidor.
+     *
+     * @return API preparada per executar operacions de lots
+     */
     private fun getLotApi(): LotApi {
         return RetrofitClient
             .getInstance(context)
@@ -21,6 +34,14 @@ class LotUseCase(
     }
 
 
+    /**
+     * LLISTAT DE LOTS.
+     *
+     * Consultats els lots disponibles al backend i convertides
+     * les respostes rebudes al model de domini.
+     *
+     * @return resultat amb els lots disponibles o l'error produït
+     */
     suspend fun llistarLots(): Result<List<Lot>> {
 
         return try {
@@ -43,6 +64,15 @@ class LotUseCase(
     }
 
 
+    /**
+     * CONSULTA D'UN LOT.
+     *
+     * Consultades les dades del lot indicat i retornada
+     * la seva representació de domini quan existeix.
+     *
+     * @param id identificador del lot que s'ha de consultar
+     * @return resultat amb el lot consultat o l'error produït
+     */
     suspend fun consultarLot(id: Long): Result<Lot> {
 
         return try {
@@ -61,6 +91,15 @@ class LotUseCase(
     }
 
 
+    /**
+     * INICI D'UN LOT.
+     *
+     * Sol·licitat l'inici del lot indicat i interpretada la resposta
+     * per informar si és necessària una confirmació prèvia.
+     *
+     * @param id identificador del lot que s'ha d'iniciar
+     * @return resultat amb la informació obtinguda en iniciar el lot
+     */
     suspend fun iniciarLot(id: Long): Result<IniciarLotResult> {
 
         return try {
@@ -91,6 +130,15 @@ class LotUseCase(
     }
 
 
+    /**
+     * CONFIRMACIÓ D'INICI D'UN LOT.
+     *
+     * Executada la confirmació necessària per iniciar el lot indicat
+     * i retornades les seves dades actualitzades.
+     *
+     * @param id identificador del lot que s'ha d'iniciar
+     * @return resultat amb el lot iniciat o l'error produït
+     */
     suspend fun confirmarIniciLot(id: Long): Result<Lot> {
 
         return try {
@@ -109,6 +157,15 @@ class LotUseCase(
     }
 
 
+    /**
+     * FINALITZACIÓ D'UN LOT.
+     *
+     * Executada la finalització del lot indicat i retornades
+     * les dades actualitzades després de completar l'operació.
+     *
+     * @param id identificador del lot que s'ha de finalitzar
+     * @return resultat amb el lot finalitzat o l'error produït
+     */
     suspend fun finalitzarLot(id: Long): Result<Lot> {
 
         return try {
@@ -127,6 +184,14 @@ class LotUseCase(
     }
 
 
+    /**
+     * CONVERSIÓ AL MODEL DE DOMINI.
+     *
+     * Transformada la resposta rebuda del backend en el model
+     * de lot utilitzat per la resta de l'aplicació.
+     *
+     * @return lot convertit al model de domini
+     */
     private fun LotResponse.toDomain(): Lot {
         return Lot(
             id = id,

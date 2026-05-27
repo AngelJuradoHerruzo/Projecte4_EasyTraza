@@ -39,6 +39,14 @@ import cat.copernic.easytraza.repository.UsuariRepository;
 import cat.copernic.easytraza.service.ocr.OcrUtils;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * SERVEI D'ALBARANS DE PROVEÏDOR.
+ *
+ * Gestionades les operacions dels albarans de proveïdor i dels lots rebuts.
+ * També preparades les dades procedents del procés OCR i les validacions prèvies al guardat.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class AlbaraProveidorService {
@@ -76,7 +84,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // OBTENIR TOTS ELS ALBARANS DE PROVEÏDOR ORDENATS PER PROVEÏDOR I ID
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<AlbaraProveidor> getAllAlbaransProveidor() {
 
         List<AlbaraProveidor> albarans = albaraProveidorRepository.findAll();
@@ -98,7 +113,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // OBTENIR ALBARANS AGRUPATS PER PROVEÏDOR
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @return llista de resultats obtinguda
+     */
     public Map<String, List<AlbaraProveidor>> getAlbaransAgrupatsPerProveidor() {
         return agruparAlbaransPerProveidor(getAllAlbaransProveidor());
     }
@@ -122,7 +144,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // AGRUPAR ALBARANS PER NOM DE PROVEÏDOR
+    /**
+     * AGRUPACIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param albarans valor de albarans utilitzat pel mètode
+     * @return llista de resultats obtinguda
+     */
     private Map<String, List<AlbaraProveidor>> agruparAlbaransPerProveidor(List<AlbaraProveidor> albarans) {
 
         Map<String, List<AlbaraProveidor>> albaransPerProveidor = new LinkedHashMap<>();
@@ -144,14 +174,30 @@ public class AlbaraProveidorService {
     }
 
 
-    // OBTENIR ALBARÀ DE PROVEÏDOR PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public AlbaraProveidor getAlbaraProveidorById(Long id) {
         Optional<AlbaraProveidor> albaraProveidor = albaraProveidorRepository.findById(id);
         return albaraProveidor.orElse(null);
     }
 
 
-    // OBTENIR ALBARÀ DE PROVEÏDOR AMB DETALL
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public AlbaraProveidor getAlbaraProveidorDetallById(Long id) {
 
         Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
@@ -244,7 +290,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // ELIMINAR ALBARÀ DE PROVEÏDOR
+    /**
+     * ELIMINACIÓ DEL REGISTRE.
+     *
+     * Eliminat el registre identificat quan el servei permet completar
+     * l'operació sol·licitada.
+     *
+     * @param id identificador utilitzat en l'operació
+     */
     public void deleteAlbaraProveidor(Long id) {
 
         Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
@@ -256,7 +309,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPROVAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     public boolean esModificable(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor == null || albaraProveidor.getLots() == null) {
@@ -273,7 +334,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // OBTENIR NÚMERO D'ALBARÀ PER MOSTRAR A LA WEB
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     public String obtenirNumeroAlbaraVisible(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor == null) {
@@ -294,7 +363,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // VALIDAR SI L'ALBARÀ ES POT MODIFICAR O ELIMINAR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     */
     public void validarAlbaraModificable(AlbaraProveidor albaraProveidor) {
 
         if (!esModificable(albaraProveidor)) {
@@ -303,7 +379,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // ELIMINAR AVISOS D'ASSOCIACIÓ ANTICS ABANS DE TORNAR A CONSULTAR LA BASE DE DADES
+    /**
+     * NETEJA DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param resultatOcr valor de resultatOcr utilitzat pel mètode
+     */
     public void netejarAvisosAssociacioOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
         if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
             return;
@@ -352,7 +435,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // CONVERTIR EL RESULTAT OCR A L'ENTITAT USADA PEL FORMULARI
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param resultatOcr valor de resultatOcr utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     public AlbaraProveidor convertirResultatOcrAFormulari(OcrResultatAlbaraProveidorDto resultatOcr) {
         AlbaraProveidor albaraProveidor = new AlbaraProveidor();
         OcrAlbaraPendent pendent = resultatOcr.getAlbaraPendent();
@@ -382,7 +473,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // CONVERTIR UNA LÍNIA OCR A LOT TEMPORAL DE FORMULARI
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param liniaOcr valor de liniaOcr utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private LotProveidor convertirLiniaOcrAFormulari(OcrLiniaDto liniaOcr) {
         LotProveidor lot = new LotProveidor();
         lot.setIdentificadorLot(liniaOcr.getIdentificadorLot());
@@ -397,7 +496,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPLETAR ASSOCIACIONS AMB ELEMENTS EXISTENTS DE BASE DE DADES
+    /**
+     * COMPLECIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultatOcr valor de resultatOcr utilitzat pel mètode
+     */
     public void completarAssociacionsOcr(OcrResultatAlbaraProveidorDto resultatOcr) {
         if (resultatOcr == null || resultatOcr.getAlbaraPendent() == null) {
             return;
@@ -409,7 +515,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // ASSOCIAR PROVEÏDOR OCR SI EXISTEIX A LA BASE DE DADES
+    /**
+     * ASSOCIACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param pendent valor de pendent utilitzat pel mètode
+     */
     private void associarProveidorOcr(OcrAlbaraPendent pendent) {
         Proveidor proveidor = buscarProveidor(pendent.getProveidorCifDetectat(), pendent.getProveidorDetectat());
 
@@ -428,7 +541,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // ASSOCIAR MATÈRIES PRIMERES OCR SI EXISTEIXEN A LA BASE DE DADES
+    /**
+     * ASSOCIACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param pendent valor de pendent utilitzat pel mètode
+     */
     private void associarMateriesPrimeresOcr(OcrAlbaraPendent pendent) {
         if (pendent.getLinies() == null) {
             return;
@@ -453,7 +573,16 @@ public class AlbaraProveidorService {
     }
 
 
-    // BUSCAR PROVEÏDOR PER CIF O NOM FLEXIBLE
+    /**
+     * CERCA DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param cifDetectat valor de cifDetectat utilitzat pel mètode
+     * @param nomDetectat valor de nomDetectat utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private Proveidor buscarProveidor(String cifDetectat, String nomDetectat) {
         for (Proveidor proveidor : proveidorService.getAllProveidors()) {
             if (cifDetectat != null && !cifDetectat.isBlank()
@@ -484,7 +613,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // BUSCAR MATÈRIA PRIMERA PER NOM FLEXIBLE
+    /**
+     * CERCA DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materiaDetectada valor de materiaDetectada utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private MateriaPrimera buscarMateriaPrimera(String materiaDetectada) {
         if (materiaDetectada == null || materiaDetectada.isBlank()) {
             return null;
@@ -507,7 +644,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // CONVERTIR DATA OCR A LOCALDATE
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param dataOcr valor de dataOcr utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private LocalDate convertirDataOcr(String dataOcr) {
         if (dataOcr == null || dataOcr.isBlank()) {
             return LocalDate.now();
@@ -533,7 +678,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // CONVERTIR QUANTITAT OCR A ENTER PER AL FORMULARI ACTUAL
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param quantitat valor de quantitat utilitzat pel mètode
+     * @return valor numèric obtingut
+     */
     private Integer convertirQuantitatOcr(Double quantitat) {
         if (quantitat == null) {
             return null;
@@ -542,7 +695,17 @@ public class AlbaraProveidorService {
         return (int) Math.round(quantitat);
     }
 
-    // COMPROVAR FILTRE PER PROVEÏDOR
+
+    /**
+     * COMPROVACIÓ DE COINCIDÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param proveidor valor de proveidor utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean coincideixProveidor(AlbaraProveidor albaraProveidor, String proveidor) {
 
         if (filtreBuit(proveidor)) {
@@ -557,7 +720,16 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPROVAR FILTRE PER NÚMERO D'ALBARÀ
+    /**
+     * COMPROVACIÓ DE COINCIDÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param numeroAlbara valor de numeroAlbara utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean coincideixNumeroAlbara(AlbaraProveidor albaraProveidor, String numeroAlbara) {
 
         if (filtreBuit(numeroAlbara)) {
@@ -569,7 +741,16 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPROVAR FILTRE PER IDENTIFICADOR DE LOT
+    /**
+     * COMPROVACIÓ DE COINCIDÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param identificadorLot valor de identificadorLot utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean coincideixIdentificadorLot(AlbaraProveidor albaraProveidor, String identificadorLot) {
 
         if (filtreBuit(identificadorLot)) {
@@ -590,7 +771,16 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPROVAR FILTRE PER DATA DE RECEPCIÓ
+    /**
+     * COMPROVACIÓ DE COINCIDÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param dataRecepcio valor de dataRecepcio utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean coincideixDataRecepcio(AlbaraProveidor albaraProveidor, String dataRecepcio) {
 
         if (filtreBuit(dataRecepcio)) {
@@ -608,7 +798,16 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPROVAR FILTRE PER USUARI RECEPTOR
+    /**
+     * COMPROVACIÓ DE COINCIDÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param receptor valor de receptor utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean coincideixReceptor(AlbaraProveidor albaraProveidor, String receptor) {
 
         if (filtreBuit(receptor)) {
@@ -627,13 +826,30 @@ public class AlbaraProveidorService {
     }
 
 
-    // COMPROVAR SI UN FILTRE ESTÀ BUIT
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @return cert si es compleix la condició indicada
+     */
     private boolean filtreBuit(String valor) {
         return valor == null || valor.isBlank();
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param text text utilitzat en el procés
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String text, String filtre) {
 
         if (text == null || filtreBuit(filtre)) {
@@ -644,7 +860,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // PREPARAR NÚMERO D'ALBARÀ ABANS DE VALIDAR I GUARDAR
+    /**
+     * PREPARACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     */
     private void prepararNumeroAlbara(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor.getNumeroAlbara() != null && !albaraProveidor.getNumeroAlbara().isBlank()) {
@@ -660,7 +883,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // PREPARAR ALBARÀ I LOTS ABANS DE GUARDAR
+    /**
+     * PREPARACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     */
     private void prepararAlbaraPerGuardar(AlbaraProveidor albaraProveidor) {
         validarDadesAlbaraProveidor(albaraProveidor);
 
@@ -676,7 +906,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // SUBSTITUIR LOTS D'UN ALBARÀ MODIFICABLE
+    /**
+     * SUBSTITUCIÓ DE DADES.
+     *
+     * Gestionat el fitxer o la dada associada al registre actual
+     * segons l'operació requerida.
+     *
+     * @param albaraActual valor de albaraActual utilitzat pel mètode
+     * @param lotsFormulari valor de lotsFormulari utilitzat pel mètode
+     */
     private void substituirLots(AlbaraProveidor albaraActual, List<LotProveidor> lotsFormulari) {
 
         if (albaraActual.getLots() == null) {
@@ -695,7 +933,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // CREAR UN LOT NOU A PARTIR DE LES DADES DEL FORMULARI
+    /**
+     * CREACIÓ DE DADES.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param lotFormulari valor de lotFormulari utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private LotProveidor crearLotNouDesDeFormulari(LotProveidor lotFormulari) {
 
         LotProveidor lotNou = new LotProveidor();
@@ -710,7 +956,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // PREPARAR LOT ABANS DE GUARDAR
+    /**
+     * PREPARACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param lot valor de lot utilitzat pel mètode
+     */
     private void prepararLotPerGuardar(AlbaraProveidor albaraProveidor, LotProveidor lot) {
         validarDadesLotProveidor(lot);
 
@@ -723,7 +977,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // OBTENIR USUARI RECEPTOR DES DE LA SESSIÓ
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param session sessió HTTP de l'usuari actual
+     * @return resultat obtingut pel mètode
+     */
     private Usuari obtenirUsuariReceptorSessio(HttpSession session) {
 
         Long usuariId = session == null ? null : (Long) session.getAttribute("usuariId");
@@ -737,7 +999,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // VALIDAR DADES DE L'ALBARÀ DE PROVEÏDOR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     */
     private void validarDadesAlbaraProveidor(AlbaraProveidor albaraProveidor) {
 
         if (albaraProveidor.getDataRecepcio() == null) {
@@ -762,7 +1031,14 @@ public class AlbaraProveidorService {
     }
 
 
-    // VALIDAR DADES DEL LOT DE PROVEÏDOR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param lotProveidor valor de lotProveidor utilitzat pel mètode
+     */
     private void validarDadesLotProveidor(LotProveidor lotProveidor) {
 
         if (lotProveidor.getIdentificadorLot() == null || lotProveidor.getIdentificadorLot().isBlank()) {
@@ -809,7 +1085,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // GUARDAR FITXER PUJAT DES DEL FORMULARI
+    /**
+     * GUARDAT DE DADES.
+     *
+     * Gestionat el fitxer o la dada associada al registre actual
+     * segons l'operació requerida.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param imatgeAlbara valor de imatgeAlbara utilitzat pel mètode
+     */
     private void guardarFitxerPujatAlbara(AlbaraProveidor albaraProveidor, MultipartFile imatgeAlbara) {
 
         try {
@@ -834,7 +1118,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // MOURE DOCUMENT OCR TEMPORAL A LA CARPETA DEFINITIVA DE L'ALBARÀ
+    /**
+     * MOVIMENT DE FITXER.
+     *
+     * Gestionat el fitxer o la dada associada al registre actual
+     * segons l'operació requerida.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param ocrDocumentTemporalId identificador utilitzat en l'operació
+     */
     private void moureDocumentOcrTemporalAlbara(AlbaraProveidor albaraProveidor, String ocrDocumentTemporalId) {
 
         try {
@@ -865,14 +1157,31 @@ public class AlbaraProveidorService {
     }
 
 
-    // GENERAR NOM DEL FITXER DEFINITIU DE L'ALBARÀ
+    /**
+     * GENERACIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param extensio valor de extensio utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String generarNomFitxerAlbara(AlbaraProveidor albaraProveidor, String extensio) {
         String data = albaraProveidor.getDataRecepcio().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         return "albara_" + albaraProveidor.getId() + "_" + data + "_" + UUID.randomUUID() + extensio;
     }
 
 
-    // SUBSTITUIR EL FITXER ASSOCIAT A L'ALBARÀ
+    /**
+     * SUBSTITUCIÓ DE DADES.
+     *
+     * Gestionat el fitxer o la dada associada al registre actual
+     * segons l'operació requerida.
+     *
+     * @param albaraProveidor valor de albaraProveidor utilitzat pel mètode
+     * @param nomFitxer fitxer rebut per al procés
+     */
     private void substituirFitxerAssociat(AlbaraProveidor albaraProveidor, String nomFitxer) {
         if (albaraProveidor.getFitxers() == null) {
             albaraProveidor.setFitxers(new ArrayList<>());
@@ -883,7 +1192,15 @@ public class AlbaraProveidorService {
     }
 
 
-    // OBTENIR L'EXTENSIÓ DEL FITXER ORIGINAL
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param nomOriginal valor de nomOriginal utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String obtenirExtensioFitxer(String nomOriginal) {
 
         if (nomOriginal == null || !nomOriginal.contains(".")) {
@@ -899,6 +1216,17 @@ public class AlbaraProveidorService {
         return extensio;
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

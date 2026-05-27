@@ -24,6 +24,14 @@ import cat.copernic.easytraza.service.ProveidorService;
 import cat.copernic.easytraza.service.UnitatMesuraService;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * CONTROLADOR WEB D'UNITATS DE MESURA.
+ *
+ * Gestionada la creació d'unitats de mesura des del formulari d'albarans
+ * de proveïdor, conservant les dades temporals del procés OCR.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/unitats-mesura")
 public class UnitatMesuraWebController {
@@ -52,7 +60,20 @@ public class UnitatMesuraWebController {
     }
 
 
-    // GUARDAR UNITAT DE MESURA DES DEL FORMULARI D'ALBARÀ DE PROVEÏDOR
+    /**
+     * GUARDAT D'UNA UNITAT DE MESURA.
+     *
+     * Creada una unitat de mesura des del formulari d'albarà de proveïdor
+     * i conservades les dades ja introduïdes i la informació OCR temporal.
+     *
+     * @param albaraProveidor dades actuals de l'albarà introduïdes al formulari
+     * @param novaUnitatMesura nom de la unitat de mesura que s'ha de crear
+     * @param indexUnitatMesura posició del lot al qual s'ha d'assignar la unitat
+     * @param ocrDocumentTemporalId identificador del document OCR temporal
+     * @param session sessió web de l'usuari
+     * @param model model de dades de la vista
+     * @return vista del formulari d'albarans de proveïdor
+     */
     @PostMapping("/save-from-albara-proveidor")
     public String guardarUnitatMesuraDesAlbaraProveidor(
             @ModelAttribute("albaraProveidor") AlbaraProveidor albaraProveidor,
@@ -108,7 +129,15 @@ public class UnitatMesuraWebController {
     }
 
 
-    // OBTENIR RESULTAT OCR TEMPORAL CONSERVAT A LA SESSIÓ
+    /**
+     * OBTENCIÓ DEL RESULTAT OCR TEMPORAL.
+     *
+     * Recuperat el resultat OCR mantingut temporalment a la sessió
+     * durant l'edició de l'albarà de proveïdor.
+     *
+     * @param session sessió web de l'usuari
+     * @return resultat OCR temporal o valor nul si no existeix
+     */
     private OcrResultatAlbaraProveidorDto obtenirResultatOcrSessio(HttpSession session) {
         Object resultat = session.getAttribute(SESSION_OCR_RESULTAT);
         return resultat instanceof OcrResultatAlbaraProveidorDto
@@ -117,7 +146,15 @@ public class UnitatMesuraWebController {
     }
 
 
-    // RECUPERAR VISTA PRÈVIA DEL DOCUMENT OCR SENSE REENVIAR LA IMATGE
+    /**
+     * PREVISUALITZACIÓ DEL DOCUMENT OCR.
+     *
+     * Afegides al model les dades disponibles per mostrar el document OCR
+     * temporal sense tornar a carregar la imatge original.
+     *
+     * @param model model de dades de la vista
+     * @param ocrDocumentTemporalId identificador del document OCR temporal
+     */
     private void afegirDadesDocumentTemporal(Model model, String ocrDocumentTemporalId) {
         if (ocrDocumentTemporalId == null || ocrDocumentTemporalId.isBlank()) {
             return;
@@ -134,6 +171,17 @@ public class UnitatMesuraWebController {
         }
     }
 
+
+    /**
+     * OBTENCIÓ D'UN MISSATGE TRADUÏT.
+     *
+     * Recuperat el text corresponent al codi indicat segons l'idioma
+     * actiu de la interfície web.
+     *
+     * @param codi codi del missatge que s'ha de recuperar
+     * @param arguments valors incorporats al missatge
+     * @return missatge traduït a l'idioma actiu
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

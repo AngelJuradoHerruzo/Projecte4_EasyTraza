@@ -36,7 +36,14 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 /**
- * Menú de configuració de l'app.
+ * MENÚ DE CONFIGURACIÓ.
+ *
+ * Mostrades les opcions disponibles per modificar l'adreça
+ * del servidor i l'idioma de l'aplicació mòbil.
+ *
+ * @param onIpClick acció executada en accedir a la configuració del servidor
+ * @param onIdiomaClick acció executada en accedir a la configuració de l'idioma
+ * @param onTornarClick acció executada en tornar a la pantalla anterior
  */
 @Composable
 fun ConfiguracioMenuScreen(

@@ -16,6 +16,14 @@ import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
 import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 
+/**
+ * SERVEI DE LOTS DE PROVEÏDOR.
+ *
+ * Gestionades les operacions de consulta, inici i finalització dels lots de proveïdor.
+ * També controlades les validacions d'estat i de matèria primera associada.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class LotProveidorService {
@@ -34,7 +42,14 @@ public class LotProveidorService {
     }
 
 
-    // OBTENIR TOTS ELS LOTS DE PROVEÏDOR
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<LotProveidor> getAllLotsProveidor() {
         return lotProveidorRepository.findAll();
     }
@@ -73,19 +88,42 @@ public class LotProveidorService {
     }
 
 
-    // OBTENIR TOTES LES MATÈRIES PRIMERES ORDENADES
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<MateriaPrimera> getAllMateriesPrimeresOrdenades() {
         return materiaPrimeraRepository.findAll(Sort.by("nomMateria").ascending());
     }
 
 
-    // OBTENIR LOT DE PROVEÏDOR PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public LotProveidor getLotProveidorById(Long id) {
         return obtenirLotValidat(id);
     }
 
 
-    // COMPROVAR SI EXISTEIX UN LOT OBERT DE LA MATEIXA MATÈRIA PRIMERA
+    /**
+     * COMPROVACIÓ D'EXISTÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return cert si es compleix la condició indicada
+     */
     public boolean existeixLotObertMateixaMateria(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -103,7 +141,16 @@ public class LotProveidorService {
     }
 
 
-    // INICIAR LOT
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param confirmarFinalitzacioAnterior valor de confirmarFinalitzacioAnterior utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public LotProveidor iniciarLot(Long id, boolean confirmarFinalitzacioAnterior) {
 
         LotProveidor lotProveidorActual = obtenirLotValidat(id);
@@ -135,7 +182,15 @@ public class LotProveidorService {
     }
 
 
-    // FINALITZAR LOT
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return registre resultant de l'operació
+     */
     public LotProveidor finalitzarLot(Long id) {
 
         LotProveidor lotProveidor = obtenirLotValidat(id);
@@ -149,7 +204,15 @@ public class LotProveidorService {
     }
 
 
-    // OBTENIR LOT VALIDAT
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     private LotProveidor obtenirLotValidat(Long id) {
 
         Optional<LotProveidor> lotProveidorOpt = lotProveidorRepository.findById(id);
@@ -162,7 +225,14 @@ public class LotProveidorService {
     }
 
 
-    // VALIDAR LOT PER INICIAR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param lotProveidor valor de lotProveidor utilitzat pel mètode
+     */
     private void validarLotPerIniciar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getMateriaPrimera() == null) {
@@ -179,7 +249,14 @@ public class LotProveidorService {
     }
 
 
-    // VALIDAR LOT PER FINALITZAR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param lotProveidor valor de lotProveidor utilitzat pel mètode
+     */
     private void validarLotPerFinalitzar(LotProveidor lotProveidor) {
 
         if (lotProveidor.getEstat() == null) {
@@ -192,7 +269,16 @@ public class LotProveidorService {
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String valor, String filtre) {
 
         if (filtre == null || filtre.isBlank()) {
@@ -206,6 +292,17 @@ public class LotProveidorService {
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

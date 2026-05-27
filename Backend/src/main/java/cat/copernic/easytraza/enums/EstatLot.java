@@ -1,14 +1,13 @@
 package cat.copernic.easytraza.enums;
 
 /**
- * ENUM ESTAT LOT
+ * ESTATS DEL LOT.
  *
- * EN_ESTOC → Lot disponible per a ús, encara no utilitzat
- * OBERT    → Lot en ús per a producció
- * ACABAT   → Lot completament consumit
+ * Definits els estats possibles d'un lot segons el seu ús dins del procés
+ * de producció: disponible en estoc, actualment obert o ja acabat.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 public enum EstatLot {
-    EN_ESTOC, OBERT, ACABAT // Estat d'un Lot
+    EN_ESTOC, OBERT, ACABAT
 }

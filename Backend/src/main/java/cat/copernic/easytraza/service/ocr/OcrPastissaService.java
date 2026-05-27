@@ -11,11 +11,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * Parser OCR específic per al proveïdor PASTISSA.
+ * PARSER OCR DE PASTISSA.
  *
- * Treballa amb quatre zones independents: informació de l'albarà,
- * descripcions, lots i quantitats. Les línies es relacionen segons el seu
- * ordre vertical, fent que la columna de descripcions determini les files.
+ * Interpretades les dades OCR dels albarans del proveïdor Pastissa.
+ * També aplicades lectures alternatives quan el format del document dificulta la detecció principal.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrPastissaService implements OcrParserProveidor {
@@ -45,6 +46,18 @@ public class OcrPastissaService implements OcrParserProveidor {
     }
 
     @Override
+
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param textOcrOriginal text utilitzat en el procés
+     * @param textOcrNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrAlbaraPendent parsejar(String textOcrOriginal, String textOcrNormalitzat) {
         OcrAlbaraPendent resultat = new OcrAlbaraPendent();
 
@@ -58,6 +71,16 @@ public class OcrPastissaService implements OcrParserProveidor {
         return resultat;
     }
 
+
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
+     */
     private String extreureNumeroAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
                 text,
@@ -71,6 +94,16 @@ public class OcrPastissaService implements OcrParserProveidor {
         return matcher.find() ? "F-" + matcher.group(1) : null;
     }
 
+
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
+     */
     private String extreureDataAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
                 text,
@@ -82,9 +115,15 @@ public class OcrPastissaService implements OcrParserProveidor {
         return data != null ? data : OcrUtils.extreurePrimeraDataNormalitzada(text);
     }
 
+
     /**
-     * Les descripcions defineixen el nombre real de files. D'aquesta manera,
-     * un número residual a la zona de quantitats no crea una línia buida nova.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLinies(String text) {
         List<String> materies = extreureMateries(text);
@@ -126,9 +165,15 @@ public class OcrPastissaService implements OcrParserProveidor {
         return linies;
     }
 
+
     /**
-     * Llegeix la columna de descripció. Es descarta "preu litre" perquè no és
-     * part de la matèria primera, sinó informació comercial del primer article.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<String> extreureMateries(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -166,9 +211,15 @@ public class OcrPastissaService implements OcrParserProveidor {
         return materies;
     }
 
+
     /**
-     * Llegeix només el primer token de cada fila de la columna LOT; la data de
-     * caducitat situada a la dreta queda fora del valor retornat.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<String> extreureLots(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -200,11 +251,15 @@ public class OcrPastissaService implements OcrParserProveidor {
         return lots;
     }
 
+
     /**
-     * Extreu les quantitats detectades a la columna QUANT.
+     * EXTRACCIÓ DE DADES.
      *
-     * La zona OCR és exclusivament numèrica i pot contenir espais buits entre
-     * línies. Es conserva cada valor decimal llegit en ordre vertical.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<Double> extreureQuantitats(String text) {
         String blocQuantitats = OcrUtils.extreureBlocEntreMarcadors(
@@ -235,9 +290,15 @@ public class OcrPastissaService implements OcrParserProveidor {
         return quantitats;
     }
 
+
     /**
-     * Retorn de seguretat si no es poden obtenir les descripcions del retall.
-     * Interpreta únicament files completes presents al text OCR general.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLiniesFallback(String text) {
         List<OcrLiniaDto> linies = new ArrayList<>();
@@ -265,6 +326,16 @@ public class OcrPastissaService implements OcrParserProveidor {
         return linies;
     }
 
+
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String normalitzarLotNumeric(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -278,6 +349,16 @@ public class OcrPastissaService implements OcrParserProveidor {
         );
     }
 
+
+    /**
+     * NETEJA DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String netejarMateria(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -292,6 +373,16 @@ public class OcrPastissaService implements OcrParserProveidor {
         return materia.length() < 3 ? null : materia;
     }
 
+
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String normalitzarLinia(String valor) {
         return valor == null ? "" : valor
                 .replace('’', '\'')
@@ -299,6 +390,16 @@ public class OcrPastissaService implements OcrParserProveidor {
                 .trim();
     }
 
+
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return valor numèric obtingut
+     */
     private Double convertirDecimalOcr(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -311,6 +412,16 @@ public class OcrPastissaService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * DETECCIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String detectarUnitat(String materia) {
         String normalitzada = OcrUtils.normalitzarPerComparar(materia);
 
@@ -325,6 +436,15 @@ public class OcrPastissaService implements OcrParserProveidor {
         return "UT";
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultat valor de resultat utilitzat pel mètode
+     */
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
             resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "PASTISSA"));
@@ -339,10 +459,32 @@ public class OcrPastissaService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param valors valor que s'ha de processar
+     * @param index valor de index utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private <T> T obtenirValor(List<T> valors, int index) {
         return valors != null && index >= 0 && index < valors.size() ? valors.get(index) : null;
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

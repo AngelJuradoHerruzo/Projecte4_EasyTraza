@@ -5,7 +5,12 @@ import androidx.core.content.edit
 import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentificat
 
 /**
- * Gestor de sessió local de l'usuari identificat.
+ * GESTIÓ DE LA SESSIÓ LOCAL.
+ *
+ * Gestionades les dades locals de l'usuari identificat per mantenir
+ * la seva sessió disponible durant l'ús de l'aplicació mòbil.
+ *
+ * @author Ángel Jurado Herruz
  */
 object UsuariSessionManager {
 
@@ -18,7 +23,13 @@ object UsuariSessionManager {
 
 
     /**
-     * Desa l'usuari identificat.
+     * GUARDAT DE L'USUARI IDENTIFICAT.
+     *
+     * Desades a les preferències locals les dades de l'usuari
+     * que ha estat identificat correctament a l'aplicació.
+     *
+     * @param context context utilitzat per accedir a les preferències locals
+     * @param usuari usuari identificat que s'ha de conservar
      */
     fun guardarUsuari(context: Context, usuari: UsuariIdentificat) {
         val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -34,7 +45,13 @@ object UsuariSessionManager {
 
 
     /**
-     * Obté l'usuari identificat.
+     * OBTENCIÓ DE L'USUARI IDENTIFICAT.
+     *
+     * Recuperades les dades de l'usuari desades localment o retornat
+     * un valor nul quan encara no existeix cap sessió identificada.
+     *
+     * @param context context utilitzat per accedir a les preferències locals
+     * @return usuari identificat desat o nul si no hi ha cap sessió
      */
     fun obtenirUsuari(context: Context): UsuariIdentificat? {
         val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -54,7 +71,13 @@ object UsuariSessionManager {
 
 
     /**
-     * Indica si hi ha un usuari identificat.
+     * COMPROVACIÓ DE LA SESSIÓ.
+     *
+     * Comprovat si existeixen dades locals corresponents
+     * a un usuari identificat a l'aplicació.
+     *
+     * @param context context utilitzat per accedir a les preferències locals
+     * @return cert si hi ha un usuari identificat desat
      */
     fun hiHaUsuariIdentificat(context: Context): Boolean {
         val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -63,7 +86,12 @@ object UsuariSessionManager {
 
 
     /**
-     * Elimina les dades de l'usuari identificat.
+     * TANCAMENT DE LA SESSIÓ.
+     *
+     * Eliminades les dades locals de l'usuari identificat
+     * per finalitzar la sessió mantinguda al dispositiu.
+     *
+     * @param context context utilitzat per accedir a les preferències locals
      */
     fun tancarSessio(context: Context) {
         val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

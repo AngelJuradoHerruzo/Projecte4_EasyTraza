@@ -9,11 +9,12 @@ import cat.copernic.easytraza.entities.LotProveidor;
 import cat.copernic.easytraza.service.LotProveidorService;
 
 /**
- * CONTROLADOR REST DE LOTS DE PROVEÏDOR MÒBIL
+ * CONTROLADOR REST DE LOTS DE PROVEÏDOR MÒBIL.
  *
- * Gestiona el llistat, detall, inici i finalització de lots des de l'app mòbil.
+ * Gestionada la consulta, l'inici i la finalització de lots de proveïdor
+ * des de l'aplicació mòbil.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @RestController
 @RequestMapping("/api/mobile/lots")
@@ -27,7 +28,14 @@ public class LotProveidorMobileRestController {
     }
 
 
-    // LLISTAR LOTS DE PROVEÏDOR
+    /**
+     * LLISTAT DE LOTS MÒBIL.
+     *
+     * Recuperats els lots de proveïdor i transformades les seves dades
+     * per retornar-les a l'aplicació mòbil.
+     *
+     * @return resposta amb la llista de lots disponibles
+     */
     @GetMapping
     public ResponseEntity<List<LotMobileResponse>> llistarLots() {
 
@@ -40,7 +48,15 @@ public class LotProveidorMobileRestController {
     }
 
 
-    // CONSULTAR DETALL DEL LOT
+    /**
+     * DETALL D'UN LOT MÒBIL.
+     *
+     * Recuperat el lot seleccionat i retornades les seves dades detallades
+     * quan existeix.
+     *
+     * @param id identificador del lot de proveïdor
+     * @return resposta amb el lot consultat o l'error corresponent
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> consultarLot(@PathVariable Long id) {
 
@@ -55,7 +71,15 @@ public class LotProveidorMobileRestController {
     }
 
 
-    // INICIAR LOT
+    /**
+     * INICI D'UN LOT MÒBIL.
+     *
+     * Sol·licitat l'inici del lot i retornada la informació necessària,
+     * incloent-hi la confirmació quan existeix un lot anterior obert.
+     *
+     * @param id identificador del lot de proveïdor
+     * @return resposta amb el resultat de la sol·licitud d'inici
+     */
     @PostMapping("/{id}/iniciar")
     public ResponseEntity<?> iniciarLot(@PathVariable Long id) {
 
@@ -88,7 +112,15 @@ public class LotProveidorMobileRestController {
     }
 
 
-    // CONFIRMAR INICI DE LOT
+    /**
+     * CONFIRMACIÓ DE L'INICI D'UN LOT.
+     *
+     * Confirmat l'inici del lot seleccionat quan l'aplicació mòbil
+     * ha validat prèviament l'operació requerida.
+     *
+     * @param id identificador del lot de proveïdor
+     * @return resposta amb el lot iniciat o l'error corresponent
+     */
     @PostMapping("/{id}/iniciar-confirmat")
     public ResponseEntity<?> confirmarIniciLot(@PathVariable Long id) {
 
@@ -109,7 +141,15 @@ public class LotProveidorMobileRestController {
     }
 
 
-    // FINALITZAR LOT
+    /**
+     * FINALITZACIÓ D'UN LOT MÒBIL.
+     *
+     * Sol·licitada la finalització del lot seleccionat i retornades
+     * les dades actualitzades quan l'operació és correcta.
+     *
+     * @param id identificador del lot de proveïdor
+     * @return resposta amb el lot finalitzat o l'error corresponent
+     */
     @PostMapping("/{id}/finalitzar")
     public ResponseEntity<?> finalitzarLot(@PathVariable Long id) {
 
@@ -124,7 +164,15 @@ public class LotProveidorMobileRestController {
     }
 
 
-    // CREAR DTO DE RESPOSTA DEL LOT
+    /**
+     * PREPARACIÓ DE LA RESPOSTA DEL LOT.
+     *
+     * Transformades les dades de l'entitat de lot en la resposta utilitzada
+     * per l'aplicació mòbil.
+     *
+     * @param lotProveidor lot de proveïdor que s'ha de transformar
+     * @return resposta mòbil amb les dades del lot
+     */
     private LotMobileResponse crearLotMobileResponse(LotProveidor lotProveidor) {
 
         return new LotMobileResponse(

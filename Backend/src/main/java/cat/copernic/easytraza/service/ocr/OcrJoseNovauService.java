@@ -11,10 +11,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * Parser OCR específic per al proveïdor JOSE NOVAU DIL.
+ * PARSER OCR DE JOSÉ NOVAU.
  *
- * Aquest model s'interpreta a partir del text complet de la pàgina, ja que
- * Tesseract conserva prou bé les files de la taula quan es processen juntes.
+ * Interpretades les dades OCR dels albarans del proveïdor José Novau.
+ * També normalitzades les línies de producte per obtenir lots, quantitats i matèries primeres.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrJoseNovauService implements OcrParserProveidor {
@@ -48,6 +50,18 @@ public class OcrJoseNovauService implements OcrParserProveidor {
     }
 
     @Override
+
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param textOcrOriginal text utilitzat en el procés
+     * @param textOcrNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrAlbaraPendent parsejar(String textOcrOriginal, String textOcrNormalitzat) {
         String textJoseNovau = obtenirTextJoseNovau(textOcrOriginal);
 
@@ -63,8 +77,15 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return resultat;
     }
 
+
     /**
-     * Recupera la lectura OCR específica de JOSE NOVAU si existeixen marcadors.
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String obtenirTextJoseNovau(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -76,11 +97,15 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return bloc == null || bloc.isBlank() ? text : bloc;
     }
 
+
     /**
-     * Extreu el número de la línia DOCUMENT / NÚMERO / DATA.
+     * EXTRACCIÓ DE DADES.
      *
-     * Tesseract ha llegit "Albarà" com "Ambara", per això no es valida
-     * literalment el nom del camp.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureNumeroAlbara(String text) {
         for (String liniaOriginal : OcrUtils.obtenirLiniesNoBuides(text)) {
@@ -100,16 +125,29 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return null;
     }
 
+
     /**
-     * Extreu la primera data vàlida del document.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureDataAlbara(String text) {
         return OcrUtils.extreurePrimeraDataNormalitzada(text);
     }
 
+
     /**
-     * Interpreta només les files que hi ha entre la capçalera ARTICLE /
-     * DESCRIPCIÓ i el final de la taula.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLinies(String text) {
         List<OcrLiniaDto> linies = new ArrayList<>();
@@ -141,8 +179,15 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return linies;
     }
 
+
     /**
-     * Extreu article, matèria i primera quantitat de cadascuna de les files.
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param liniaOriginal valor de liniaOriginal utilitzat pel mètode
+     * @return resultat obtingut pel mètode
      */
     private OcrLiniaDto parsejarLiniaProducte(String liniaOriginal) {
         String linia = normalitzarLinia(liniaOriginal);
@@ -171,11 +216,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return null;
     }
 
+
     /**
-     * Separa el codi ARTICLE de la descripció.
+     * CREACIÓ DE DADES.
      *
-     * Quan Tesseract retorna un codi curt clarament erroni, com "a2", no es
-     * desa com a lot i es mostra "-" perquè l'usuari el corregeixi.
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param partEsquerra valor de partEsquerra utilitzat pel mètode
+     * @param quantitat valor de quantitat utilitzat pel mètode
+     * @return resultat obtingut pel mètode
      */
     private OcrLiniaDto crearLiniaDesDePartEsquerra(String partEsquerra, Double quantitat) {
         String valor = partEsquerra
@@ -227,6 +277,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return linia;
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param article valor de article utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean esArticleValid(String article) {
         String valor = article == null ? "" : article.toUpperCase();
 
@@ -235,12 +295,32 @@ public class OcrJoseNovauService implements OcrParserProveidor {
                 || valor.matches("[A-Z]+-[A-Z0-9\\-]{3,}");
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param article valor de article utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean esSorollArticleInicial(String article) {
         String valor = article == null ? "" : article.toUpperCase();
 
         return valor.length() <= 3 || valor.matches("[A-Z]\\d{1,3}");
     }
 
+
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param article valor de article utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String normalitzarArticle(String article) {
         return article == null ? "-" : article
                 .toUpperCase()
@@ -248,11 +328,15 @@ public class OcrJoseNovauService implements OcrParserProveidor {
                 .trim();
     }
 
+
     /**
-     * Neteja una línia OCR abans d'interpretar article, descripció i quantitat.
+     * NORMALITZACIÓ DE DADES.
      *
-     * @param linia text original detectat per Tesseract.
-     * @return línia normalitzada.
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param linia valor de linia utilitzat pel mètode
+     * @return text obtingut pel mètode
      */
     private String normalitzarLinia(String linia) {
         if (linia == null) {
@@ -266,6 +350,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
                 .trim();
     }
 
+
+    /**
+     * NETEJA DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String netejarMateria(String materia) {
         if (materia == null || materia.isBlank()) {
             return null;
@@ -280,6 +374,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return neta.length() < 3 ? null : neta;
     }
 
+
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean semblaMateria(String materia) {
         String valor = OcrUtils.normalitzarPerComparar(materia);
 
@@ -298,6 +402,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
                 );
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param linia valor de linia utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean esFinalTaula(String linia) {
         return OcrUtils.conteAlguna(
                 linia,
@@ -309,6 +423,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         );
     }
 
+
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return valor numèric obtingut
+     */
     private Double convertirQuantitatSenseSeparador(String valor) {
         if (valor == null || !valor.matches("\\d{3}")) {
             return null;
@@ -325,6 +449,16 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * DETECCIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String detectarUnitat(String materia) {
         String valor = OcrUtils.normalitzarPerComparar(materia);
 
@@ -335,6 +469,15 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         return "UT";
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultat valor de resultat utilitzat pel mètode
+     */
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
             resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "JOSE NOVAU"));
@@ -349,6 +492,17 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

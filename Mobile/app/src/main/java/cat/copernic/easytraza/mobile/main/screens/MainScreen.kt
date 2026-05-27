@@ -42,7 +42,16 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 /**
- * Pantalla principal de l'app mòbil.
+ * PANTALLA PRINCIPAL.
+ *
+ * Mostrat el menú principal de l'aplicació mòbil amb les dades
+ * de l'usuari identificat i els accessos a les funcionalitats disponibles.
+ *
+ * @param usuari usuari identificat que es mostra a la pantalla
+ * @param onLotsClick acció executada en accedir a la gestió de lots
+ * @param onProcessarAlbaraClick acció executada en accedir al processament d'albarans
+ * @param onConfiguracioClick acció executada en accedir a la configuració
+ * @param onSortirClick acció executada en canviar d'usuari
  */
 @Composable
 fun MainScreen(
@@ -100,8 +109,18 @@ fun MainScreen(
     }
 }
 
+
 /**
- * Targeta d'opció del menú principal.
+ * OPCIÓ DEL MENÚ PRINCIPAL.
+ *
+ * Mostrada una targeta d'accés a una funcionalitat del menú principal,
+ * indicant visualment si aquesta opció està disponible per a l'usuari.
+ *
+ * @param title títol visible de l'opció
+ * @param subtitle descripció visible de l'opció
+ * @param icon icona representativa de l'opció
+ * @param enabled indicador que informa si l'opció està habilitada
+ * @param onClick acció executada en seleccionar l'opció habilitada
  */
 @Composable
 fun MenuOptionCard(

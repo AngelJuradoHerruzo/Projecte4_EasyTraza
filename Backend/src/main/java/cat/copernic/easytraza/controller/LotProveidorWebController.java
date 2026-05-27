@@ -10,6 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 import cat.copernic.easytraza.service.LotProveidorService;
 
+/**
+ * CONTROLADOR WEB DE LOTS DE PROVEÏDOR.
+ *
+ * Gestionades les pantalles de consulta, inici i finalització dels lots
+ * de proveïdor de la interfície web.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/lots")
 public class LotProveidorWebController {
@@ -24,7 +32,21 @@ public class LotProveidorWebController {
     }
 
 
-    // LLISTAR LOTS DE PROVEÏDOR
+    /**
+     * LLISTAT DE LOTS DE PROVEÏDOR.
+     *
+     * Preparada la vista amb els lots filtrats segons els criteris rebuts
+     * des de la pantalla web.
+     *
+     * @param materiaId identificador de la matèria primera utilitzat com a filtre
+     * @param identificadorLot identificador del lot utilitzat com a filtre
+     * @param dataCaducitat data de caducitat utilitzada com a filtre
+     * @param dataRecepcio data de recepció utilitzada com a filtre
+     * @param dataObertura data d'obertura utilitzada com a filtre
+     * @param dataAcabament data d'acabament utilitzada com a filtre
+     * @param model model de dades de la vista
+     * @return vista del llistat de lots
+     */
     @GetMapping("/list")
     public String llistarLots(@RequestParam(required = false) Long materiaId,
                               @RequestParam(required = false) String identificadorLot,
@@ -47,7 +69,16 @@ public class LotProveidorWebController {
     }
 
 
-    // CONSULTAR DETALL DEL LOT
+    /**
+     * DETALL D'UN LOT DE PROVEÏDOR.
+     *
+     * Carregades les dades del lot seleccionat per mostrar-ne el detall
+     * o redirigida la petició quan no existeix.
+     *
+     * @param id identificador del lot de proveïdor
+     * @param model model de dades de la vista
+     * @return vista de detall o redirecció al llistat
+     */
     @GetMapping("/detail/{id}")
     public String consultarLot(@PathVariable Long id, Model model) {
         try {
@@ -65,7 +96,16 @@ public class LotProveidorWebController {
     }
 
 
-    // INICIAR LOT
+    /**
+     * INICI D'UN LOT DE PROVEÏDOR.
+     *
+     * Sol·licitat l'inici del lot seleccionat i preparada la confirmació
+     * quan l'operació ho requereix.
+     *
+     * @param id identificador del lot de proveïdor
+     * @param model model de dades de la vista
+     * @return redirecció o vista corresponent al resultat de l'operació
+     */
     @PostMapping("/iniciar/{id}")
     public String iniciarLot(@PathVariable Long id, Model model) {
         try {
@@ -93,7 +133,16 @@ public class LotProveidorWebController {
     }
 
 
-    // CONFIRMAR INICI DE LOT
+    /**
+     * CONFIRMACIÓ DE L'INICI D'UN LOT.
+     *
+     * Confirmat l'inici del lot seleccionat després de validar
+     * l'operació requerida per l'usuari.
+     *
+     * @param id identificador del lot de proveïdor
+     * @param model model de dades de la vista
+     * @return redirecció o vista corresponent al resultat de l'operació
+     */
     @PostMapping("/iniciar-confirmat/{id}")
     public String confirmarIniciLot(@PathVariable Long id, Model model) {
         try {
@@ -112,7 +161,16 @@ public class LotProveidorWebController {
     }
 
 
-    // FINALITZAR LOT
+    /**
+     * FINALITZACIÓ D'UN LOT DE PROVEÏDOR.
+     *
+     * Sol·licitada la finalització del lot seleccionat i informat
+     * l'usuari del resultat de l'operació.
+     *
+     * @param id identificador del lot de proveïdor
+     * @param model model de dades de la vista
+     * @return redirecció o vista corresponent al resultat de l'operació
+     */
     @PostMapping("/finalitzar/{id}")
     public String finalitzarLot(@PathVariable Long id, Model model) {
         try {

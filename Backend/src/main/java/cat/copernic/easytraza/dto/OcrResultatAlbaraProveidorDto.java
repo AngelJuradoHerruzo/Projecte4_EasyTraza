@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DTO de resultat de l'anàlisi OCR d'un albarà de proveïdor.
+ * RESULTAT DE L'ANÀLISI OCR.
  *
- * Conté el document temporal i les dades detectades. No implica cap guardat
- * d'albarans, lots, proveïdors o matèries primeres.
+ * Agrupades les dades detectades durant l'anàlisi OCR d'un albarà de proveïdor,
+ * incloent-hi el document temporal, els textos reconeguts i els avisos generats.
+ * Aquest objecte no implica el guardat de cap dada de negoci.
+ *
+ * @author Ángel Jurado Herruz
  */
 public class OcrResultatAlbaraProveidorDto {
 
@@ -31,12 +34,29 @@ public class OcrResultatAlbaraProveidorDto {
 
 
     /*********************       .MÈTODES DE SUPORT.       *********************/
+    /**
+     * INCORPORACIÓ D'UN AVÍS.
+     *
+     * Afegit un avís al resultat OCR quan conté informació útil per mostrar
+     * durant la revisió del document.
+     *
+     * @param avis missatge d'avís que s'ha d'incorporar
+     */
     public void afegirAvis(String avis) {
         if (avis != null && !avis.isBlank()) {
             this.avisos.add(avis);
         }
     }
 
+    
+    /**
+     * COMPROVACIÓ D'AVISOS.
+     *
+     * Comprovat si el resultat OCR o l'albarà temporal associat conté avisos
+     * pendents de revisió.
+     *
+     * @return cert si existeix algun avís al resultat o a l'albarà temporal
+     */
     public boolean teAvisos() {
         return avisos != null && !avisos.isEmpty()
                 || albaraPendent != null && albaraPendent.teAvisos(); 

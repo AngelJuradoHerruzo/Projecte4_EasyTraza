@@ -10,11 +10,12 @@ import cat.copernic.easytraza.enums.EstatAlbaraClient;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT ALBARÀ DE CLIENT
+ * ENTITAT ALBARÀ DE CLIENT.
  *
- * Representa el lliurament d'un o més productes a un client.
+ * Representat el lliurament d'un o més productes a un client,
+ * juntament amb les línies de producció i els lots associats.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "albarans_client")

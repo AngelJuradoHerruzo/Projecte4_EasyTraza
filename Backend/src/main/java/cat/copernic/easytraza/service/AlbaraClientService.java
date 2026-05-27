@@ -22,6 +22,14 @@ import cat.copernic.easytraza.repository.AlbaraClientRepository;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
 import cat.copernic.easytraza.repository.UsuariRepository;
 
+/**
+ * SERVEI D'ALBARANS DE CLIENT.
+ *
+ * Gestionades les operacions de consulta, creació, modificació, lliurament i eliminació dels albarans de client.
+ * També aplicades les validacions necessàries sobre les línies de producció associades.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class AlbaraClientService {
@@ -43,7 +51,14 @@ public class AlbaraClientService {
     }
 
 
-    // OBTENIR TOTS ELS ALBARANS DE CLIENT ORDENATS PER DATA I HORA
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<AlbaraClient> getAllAlbaransClient() {
         return albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc();
     }
@@ -73,14 +88,30 @@ public class AlbaraClientService {
     }
 
 
-    // OBTENIR ALBARÀ DE CLIENT PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public AlbaraClient getAlbaraClientById(Long id) {
         Optional<AlbaraClient> albaraClient = albaraClientRepository.findById(id);
         return albaraClient.orElse(null);
     }
 
 
-    // OBTENIR ALBARÀ DE CLIENT AMB DETALL
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public AlbaraClient getAlbaraClientDetallById(Long id) {
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
 
@@ -120,7 +151,15 @@ public class AlbaraClientService {
     }
 
 
-    // CREAR ALBARÀ DE CLIENT
+    /**
+     * CREACIÓ DEL REGISTRE.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param albaraClient valor de albaraClient utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public AlbaraClient createAlbaraClient(AlbaraClient albaraClient) {
 
         if (albaraClient.getDataAlbara() == null) {
@@ -144,7 +183,16 @@ public class AlbaraClientService {
     }
 
 
-    // ACTUALITZAR ALBARÀ DE CLIENT
+    /**
+     * ACTUALITZACIÓ DEL REGISTRE.
+     *
+     * Actualitzat el registre indicat amb les dades rebudes, mantenint
+     * les validacions pròpies del servei.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param albaraClient valor de albaraClient utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public AlbaraClient updateAlbaraClient(Long id, AlbaraClient albaraClient) {
 
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
@@ -178,7 +226,14 @@ public class AlbaraClientService {
     }
 
 
-    // ELIMINAR ALBARÀ DE CLIENT
+    /**
+     * ELIMINACIÓ DEL REGISTRE.
+     *
+     * Eliminat el registre identificat quan el servei permet completar
+     * l'operació sol·licitada.
+     *
+     * @param id identificador utilitzat en l'operació
+     */
     public void deleteAlbaraClient(Long id) {
 
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
@@ -193,7 +248,15 @@ public class AlbaraClientService {
     }
 
 
-    // LLIURAR ALBARÀ DE CLIENT
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public AlbaraClient lliurarAlbaraClient(Long id) {
 
         Optional<AlbaraClient> albaraClientOpt = albaraClientRepository.findById(id);
@@ -212,7 +275,14 @@ public class AlbaraClientService {
     }
 
 
-    // VALIDAR DADES DE L'ALBARÀ DE CLIENT
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param albaraClient valor de albaraClient utilitzat pel mètode
+     */
     private void validarDadesAlbaraClient(AlbaraClient albaraClient) {
 
         if (albaraClient.getDataAlbara() == null) {
@@ -229,7 +299,14 @@ public class AlbaraClientService {
     }
 
 
-    // VALIDAR DADES DE LA LÍNIA DE PRODUCCIÓ
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param liniaProduccio valor de liniaProduccio utilitzat pel mètode
+     */
     private void validarDadesLiniaProduccio(LiniaProduccio liniaProduccio) {
 
         if (liniaProduccio.getProducte() == null || liniaProduccio.getProducte().getId() == null) {
@@ -259,7 +336,14 @@ public class AlbaraClientService {
     }
 
 
-    // VALIDAR PRODUCTES DUPLICATS
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param albaraClient valor de albaraClient utilitzat pel mètode
+     */
     private void validarProductesDuplicats(AlbaraClient albaraClient) {
 
         for (int i = 0; i < albaraClient.getLiniesProduccio().size(); i++) {
@@ -286,7 +370,14 @@ public class AlbaraClientService {
     }
 
 
-    // VALIDAR QUE L'ALBARÀ DE CLIENT ES POT MODIFICAR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param albaraClient valor de albaraClient utilitzat pel mètode
+     */
     private void validarAlbaraClientModificable(AlbaraClient albaraClient) {
 
         if (albaraClient.getEstat() == EstatAlbaraClient.LLIURAT) {
@@ -295,7 +386,16 @@ public class AlbaraClientService {
     }
 
 
-    // ORDENAR ALBARANS PEL CAMP SELECCIONAT
+    /**
+     * ORDENACIÓ DE DADES.
+     *
+     * Ordenada la llista rebuda segons el criteri indicat o segons
+     * l'ordre propi del servei.
+     *
+     * @param albarans valor de albarans utilitzat pel mètode
+     * @param ordre camp utilitzat per ordenar les dades
+     * @param direccio direcció de l'ordenació
+     */
     private void ordenarAlbarans(List<AlbaraClient> albarans, String ordre, String direccio) {
 
         String campOrdre = ordre != null && !ordre.isBlank() ? ordre : "dataAlbara";
@@ -347,11 +447,29 @@ public class AlbaraClientService {
     }
 
 
-    // OBTENIR DATA I HORA ACTUAL SENSE SEGONS
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @return resultat obtingut pel mètode
+     */
     private LocalDateTime dataHoraActual() {
         return LocalDateTime.now().withSecond(0).withNano(0);
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

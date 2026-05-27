@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import cat.copernic.easytraza.enums.EstatLot;
 import cat.copernic.easytraza.service.TracabilitatService;
 
+/**
+ * CONTROLADOR WEB DE TRAÇABILITAT.
+ *
+ * Gestionada la pantalla d'explotació de dades dels lots i la consulta
+ * de la informació necessària per al seguiment de la traçabilitat.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/tracabilitat")
 public class TracabilitatWebController {
@@ -24,7 +32,27 @@ public class TracabilitatWebController {
         this.tracabilitatService = tracabilitatService;
     }
 
-    // EXPLOTACIÓ DE DADES
+
+    /**
+     * EXPLOTACIÓ DE DADES DE TRAÇABILITAT.
+     *
+     * Preparada la vista de traçabilitat amb els filtres del llistat de lots
+     * i els criteris utilitzats per mostrar la informació gràfica.
+     *
+     * @param materiaId identificador de la matèria primera utilitzat com a filtre
+     * @param proveidorId identificador del proveïdor utilitzat com a filtre
+     * @param estat estat del lot utilitzat com a filtre
+     * @param identificadorLot identificador del lot utilitzat com a filtre
+     * @param dataRecepcio data de recepció utilitzada com a filtre
+     * @param lotId identificador del lot seleccionat per consultar el detall
+     * @param buscar indicador d'aplicació dels criteris de cerca
+     * @param sortField camp utilitzat per ordenar el llistat
+     * @param sortDir sentit de l'ordenació aplicada
+     * @param producteGraficId identificador del producte seleccionat al gràfic
+     * @param mesGrafic mes seleccionat per al gràfic
+     * @param model model de dades de la vista
+     * @return vista d'explotació de dades de traçabilitat
+     */
     @GetMapping("/list")
     public String llistarTracabilitat(@RequestParam(required = false) Long materiaId,
                                       @RequestParam(required = false) Long proveidorId,

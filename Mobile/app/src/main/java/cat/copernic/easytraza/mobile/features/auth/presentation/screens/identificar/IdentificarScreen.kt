@@ -54,7 +54,14 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 /**
- * Pantalla d'identificació d'usuari.
+ * TARGETA D'USUARI.
+ *
+ * Mostrada la informació visual d'un usuari disponible i habilitada
+ * la seva selecció per iniciar el procés d'identificació.
+ *
+ * @param usuari usuari representat a la targeta
+ * @param index posició utilitzada per definir l'aspecte de la targeta
+ * @param onClick acció executada en seleccionar l'usuari
  */
 @Composable
 fun IdentificarScreen(
@@ -141,6 +148,7 @@ fun IdentificarScreen(
         }
     }
 }
+
 
 /**
  * Targeta d'usuari seleccionable.

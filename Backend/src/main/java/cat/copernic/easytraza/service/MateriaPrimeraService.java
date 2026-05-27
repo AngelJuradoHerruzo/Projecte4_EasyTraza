@@ -16,6 +16,14 @@ import cat.copernic.easytraza.entities.MateriaPrimera;
 import cat.copernic.easytraza.repository.LotProveidorRepository;
 import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 
+/**
+ * SERVEI DE MATÈRIES PRIMERES.
+ *
+ * Gestionades les operacions de consulta, creació, modificació i eliminació de matèries primeres.
+ * També aplicats els filtres i validacions necessaris abans de guardar-les.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class MateriaPrimeraService {
@@ -34,13 +42,28 @@ public class MateriaPrimeraService {
     }
 
 
-    // OBTENIR TOTES LES MATÈRIES PRIMERES
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<MateriaPrimera> getAllMateriesPrimeres() {
         return materiaPrimeraRepository.findAll();
     }
 
 
-    // OBTENIR MATÈRIA PRIMERA PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public MateriaPrimera getMateriaPrimeraById(Long id) {
         Optional<MateriaPrimera> materiaPrimera = materiaPrimeraRepository.findById(id);
         return materiaPrimera.orElse(null);
@@ -64,7 +87,15 @@ public class MateriaPrimeraService {
     }
 
 
-    // OBTENIR ELS IDENTIFICADORS DE LES MATÈRIES PRIMERES QUE NO ES PODEN ELIMINAR
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param materiesPrimeres valor de materiesPrimeres utilitzat pel mètode
+     * @return llista de resultats obtinguda
+     */
     public Set<Long> getIdsMateriesPrimeresEnUs(List<MateriaPrimera> materiesPrimeres) {
 
         Set<Long> materiesEnUs = new HashSet<>();
@@ -79,14 +110,31 @@ public class MateriaPrimeraService {
     }
 
 
-    // CREAR MATÈRIA PRIMERA
+    /**
+     * CREACIÓ DEL REGISTRE.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param materiaPrimera valor de materiaPrimera utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public MateriaPrimera createMateriaPrimera(MateriaPrimera materiaPrimera) {
         validarDadesMateriesPrimeres(materiaPrimera);
         return materiaPrimeraRepository.save(materiaPrimera);
     }
 
 
-    // ACTUALITZAR MATÈRIA PRIMERA
+    /**
+     * ACTUALITZACIÓ DEL REGISTRE.
+     *
+     * Actualitzat el registre indicat amb les dades rebudes, mantenint
+     * les validacions pròpies del servei.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param materiaPrimera valor de materiaPrimera utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public MateriaPrimera updateMateriaPrimera(Long id, MateriaPrimera materiaPrimera) {
 
         Optional<MateriaPrimera> materiaPrimeraOpt = materiaPrimeraRepository.findById(id);
@@ -109,7 +157,14 @@ public class MateriaPrimeraService {
     }
 
 
-    // ELIMINAR MATÈRIA PRIMERA SI NO ESTÀ ASSOCIADA A CAP LOT
+    /**
+     * ELIMINACIÓ DEL REGISTRE.
+     *
+     * Eliminat el registre identificat quan el servei permet completar
+     * l'operació sol·licitada.
+     *
+     * @param id identificador utilitzat en l'operació
+     */
     public void deleteMateriaPrimera(Long id) {
 
         if (!materiaPrimeraRepository.existsById(id)) {
@@ -124,7 +179,14 @@ public class MateriaPrimeraService {
     }
 
 
-    // VALIDAR DADES DE LA MATÈRIA PRIMERA
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param materiaPrimera valor de materiaPrimera utilitzat pel mètode
+     */
     private void validarDadesMateriesPrimeres(MateriaPrimera materiaPrimera) {
 
         if (materiaPrimera.getNomMateria() != null) {
@@ -190,13 +252,30 @@ public class MateriaPrimeraService {
     }
 
 
-    // RETORNAR TEXT SEGUR PER A L'ORDENACIÓ
+    /**
+     * NORMALITZACIÓ DEL VALOR.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String valorText(String valor) {
         return valor != null ? valor : "";
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String valor, String filtre) {
 
         if (filtre == null || filtre.isBlank()) {
@@ -210,6 +289,17 @@ public class MateriaPrimeraService {
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

@@ -3,11 +3,12 @@ package cat.copernic.easytraza.entities;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT CLIENT
+ * ENTITAT CLIENT.
  *
- * Representa un client del sistema.
+ * Representades les dades identificatives i de contacte d'un client
+ * al qual es poden associar albarans de lliurament.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "clients")

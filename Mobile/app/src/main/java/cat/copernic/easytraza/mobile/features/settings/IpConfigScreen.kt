@@ -35,7 +35,12 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyBrownDark
 import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 
 /**
- * Pantalla de configuració de la IP del servidor.
+ * CONFIGURACIÓ DEL SERVIDOR.
+ *
+ * Mostrat el formulari de configuració de l'adreça IPv4
+ * del backend i desats els canvis indicats per l'usuari.
+ *
+ * @param onTornarClick acció executada en tornar a la pantalla anterior
  */
 @Composable
 fun IpConfigScreen(

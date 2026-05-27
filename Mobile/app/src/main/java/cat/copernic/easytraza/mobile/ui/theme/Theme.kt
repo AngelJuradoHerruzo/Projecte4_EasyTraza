@@ -16,6 +16,15 @@ private val EasyTrazaColorScheme = lightColorScheme(
     error = EasyError
 )
 
+
+/**
+ * TEMA VISUAL DE L'APLICACIÓ.
+ *
+ * Aplicat l'esquema de colors i la tipografia definits
+ * per mantenir l'estil visual comú de la interfície mòbil.
+ *
+ * @param content contingut sobre el qual s'ha d'aplicar el tema visual
+ */
 @Composable
 fun MobileTheme(
     content: @Composable () -> Unit

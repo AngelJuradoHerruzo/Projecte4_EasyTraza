@@ -6,7 +6,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 /**
- * Client Retrofit per comunicar l'app mòbil amb el backend.
+ * CLIENT DE COMUNICACIÓ RETROFIT.
+ *
+ * Gestionada la instància de Retrofit utilitzada per comunicar l'aplicació
+ * mòbil amb el backend segons l'adreça de servidor configurada.
+ *
+ * @author Ángel Jurado Herruz
  */
 object RetrofitClient {
 
@@ -15,7 +20,13 @@ object RetrofitClient {
 
 
     /**
-     * Obté una instància de Retrofit amb la IP configurada.
+     * OBTENCIÓ DEL CLIENT RETROFIT.
+     *
+     * Obtinguda una instància de Retrofit preparada amb la URL configurada,
+     * recreant-la quan l'adreça del servidor hagi estat modificada.
+     *
+     * @param context context utilitzat per obtenir la configuració del servidor
+     * @return instància de Retrofit preparada per consumir l'API
      */
     fun getInstance(context: Context): Retrofit {
 
@@ -36,7 +47,10 @@ object RetrofitClient {
 
 
     /**
-     * Reinicia la instància de Retrofit.
+     * REINICI DEL CLIENT RETROFIT.
+     *
+     * Eliminada la instància actual i la URL associada perquè la propera
+     * petició construeixi el client amb la configuració vigent.
      */
     fun reset() {
         retrofit = null

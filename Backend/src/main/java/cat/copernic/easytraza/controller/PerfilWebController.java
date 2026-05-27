@@ -18,11 +18,12 @@ import cat.copernic.easytraza.service.UsuariService;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * CONTROLADOR WEB DEL PERFIL D'USUARI
+ * CONTROLADOR WEB DEL PERFIL D'USUARI.
  *
- * Gestiona la visualització i modificació del perfil de l'usuari autenticat.
+ * Gestionada la visualització i modificació del perfil de l'usuari autenticat,
+ * incloent-hi la consulta del seu avatar.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Controller
 @RequestMapping("/perfil")
@@ -40,7 +41,16 @@ public class PerfilWebController {
     }
 
 
-    // VISUALITZAR PERFIL
+    /**
+     * VISUALITZACIÓ DEL PERFIL.
+     *
+     * Carregades les dades del perfil de l'usuari autenticat per mostrar-les
+     * a la pantalla corresponent.
+     *
+     * @param model model de dades de la vista
+     * @param session sessió web de l'usuari
+     * @return vista del perfil o redirecció al login
+     */
     @GetMapping
     public String veurePerfil(Model model, HttpSession session) {
 
@@ -56,7 +66,15 @@ public class PerfilWebController {
     }
 
 
-    // MOSTRAR AVATAR DE L'USUARI AUTENTICAT
+    /**
+     * OBTENCIÓ DE L'AVATAR DEL PERFIL.
+     *
+     * Retornada la imatge de l'avatar de l'usuari autenticat quan existeix
+     * i està disponible a la seva sessió.
+     *
+     * @param session sessió web de l'usuari
+     * @return resposta amb la imatge de l'avatar o resposta de recurs no trobat
+     */
     @GetMapping("/avatar")
     @ResponseBody
     public ResponseEntity<byte[]> mostrarAvatarPerfil(HttpSession session) {
@@ -84,7 +102,16 @@ public class PerfilWebController {
     }
 
 
-    // FORMULARI D'EDICIÓ DEL PERFIL
+    /**
+     * FORMULARI D'EDICIÓ DEL PERFIL.
+     *
+     * Carregades les dades de l'usuari autenticat per mostrar-les
+     * al formulari d'edició del seu perfil.
+     *
+     * @param model model de dades de la vista
+     * @param session sessió web de l'usuari
+     * @return vista del formulari o redirecció al login
+     */
     @GetMapping("/edit")
     public String editarPerfil(Model model, HttpSession session) {
 
@@ -102,7 +129,19 @@ public class PerfilWebController {
     }
 
 
-    // ACTUALITZAR PERFIL
+    /**
+     * ACTUALITZACIÓ DEL PERFIL.
+     *
+     * Processats els canvis de les dades personals i de l'avatar de l'usuari
+     * autenticat, actualitzant la informació conservada a la sessió.
+     *
+     * @param usuari dades actualitzades del perfil
+     * @param avatarFile imatge d'avatar adjuntada al formulari
+     * @param model model de dades de la vista
+     * @param session sessió web de l'usuari
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al perfil o vista del formulari amb errors
+     */
     @PostMapping("/update")
     public String updatePerfil(@ModelAttribute("usuari") Usuari usuari,
                                @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
@@ -153,7 +192,15 @@ public class PerfilWebController {
     }
 
 
-    // OBTENIR USUARI AUTENTICAT DE LA SESSIÓ
+    /**
+     * OBTENCIÓ DE L'USUARI AUTENTICAT.
+     *
+     * Recuperat l'usuari associat a l'identificador mantingut a la sessió
+     * web activa.
+     *
+     * @param session sessió web de l'usuari
+     * @return usuari autenticat o valor nul si no està disponible
+     */
     private Usuari obtenirUsuariSessio(HttpSession session) {
 
         Long usuariId = (Long) session.getAttribute("usuariId");
@@ -171,6 +218,17 @@ public class PerfilWebController {
         return usuari;
     }
 
+
+    /**
+     * OBTENCIÓ D'UN MISSATGE TRADUÏT.
+     *
+     * Recuperat el text corresponent al codi indicat segons l'idioma
+     * actiu de la interfície web.
+     *
+     * @param codi codi del missatge que s'ha de recuperar
+     * @param arguments valors incorporats al missatge
+     * @return missatge traduït a l'idioma actiu
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

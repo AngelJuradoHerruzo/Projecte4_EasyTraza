@@ -39,7 +39,12 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 /**
- * Pantalla de configuració de l'idioma de l'aplicació.
+ * CONFIGURACIÓ DE L'IDIOMA.
+ *
+ * Mostrades les opcions d'idioma disponibles i aplicada
+ * la selecció efectuada per l'usuari a l'aplicació.
+ *
+ * @param onTornarClick acció executada en tornar a la pantalla anterior
  */
 @Composable
 fun IdiomaConfigScreen(
@@ -114,6 +119,17 @@ fun IdiomaConfigScreen(
     }
 }
 
+
+/**
+ * OPCIÓ D'IDIOMA.
+ *
+ * Mostrada una opció seleccionable d'idioma i ressaltada
+ * quan coincideix amb la configuració activa.
+ *
+ * @param text nom visible de l'idioma
+ * @param selected indicador que informa si l'idioma està seleccionat
+ * @param onClick acció executada en seleccionar l'opció
+ */
 @Composable
 private fun LanguageOption(
     text: String,

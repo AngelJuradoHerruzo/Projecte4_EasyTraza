@@ -3,10 +3,12 @@ package cat.copernic.easytraza.entities;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT UNITAT MESURA
+ * ENTITAT UNITAT DE MESURA.
  *
- * Representa una unitat de mesura utilitzada en les línies dels albarans.
- * Es desa com a text curt i normalitzat per evitar duplicats innecessaris.
+ * Representada una unitat de mesura utilitzada en les línies
+ * dels albarans i desada de forma normalitzada.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "unitats_mesura")

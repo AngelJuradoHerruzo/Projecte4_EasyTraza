@@ -11,11 +11,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * Parser OCR específic per al proveïdor TAL COM PINTA.
+ * PARSER OCR DE TAL COM PINTA.
  *
- * La matèria primera es llegeix des de la columna Descripció. El número
- * d'albarà correspon al camp N. Entrega. Les línies es construeixen per ordre
- * vertical i no depenen del codi d'article.
+ * Interpretades les dades OCR dels albarans del proveïdor Tal Com Pinta.
+ * També normalitzats els lots i les línies detectades abans de presentar-les a revisió.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrTalComPintaService implements OcrParserProveidor {
@@ -52,6 +53,18 @@ public class OcrTalComPintaService implements OcrParserProveidor {
     }
 
     @Override
+
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param textOcrOriginal text utilitzat en el procés
+     * @param textOcrNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrAlbaraPendent parsejar(String textOcrOriginal, String textOcrNormalitzat) {
         OcrAlbaraPendent resultat = new OcrAlbaraPendent();
 
@@ -65,8 +78,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return resultat;
     }
 
+
     /**
-     * N. Entrega és el número d'albarà del model TAL COM PINTA.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureNumeroAlbara(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -90,6 +110,16 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return buscarNumeroEntrega(taulaCompleta);
     }
 
+
+    /**
+     * CERCA DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String buscarNumeroEntrega(String valor) {
         String normalitzat = OcrUtils.normalitzarPerComparar(valor);
         Matcher matcher = PATRON_NUMERO_ENTREGA.matcher(normalitzat);
@@ -108,6 +138,16 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return null;
     }
 
+
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
+     */
     private String extreureDataAlbara(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
                 text,
@@ -124,9 +164,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return OcrUtils.extreurePrimeraDataNormalitzada(text);
     }
 
+
     /**
-     * Les descripcions defineixen el nombre de línies reals. Això evita que
-     * els imports o altres números creïn files fictícies.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLinies(String text) {
         List<String> materies = extreureMateries(text);
@@ -157,9 +203,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return linies;
     }
 
+
     /**
-     * Llegeix les files de producte sense dependre del codi d'article.
-     * Les files de lot tenen data i es descarten de la llista de matèries.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<String> extreureMateries(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -187,11 +239,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return materies;
     }
 
+
     /**
-     * Extreu els lots des de la zona específica de sublínies.
+     * EXTRACCIÓ DE DADES.
      *
-     * No valida estrictament la data perquè el lot pot ser correcte encara que
-     * Tesseract deformi la data de caducitat.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<String> extreureLots(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -215,8 +271,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return lots;
     }
 
+
     /**
-     * Localitza les sublínies quantitat + lot + data i retorna el lot normalitzat.
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param bloc valor de bloc utilitzat pel mètode
+     * @return llista de resultats obtinguda
      */
     private List<String> obtenirLotsDelBloc(String bloc) {
         List<String> lots = new ArrayList<>();
@@ -239,9 +302,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return lots;
     }
 
+
     /**
-     * Quantitats de la columna Quantitat. La zona és prou alta per admetre
-     * més files que les tres de la mostra.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<Double> extreureQuantitats(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -279,8 +348,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return quantitats;
     }
 
+
     /**
-     * Retorn de seguretat sobre la lectura completa de la taula.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLiniesFallback(String text) {
         String bloc = OcrUtils.extreureBlocEntreMarcadors(
@@ -339,6 +415,16 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return linies;
     }
 
+
+    /**
+     * NETEJA DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String netejarMateria(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -353,6 +439,16 @@ public class OcrTalComPintaService implements OcrParserProveidor {
                 .trim();
     }
 
+
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean semblaMateria(String materia) {
         if (materia == null || materia.isBlank()) {
             return false;
@@ -366,6 +462,16 @@ public class OcrTalComPintaService implements OcrParserProveidor {
                 && !comparar.contains("ADRECA");
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @return cert si es compleix la condició indicada
+     */
     private boolean esSoroll(String valor) {
         return valor == null
                 || valor.isBlank()
@@ -378,14 +484,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
                 );
     }
 
+
     /**
-     * Normalitza errors OCR habituals en els lots de TAL COM PINTA.
+     * NORMALITZACIÓ DE DADES.
      *
-     * Exemples:
-     * - 1602248  -> L602248
-     * - 1602265  -> L602265
-     * - L6O2248  -> L602248
-     * - 0926     -> 0926
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
      */
     private String normalitzarLot(String valor) {
         if (valor == null || valor.isBlank()) {
@@ -395,16 +502,12 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         String lot = valor.toUpperCase()
                 .replaceAll("[^A-Z0-9]", "");
 
-        /*
-        * OCR confon habitualment el prefix L6 amb 16.
-        */
+        // OCR confon habitualment el prefix L6 amb 16.
         if (lot.matches("1\\d{6}")) {
             lot = "L" + lot.substring(1);
         }
 
-        /*
-        * Dins d'un lot alfanumèric amb prefix L, la lletra O correspon a zero.
-        */
+        //Dins d'un lot alfanumèric amb prefix L, la lletra O correspon a zero.
         if (lot.startsWith("L")) {
             lot = "L" + lot.substring(1).replace('O', '0');
         }
@@ -412,10 +515,30 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return lot;
     }
 
+
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param lot valor de lot utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean lotValido(String lot) {
         return lot != null && lot.length() >= 4 && lot.matches(".*\\d.*");
     }
 
+
+    /**
+     * DETECCIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String detectarUnitat(String materia) {
         String normalitzada = OcrUtils.normalitzarPerComparar(materia);
 
@@ -430,6 +553,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         return "UT";
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param linia valor de linia utilitzat pel mètode
+     */
     private void afegirAvisosLinia(OcrLiniaDto linia) {
         if (linia.getMateriaPrimeraDetectada() == null || linia.getMateriaPrimeraDetectada().isBlank()) {
             linia.afegirAvis(missatge("ocr.avis.materiaNoDetectada"));
@@ -445,6 +577,15 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultat valor de resultat utilitzat pel mètode
+     */
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
             resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "TAL COM PINTA"));
@@ -459,10 +600,32 @@ public class OcrTalComPintaService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param valors valor que s'ha de processar
+     * @param index valor de index utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private <T> T obtenirValor(List<T> valors, int index) {
         return valors != null && index >= 0 && index < valors.size() ? valors.get(index) : null;
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

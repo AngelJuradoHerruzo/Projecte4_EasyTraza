@@ -1,7 +1,12 @@
 package cat.copernic.easytraza.mobile.features.lots.data.sources.remote
 
 /**
- * DTO de resposta en iniciar un lot.
+ * RESPOSTA D'INICI DE LOT.
+ *
+ * Representat el resultat retornat pel backend en iniciar un lot,
+ * indicant si cal confirmar l'operació i el lot afectat.
+ *
+ * @author Ángel Jurado Herruz
  */
 data class ConfirmarIniciLotResponse(
     val requereixConfirmacio: Boolean,

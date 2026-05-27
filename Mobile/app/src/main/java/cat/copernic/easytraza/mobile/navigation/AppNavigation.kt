@@ -19,7 +19,10 @@ import cat.copernic.easytraza.mobile.features.splash.SplashScreen
 import cat.copernic.easytraza.mobile.main.screens.MainScreen
 
 /**
- * Navegació principal de l'app.
+ * NAVEGACIÓ PRINCIPAL.
+ *
+ * Gestionada la pantalla visible de l'aplicació mòbil, la sessió
+ * de l'usuari i la navegació entre identificació, lots i configuració.
  */
 @Composable
 fun AppNavigation() {

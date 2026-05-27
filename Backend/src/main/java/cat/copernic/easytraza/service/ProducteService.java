@@ -13,6 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import cat.copernic.easytraza.entities.Producte;
 import cat.copernic.easytraza.repository.ProducteRepository;
 
+/**
+ * SERVEI DE PRODUCTES.
+ *
+ * Gestionades les operacions de consulta, creació, modificació i eliminació dels productes.
+ * També aplicades les validacions i ordenacions necessàries sobre les dades introduïdes.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class ProducteService {
@@ -27,13 +35,28 @@ public class ProducteService {
     }
 
 
-    // OBTENIR TOTS ELS PRODUCTES ORDENATS ALFABÈTICAMENT
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<Producte> getAllProductes() {
         return getAllProductes(null);
     }
 
 
-    // OBTENIR PRODUCTES AMB FILTRE OPCIONAL I ORDENATS ALFABÈTICAMENT
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @param nomProducte valor de nomProducte utilitzat pel mètode
+     * @return llista de resultats obtinguda
+     */
     public List<Producte> getAllProductes(String nomProducte) {
 
         List<Producte> productes = new ArrayList<>(producteRepository.findAll());
@@ -48,21 +71,46 @@ public class ProducteService {
     }
 
 
-    // OBTENIR PRODUCTE PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public Producte getProducteById(Long id) {
         Optional<Producte> producte = producteRepository.findById(id);
         return producte.orElse(null);
     }
 
 
-    // CREAR PRODUCTE
+    /**
+     * CREACIÓ DEL REGISTRE.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param producte valor de producte utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public Producte createProducte(Producte producte) {
         validarDadesProducte(producte);
         return producteRepository.save(producte);
     }
 
 
-    // ACTUALITZAR PRODUCTE
+    /**
+     * ACTUALITZACIÓ DEL REGISTRE.
+     *
+     * Actualitzat el registre indicat amb les dades rebudes, mantenint
+     * les validacions pròpies del servei.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param producte valor de producte utilitzat pel mètode
+     * @return registre resultant de l'operació
+     */
     public Producte updateProducte(Long id, Producte producte) {
 
         Optional<Producte> producteOpt = producteRepository.findById(id);
@@ -85,13 +133,27 @@ public class ProducteService {
     }
 
 
-    // ELIMINAR PRODUCTE
+    /**
+     * ELIMINACIÓ DEL REGISTRE.
+     *
+     * Eliminat el registre identificat quan el servei permet completar
+     * l'operació sol·licitada.
+     *
+     * @param id identificador utilitzat en l'operació
+     */
     public void deleteProducte(Long id) {
         producteRepository.deleteById(id);
     }
 
 
-    // VALIDAR DADES DEL PRODUCTE
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param producte valor de producte utilitzat pel mètode
+     */
     private void validarDadesProducte(Producte producte) {
 
         if (producte.getNomProducte() != null) {
@@ -119,7 +181,14 @@ public class ProducteService {
     }
 
 
-    // ORDENAR PRODUCTES ALFABÈTICAMENT PER NOM IGNORANT MAJÚSCULES I MINÚSCULES
+    /**
+     * ORDENACIÓ DE DADES.
+     *
+     * Ordenada la llista rebuda segons el criteri indicat o segons
+     * l'ordre propi del servei.
+     *
+     * @param productes valor de productes utilitzat pel mètode
+     */
     private void ordenarProductesPerNom(List<Producte> productes) {
 
         productes.sort(
@@ -131,7 +200,16 @@ public class ProducteService {
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String valor, String filtre) {
 
         if (filtre == null || filtre.isBlank()) {
@@ -145,6 +223,17 @@ public class ProducteService {
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }
