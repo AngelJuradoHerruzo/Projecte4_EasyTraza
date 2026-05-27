@@ -3,11 +3,12 @@ package cat.copernic.easytraza.entities;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT PROVEÏDOR
+ * ENTITAT PROVEÏDOR.
  *
- * Representa un proveïdor de matèries primeres del sistema.
+ * Representades les dades d'un proveïdor de matèries primeres
+ * del qual es poden registrar recepcions mitjançant albarans.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "proveidors")

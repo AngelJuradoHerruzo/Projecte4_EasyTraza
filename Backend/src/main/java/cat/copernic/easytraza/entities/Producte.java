@@ -3,11 +3,12 @@ package cat.copernic.easytraza.entities;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT PRODUCTE
+ * ENTITAT PRODUCTE.
  *
- * Representa un producte que el negoci produeix o ven.
+ * Representat un producte acabat que el negoci produeix o ven
+ * i que pot incloure's als albarans dels clients.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "productes")

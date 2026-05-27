@@ -3,11 +3,12 @@ package cat.copernic.easytraza.entities;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT LÍNIA DE PRODUCCIÓ
+ * ENTITAT LÍNIA DE PRODUCCIÓ.
  *
- * Representa una quantitat de producte manufacturat acabat dins d'un albarà de client.
+ * Representada una quantitat de producte manufacturat dins d'un albarà
+ * de client, indicant el producte i l'operari responsables.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "linies_produccio")

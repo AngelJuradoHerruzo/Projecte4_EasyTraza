@@ -7,11 +7,12 @@ import java.util.List;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT ALBARÀ DE PROVEÏDOR
+ * ENTITAT ALBARÀ DE PROVEÏDOR.
  *
- * Representa una recepció de lots de matèria primera d'un proveïdor.
+ * Representada la recepció de lots de matèria primera procedents
+ * d'un proveïdor i els fitxers vinculats al document rebut.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "albarans_proveidor")

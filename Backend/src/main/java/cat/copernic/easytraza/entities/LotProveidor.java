@@ -6,11 +6,12 @@ import cat.copernic.easytraza.enums.EstatLot;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT LOT DE PROVEÏDOR
+ * ENTITAT LOT DE PROVEÏDOR.
  *
- * Representa un lot de matèria primera recepcionat mitjançant un albarà de proveïdor.
+ * Representat un lot de matèria primera recepcionat mitjançant un albarà
+ * de proveïdor, incloent-hi el seu estat i les dates de seguiment.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "lots_proveidor")

@@ -3,12 +3,12 @@ package cat.copernic.easytraza.entities;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT MATÈRIA PRIMERA
+ * ENTITAT MATÈRIA PRIMERA.
  *
- * Representa una matèria primera del sistema.
- * És un producte base utilitzat per a la fabricació de producte acabat.
+ * Representat un producte base utilitzat en la fabricació dels productes
+ * acabats gestionats per l'aplicació.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "materies_primeres")

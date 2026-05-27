@@ -4,14 +4,12 @@ import cat.copernic.easytraza.enums.RolUsuari;
 import jakarta.persistence.*;
 
 /**
- * ENTITAT USUARI
+ * ENTITAT USUARI.
  *
- * Representa la classe dels usuaris del sistema.
- * Hi ha dos tipus d'usuaris:
- * - Administradors, que accedeixen des de l'aplicació web (PC) i requereixen autenticació.
- * - Operaris, que utilitzen l'aplicació mòbil Android i només necessiten identificar-se.
+ * Representades les dades dels usuaris del sistema, diferenciant
+ * els administradors de l'aplicació web i els operaris del client mòbil.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Entity
 @Table(name = "usuaris")
