@@ -11,11 +11,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * Parser OCR específic per al proveïdor AVÍCOLA LLEONART.
+ * PARSER OCR D'AVÍCOLA LLEONART.
  *
- * Aquest parser treballa amb una zona d'informació general i una zona de
- * recepció. En aquest model real hi ha una única línia de producte i el lot es
- * mostra a la línia inferior de la descripció.
+ * Interpretades les dades OCR dels albarans del proveïdor Avícola Lleonart.
+ * També extretes les dades principals i els avisos necessaris per revisar el resultat.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrAvicolaLleonartService implements OcrParserProveidor {
@@ -47,6 +48,18 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
     }
 
     @Override
+
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param textOcrOriginal text utilitzat en el procés
+     * @param textOcrNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrAlbaraPendent parsejar(String textOcrOriginal, String textOcrNormalitzat) {
         OcrAlbaraPendent resultat = new OcrAlbaraPendent();
 
@@ -60,8 +73,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         return resultat;
     }
 
+
     /**
-     * Extreu el número d'albarà de la zona superior del document.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureNumeroAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
@@ -81,8 +101,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         return null;
     }
 
+
     /**
-     * Extreu la data d'albarà, prioritzant la zona on apareix FECHA ALBARAN.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureDataAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
@@ -95,9 +122,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         return data != null ? data : OcrUtils.extreurePrimeraDataNormalitzada(text);
     }
 
+
     /**
-     * Extreu l'única línia del model AVÍCOLA LLEONART: matèria, quantitat i
-     * lot imprès sota la descripció.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLinies(String text) {
         String blocTaula = OcrUtils.extreureBlocEntreMarcadors(
@@ -141,8 +174,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         return linies;
     }
 
+
     /**
-     * Extreu la descripció del producte evitant incorporar preu o import.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureMateria(String text) {
         Matcher matcher = PATRON_PRODUCTE.matcher(text);
@@ -157,8 +197,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
                 .trim();
     }
 
+
     /**
-     * Extreu la quantitat de la mateixa línia que la matèria primera.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return valor numèric obtingut
      */
     private Double extreureQuantitat(String text) {
         Matcher matcher = PATRON_PRODUCTE.matcher(text);
@@ -174,8 +221,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         }
     }
 
+
     /**
-     * Extreu l'identificador que apareix després de la paraula Lote.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureLot(String text) {
         String normalitzat = text
@@ -194,9 +248,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         return null;
     }
 
+
     /**
-     * Normalitza errors observables de lectura sense substituir dades reals del
-     * document per valors fixos.
+     * PREPARACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
      */
     private String prepararText(String valor) {
         return OcrUtils.normalitzarPerComparar(valor)
@@ -207,6 +267,15 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
                 .trim();
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultat valor de resultat utilitzat pel mètode
+     */
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
             resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "AVÍCOLA LLEONART"));
@@ -221,6 +290,17 @@ public class OcrAvicolaLleonartService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

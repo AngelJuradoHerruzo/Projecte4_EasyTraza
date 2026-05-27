@@ -11,12 +11,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
- * Parser OCR específic per al proveïdor ARTIPAS.
+ * PARSER OCR D'ARTIPAS.
  *
- * Aquest parser treballa amb una zona d'informació general i amb la taula
- * principal d'articles. En aquest format, el Codi HS s'utilitza com a
- * identificador de lot. Si la línia no incorpora Codi HS, es retorna "-" per
- * tal que l'usuari el completi abans de guardar.
+ * Interpretades les dades OCR dels albarans del proveïdor Artipas.
+ * També extretes les línies de lots, quantitats i matèries primeres detectades.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Service
 public class OcrArtipasService implements OcrParserProveidor {
@@ -54,6 +54,18 @@ public class OcrArtipasService implements OcrParserProveidor {
     }
 
     @Override
+
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param textOcrOriginal text utilitzat en el procés
+     * @param textOcrNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
+     */
     public OcrAlbaraPendent parsejar(String textOcrOriginal, String textOcrNormalitzat) {
         OcrAlbaraPendent resultat = new OcrAlbaraPendent();
 
@@ -67,9 +79,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return resultat;
     }
 
+
     /**
-     * Extreu el número d'albarà de la zona superior, tolerant la lectura OCR
-     * WH/0UT en lloc de WH/OUT.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureNumeroAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
@@ -89,8 +107,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return null;
     }
 
+
     /**
-     * Extreu la data d'enviament, que és la data operativa de l'albarà.
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
      */
     private String extreureDataAlbara(String text) {
         String blocInfo = OcrUtils.extreureBlocEntreMarcadors(
@@ -103,12 +128,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return data != null ? data : OcrUtils.extreurePrimeraDataNormalitzada(text);
     }
 
+
     /**
-     * Extreu les línies de la taula principal.
+     * EXTRACCIÓ DE DADES.
      *
-     * La primera línia es tracta en una zona separada perquè al document ARTIPAS
-     * queda molt pròxima a la capçalera i Tesseract pot ometre-la quan interpreta
-     * tota la taula conjuntament.
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
      */
     private List<OcrLiniaDto> extreureLinies(String text) {
         String blocPrimeraLinia = OcrUtils.extreureBlocEntreMarcadors(
@@ -131,8 +159,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return linies;
     }
 
+
     /**
-     * Interpreta totes les línies vàlides d'un bloc OCR i evita duplicats.
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param bloc valor de bloc utilitzat pel mètode
+     * @param linies valor de linies utilitzat pel mètode
      */
     private void afegirLiniesDelBloc(String bloc, List<OcrLiniaDto> linies) {
         for (String liniaOriginal : OcrUtils.obtenirLiniesNoBuides(bloc)) {
@@ -155,8 +190,16 @@ public class OcrArtipasService implements OcrParserProveidor {
         }
     }
 
+
     /**
-     * Evita duplicar la primera fila si també apareix en la lectura general.
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param linies valor de linies utilitzat pel mètode
+     * @param candidata valor de candidata utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
      */
     private boolean jaExisteixLinia(List<OcrLiniaDto> linies, OcrLiniaDto candidata) {
         return linies.stream().anyMatch(linia ->
@@ -166,10 +209,31 @@ public class OcrArtipasService implements OcrParserProveidor {
         );
     }
 
+
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param primer valor de primer utilitzat pel mètode
+     * @param segon valor de segon utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean igual(Object primer, Object segon) {
         return primer == null ? segon == null : primer.equals(segon);
     }
 
+
+    /**
+     * INTERPRETACIÓ DEL TEXT OCR.
+     *
+     * Interpretat el text OCR rebut per construir les dades temporals
+     * de l'albarà detectat.
+     *
+     * @param linia valor de linia utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private OcrLiniaDto parsejarLinia(String linia) {
         Matcher matcher = PATRON_LINIA_AMB_CLAUDATORS.matcher(linia);
 
@@ -212,11 +276,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return resultat;
     }
 
+
     /**
-     * Comprova si la línia conté l'inici real d'un article ARTIPAS.
+     * COMPROVACIÓ DE CONTINGUT.
      *
-     * Permet conservar la primera línia quan Tesseract la fusiona amb la
-     * capçalera de la taula.
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param linia valor de linia utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
      */
     private boolean conteCodiArticle(String linia) {
         if (linia == null || linia.isBlank()) {
@@ -228,6 +296,16 @@ public class OcrArtipasService implements OcrParserProveidor {
                 .find();
     }
 
+
+    /**
+     * PREPARACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String prepararLinia(String valor) {
         if (valor == null) {
             return "";
@@ -239,6 +317,16 @@ public class OcrArtipasService implements OcrParserProveidor {
                 .trim();
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param linia valor de linia utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     private boolean esCapcaleraOSoroll(String linia) {
         String normalitzada = OcrUtils.normalitzarPerComparar(linia);
 
@@ -251,6 +339,16 @@ public class OcrArtipasService implements OcrParserProveidor {
                 || normalitzada.contains("NO ENTREGADAS");
     }
 
+
+    /**
+     * NETEJA DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String netejarMateria(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -264,9 +362,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return materia.length() < 3 ? null : materia;
     }
 
+
     /**
-     * En ARTIPAS les quantitats incorporen decimals amb coma o punt. No es pot
-     * utilitzar una normalització que elimini el punt decimal.
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return valor numèric obtingut
      */
     private Double convertirDecimal(String valor) {
         if (valor == null || valor.isBlank()) {
@@ -280,6 +384,16 @@ public class OcrArtipasService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * DETECCIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param materia valor de materia utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String detectarUnitat(String materia) {
         String normalitzada = OcrUtils.normalitzarPerComparar(materia);
 
@@ -294,6 +408,15 @@ public class OcrArtipasService implements OcrParserProveidor {
         return "UNITATS";
     }
 
+
+    /**
+     * INCORPORACIÓ DE DADES.
+     *
+     * Incorporada o completada la informació necessària dins de l'objecte
+     * que s'està preparant.
+     *
+     * @param resultat valor de resultat utilitzat pel mètode
+     */
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
             resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "ARTIPAS"));
@@ -308,6 +431,17 @@ public class OcrArtipasService implements OcrParserProveidor {
         }
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

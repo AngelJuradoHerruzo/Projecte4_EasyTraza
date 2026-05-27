@@ -10,7 +10,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utilitats comunes per al processament OCR d'albarans de proveïdor.
+ * UTILITATS DEL PROCÉS OCR.
+ *
+ * Agrupades funcions auxiliars utilitzades pels parsers OCR per normalitzar textos, 
+ * detectar dates, convertir números i comparar valors. Aquesta classe no manté estat propi.
+ *
+ * @author Ángel Jurado Herruz
  */
 public final class OcrUtils {
 
@@ -21,7 +26,15 @@ public final class OcrUtils {
     private OcrUtils() { }
 
 
-    /*********************       .TEXT.       *********************/
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     public static String normalitzarText(String valor) {
         return valor == null ? "" : valor
                 .replace("\r", "\n")
@@ -33,6 +46,16 @@ public final class OcrUtils {
                 .trim();
     }
 
+
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     public static String normalitzarPerComparar(String valor) {
         if (valor == null) {
             return "";
@@ -54,6 +77,16 @@ public final class OcrUtils {
                 .trim();
     }
 
+
+    /**
+     * NETEJA DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     public static String netejarValor(String valor) {
         return valor == null ? null : valor
                 .replace("\n", " ")
@@ -63,6 +96,16 @@ public final class OcrUtils {
                 .replaceAll("\\s{2,}", " ");
     }
 
+
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param text text utilitzat en el procés
+     * @return llista de resultats obtinguda
+     */
     public static List<String> obtenirLiniesNoBuides(String text) {
         List<String> linies = new ArrayList<>();
 
@@ -81,6 +124,18 @@ public final class OcrUtils {
         return linies;
     }
 
+
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @param marcadorInici valor de marcadorInici utilitzat pel mètode
+     * @param marcadorFi valor de marcadorFi utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     public static String extreureBlocEntreMarcadors(String text, String marcadorInici, String marcadorFi) {
         if (text == null || marcadorInici == null || marcadorFi == null) {
             return "";
@@ -103,6 +158,17 @@ public final class OcrUtils {
         return text.substring(inici, fi).trim();
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param text text utilitzat en el procés
+     * @param valors valor que s'ha de processar
+     * @return cert si es compleix la condició indicada
+     */
     public static boolean conteAlguna(String text, String... valors) {
         if (text == null || valors == null) {
             return false;
@@ -118,7 +184,15 @@ public final class OcrUtils {
     }
 
 
-    /*********************       .DATES.       *********************/
+    /**
+     * EXTRACCIÓ DE DADES.
+     *
+     * Extreta la dada necessària del text o del document analitzat
+     * per continuar amb el procés OCR.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
+     */
     public static String extreurePrimeraDataNormalitzada(String text) {
         Matcher matcher = PATRON_DATA.matcher(text == null ? "" : text);
 
@@ -133,6 +207,16 @@ public final class OcrUtils {
         return null;
     }
 
+
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     public static String normalitzarData(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -168,6 +252,18 @@ public final class OcrUtils {
         }
     }
 
+
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param any valor de any utilitzat pel mètode
+     * @param mes valor de mes utilitzat pel mètode
+     * @param dia valor de dia utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private static String validarIFormatarData(int any, int mes, int dia) {
         if (any < 2020 || any > 2100) {
             return null;
@@ -181,7 +277,15 @@ public final class OcrUtils {
     }
 
 
-    /*********************       .NÚMEROS I QUANTITATS.       *********************/
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return valor numèric obtingut
+     */
     public static Double convertirNumero(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -199,6 +303,16 @@ public final class OcrUtils {
         }
     }
 
+
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return valor numèric obtingut
+     */
     public static Double convertirQuantitatOcr(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -214,7 +328,15 @@ public final class OcrUtils {
     }
 
 
-    /*********************       .LOTS I CODIS.       *********************/
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param lot valor de lot utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     public static String normalitzarLot(String lot) {
         if (lot == null || lot.isBlank()) {
             return null;
@@ -230,6 +352,16 @@ public final class OcrUtils {
                 .trim();
     }
 
+
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param lot valor de lot utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     public static boolean esLotValid(String lot) {
         String valor = normalitzarLot(lot);
 
@@ -239,6 +371,16 @@ public final class OcrUtils {
                 && !valor.matches("\\d{1,4}");
     }
 
+
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     public static String normalitzarCodi(String valor) {
         if (valor == null || valor.isBlank()) {
             return null;
@@ -255,7 +397,16 @@ public final class OcrUtils {
     }
 
 
-    /*********************       .COMPARACIÓ FLEXIBLE.       *********************/
+    /**
+     * COMPROVACIÓ DE COINCIDÈNCIA.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param nomDetectat valor de nomDetectat utilitzat pel mètode
+     * @param nomSistema valor de nomSistema utilitzat pel mètode
+     * @return cert si es compleix la condició indicada
+     */
     public static boolean coincideixNomFlexible(String nomDetectat, String nomSistema) {
         String detectat = normalitzarPerComparar(nomDetectat);
         String sistema = normalitzarPerComparar(nomSistema);
@@ -274,6 +425,17 @@ public final class OcrUtils {
         return llargada > 0 && ((double) distancia / llargada) <= 0.25;
     }
 
+
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param primer valor de primer utilitzat pel mètode
+     * @param segon valor de segon utilitzat pel mètode
+     * @return valor numèric obtingut
+     */
     public static int distanciaLevenshtein(String primer, String segon) {
         String a = primer == null ? "" : primer;
         String b = segon == null ? "" : segon;

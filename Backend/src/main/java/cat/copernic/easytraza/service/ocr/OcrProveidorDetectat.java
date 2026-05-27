@@ -3,7 +3,12 @@ package cat.copernic.easytraza.service.ocr;
 import java.util.List;
 
 /**
- * Proveïdors suportats pel flux OCR d'albarans de proveïdor.
+ * PROVEÏDORS DETECTABLES PER OCR.
+ *
+ * Definits els proveïdors que el sistema pot reconèixer automàticament durant el procés OCR.
+ * També guardades les claus utilitzades per identificar-los dins del text normalitzat.
+ *
+ * @author Ángel Jurado Herruz
  */
 public enum OcrProveidorDetectat {
 
@@ -79,15 +84,15 @@ public enum OcrProveidorDetectat {
         return clausDeteccio;
     }
 
+
     /**
-     * Detecta el proveïdor a partir del text OCR normalitzat.
+     * DETECCIÓ DE DADES.
      *
-     * JOSE NOVAU es comprova abans que PASTISSA perquè comparteixen camps
-     * genèrics d'albarà i pagament, però JOSE NOVAU disposa de marques
-     * pròpies prou identificatives.
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
      *
-     * @param textNormalitzat text OCR normalitzat per comparar.
-     * @return proveïdor detectat o null si no s'ha pogut identificar.
+     * @param textNormalitzat text utilitzat en el procés
+     * @return resultat obtingut pel mètode
      */
     public static OcrProveidorDetectat detectar(String textNormalitzat) {
         String text = textNormalitzat == null ? "" : textNormalitzat;
@@ -119,12 +124,16 @@ public enum OcrProveidorDetectat {
         return null;
     }
 
+
     /**
-     * Comprova si el text OCR conté alguna de les claus del proveïdor.
+     * COMPROVACIÓ DE CONTINGUT.
      *
-     * @param proveidor proveïdor a comprovar.
-     * @param text text OCR normalitzat.
-     * @return true si existeix alguna coincidència.
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param proveidor valor de proveidor utilitzat pel mètode
+     * @param text text utilitzat en el procés
+     * @return cert si es compleix la condició indicada
      */
     private static boolean conteAlgunaClau(OcrProveidorDetectat proveidor, String text) {
         return proveidor.clausDeteccio.stream().anyMatch(text::contains);
