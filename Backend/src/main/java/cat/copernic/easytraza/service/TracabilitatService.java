@@ -30,6 +30,14 @@ import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
 import cat.copernic.easytraza.repository.ProducteRepository;
 import cat.copernic.easytraza.repository.ProveidorRepository;
 
+/**
+ * SERVEI DE TRAÇABILITAT.
+ *
+ * Gestionades les consultes necessàries per obtenir informació de producció i seguiment associada als lots.
+ * També preparades les dades utilitzades en l'explotació i consulta de la traçabilitat.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class TracabilitatService {
@@ -119,7 +127,14 @@ public class TracabilitatService {
     }
 
 
-    // OBTENIR MATÈRIES PRIMERES ORDENADES
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<MateriaPrimera> getAllMateriesPrimeresOrdenades() {
         return materiaPrimeraRepository.findAll(Sort.by("nomMateria").ascending());
     }
@@ -202,7 +217,15 @@ public class TracabilitatService {
     }
 
 
-    // PRODUCCIÓ GENERADA AMB UN LOT
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param lotId identificador utilitzat en l'operació
+     * @return llista de resultats obtinguda
+     */
     public List<LiniaProduccio> getProduccioPerLot(Long lotId) {
 
         if (lotId == null) {
@@ -284,7 +307,16 @@ public class TracabilitatService {
     }
 
 
-    // OBTENIR EL MES SELECCIONAT O EL MÉS RECENT DISPONIBLE
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param mesGrafic valor de mesGrafic utilitzat pel mètode
+     * @param mesosDisponibles valor de mesosDisponibles utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private YearMonth obtenirMesSeleccionat(String mesGrafic, List<YearMonth> mesosDisponibles) {
 
         if (mesGrafic != null && !mesGrafic.isBlank()) {
@@ -346,7 +378,15 @@ public class TracabilitatService {
     }
 
 
-    // OBTENIR ETIQUETES DELS DIES DEL MES
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param mesSeleccionat valor de mesSeleccionat utilitzat pel mètode
+     * @return llista de resultats obtinguda
+     */
     private List<String> obtenirLabelsDiesMes(YearMonth mesSeleccionat) {
 
         List<String> labels = new ArrayList<>();
@@ -359,7 +399,15 @@ public class TracabilitatService {
     }
 
 
-    // OBTENIR NOM DE LA SÈRIE MOSTRADA AL GRÀFIC
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param producteGraficId identificador utilitzat en l'operació
+     * @return text obtingut pel mètode
+     */
     private String obtenirLabelSerie(Long producteGraficId) {
 
         if (producteGraficId == null) {
@@ -376,7 +424,15 @@ public class TracabilitatService {
     }
 
 
-    // CONVERTIR ETIQUETES A JSON
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param labels valor de labels utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String convertirLabelsAJson(List<String> labels) {
 
         StringBuilder json = new StringBuilder("[");
@@ -396,7 +452,15 @@ public class TracabilitatService {
     }
 
 
-    // CONVERTIR LLISTA DE NÚMEROS A JSON
+    /**
+     * CONVERSIÓ DE DADES.
+     *
+     * Convertit el valor rebut al format necessari per poder-lo utilitzar
+     * dins del procés del servei.
+     *
+     * @param numeros valor de numeros utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String convertirNumerosAJson(List<Integer> numeros) {
 
         StringBuilder json = new StringBuilder("[");
@@ -416,7 +480,15 @@ public class TracabilitatService {
     }
 
 
-    // ESCAPAR TEXT PER JSON
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param text text utilitzat en el procés
+     * @return text obtingut pel mètode
+     */
     private String escaparJson(String text) {
 
         if (text == null) {
@@ -429,7 +501,16 @@ public class TracabilitatService {
     }
 
 
-    // ORDENAR LOTS
+    /**
+     * ORDENACIÓ DE DADES.
+     *
+     * Ordenada la llista rebuda segons el criteri indicat o segons
+     * l'ordre propi del servei.
+     *
+     * @param lots valor de lots utilitzat pel mètode
+     * @param sortField valor de sortField utilitzat pel mètode
+     * @param sortDir valor de sortDir utilitzat pel mètode
+     */
     private void ordenarLots(List<LotProveidor> lots, String sortField, String sortDir) {
 
         Comparator<LotProveidor> comparator = obtenirComparadorLots(sortField);
@@ -442,7 +523,15 @@ public class TracabilitatService {
     }
 
 
-    // OBTENIR COMPARADOR SEGONS LA COLUMNA SELECCIONADA
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param sortField valor de sortField utilitzat pel mètode
+     * @return resultat obtingut pel mètode
+     */
     private Comparator<LotProveidor> obtenirComparadorLots(String sortField) {
 
         if ("identificadorLot".equals(sortField)) {
@@ -488,7 +577,16 @@ public class TracabilitatService {
     }
 
 
-    // COMPROVAR SI UN ALBARÀ DE CLIENT TÉ ASSOCIAT EL LOT
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param albaraClient valor de albaraClient utilitzat pel mètode
+     * @param lotId identificador utilitzat en l'operació
+     * @return cert si es compleix la condició indicada
+     */
     private boolean albaraConteLot(AlbaraClient albaraClient, Long lotId) {
 
         if (albaraClient.getLotsAssociats() == null || albaraClient.getLotsAssociats().isEmpty()) {
@@ -505,7 +603,16 @@ public class TracabilitatService {
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String valor, String filtre) {
 
         if (filtre == null || filtre.isBlank()) {
@@ -520,7 +627,15 @@ public class TracabilitatService {
     }
 
 
-    // NORMALITZAR CAMP D'ORDENACIÓ
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param sortField valor de sortField utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String normalitzarSortField(String sortField) {
 
         if (sortField == null || sortField.isBlank()) {
@@ -531,7 +646,15 @@ public class TracabilitatService {
     }
 
 
-    // NORMALITZAR DIRECCIÓ D'ORDENACIÓ
+    /**
+     * NORMALITZACIÓ DE DADES.
+     *
+     * Preparat el valor rebut perquè pugui ser comparat, mostrat
+     * o processat de manera coherent pel servei.
+     *
+     * @param sortDir valor de sortDir utilitzat pel mètode
+     * @return text obtingut pel mètode
+     */
     private String normalitzarSortDir(String sortDir) {
 
         if (sortDir == null || sortDir.isBlank()) {
@@ -542,7 +665,15 @@ public class TracabilitatService {
     }
 
 
-    // RETORNAR TEXT SEGUR PER ORDENAR
+    /**
+     * COMPROVACIÓ DE CONDICIÓ.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String textSegur(String valor) {
 
         if (valor == null) {
@@ -553,7 +684,15 @@ public class TracabilitatService {
     }
 
 
-    // RETORNAR NÚMERO SEGUR PER ORDENAR
+    /**
+     * GESTIÓ DE DADES.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @return valor numèric obtingut
+     */
     private Integer numeroSegur(Integer valor) {
 
         if (valor == null) {
@@ -563,6 +702,17 @@ public class TracabilitatService {
         return valor;
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

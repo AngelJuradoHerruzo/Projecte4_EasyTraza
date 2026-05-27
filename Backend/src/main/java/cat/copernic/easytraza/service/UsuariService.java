@@ -20,6 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 import cat.copernic.easytraza.entities.Usuari;
 import cat.copernic.easytraza.repository.UsuariRepository;
 
+/**
+ * SERVEI D'USUARIS.
+ *
+ * Gestionades les operacions de consulta, creació, modificació i eliminació dels usuaris.
+ * També controlades les validacions de dades i la gestió de l'avatar associat.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Service
 @Transactional
 public class UsuariService {    
@@ -48,13 +56,28 @@ public class UsuariService {
     }
 
 
-    // OBTENIR TOTS ELS USUARIS
+    /**
+     * OBTENCIÓ DEL LLISTAT.
+     *
+     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
+     * els filtres o l'ordenació corresponents quan és necessari.
+     *
+     * @return llista de resultats obtinguda
+     */
     public List<Usuari> getAllUsuaris() {
         return usuariRepository.findAll();
     }
 
 
-    // OBTENIR USUARI PER ID
+    /**
+     * OBTENCIÓ DE DADES.
+     *
+     * Obtinguda la informació sol·licitada a partir de les dades disponibles
+     * o dels paràmetres rebuts pel mètode.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @return resultat obtingut pel mètode
+     */
     public Usuari getUsuariById(Long id) {
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
         return usuariOpt.orElse(null);
@@ -91,7 +114,16 @@ public class UsuariService {
     }
 
 
-    // CREAR USUARI
+    /**
+     * CREACIÓ DEL REGISTRE.
+     *
+     * Creat un nou registre o objecte a partir de les dades rebudes,
+     * aplicant prèviament les comprovacions necessàries.
+     *
+     * @param usuari valor de usuari utilitzat pel mètode
+     * @param avatarFile fitxer rebut per al procés
+     * @return registre resultant de l'operació
+     */
     public Usuari createUsuari(Usuari usuari, MultipartFile avatarFile) {
 
         validarDadesUsuari(usuari, null);
@@ -108,7 +140,17 @@ public class UsuariService {
     }
 
 
-    // ACTUALITZAR USUARI
+    /**
+     * ACTUALITZACIÓ DEL REGISTRE.
+     *
+     * Actualitzat el registre indicat amb les dades rebudes, mantenint
+     * les validacions pròpies del servei.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param usuari valor de usuari utilitzat pel mètode
+     * @param avatarFile fitxer rebut per al procés
+     * @return registre resultant de l'operació
+     */
     public Usuari updateUsuari(Long id, Usuari usuari, MultipartFile avatarFile) {
 
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
@@ -145,7 +187,17 @@ public class UsuariService {
     }
 
 
-    // ACTUALITZAR PERFIL D'USUARI
+    /**
+     * ACTUALITZACIÓ DEL REGISTRE.
+     *
+     * Actualitzat el registre indicat amb les dades rebudes, mantenint
+     * les validacions pròpies del servei.
+     *
+     * @param id identificador utilitzat en l'operació
+     * @param usuari valor de usuari utilitzat pel mètode
+     * @param avatarFile fitxer rebut per al procés
+     * @return registre resultant de l'operació
+     */
     public Usuari updatePerfilUsuari(Long id, Usuari usuari, MultipartFile avatarFile) {
 
         Optional<Usuari> usuariOpt = usuariRepository.findById(id);
@@ -182,13 +234,28 @@ public class UsuariService {
     }
 
 
-    // ELIMINAR USUARI
+    /**
+     * ELIMINACIÓ DEL REGISTRE.
+     *
+     * Eliminat el registre identificat quan el servei permet completar
+     * l'operació sol·licitada.
+     *
+     * @param id identificador utilitzat en l'operació
+     */
     public void deleteUsuari(Long id) {
         usuariRepository.deleteById(id);
     }
 
 
-    // VALIDAR DADES D'USUARI
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param usuari valor de usuari utilitzat pel mètode
+     * @param id identificador utilitzat en l'operació
+     */
     private void validarDadesUsuari(Usuari usuari, Long id) {
 
         if (usuari.getDni() != null) {
@@ -251,7 +318,15 @@ public class UsuariService {
     }
 
 
-    // VALIDAR FITXER D'AVATAR
+    /**
+     * VALIDACIÓ DE DADES.
+     *
+     * Comprovades les dades rebudes abans de continuar amb el procés,
+     * llençant un error quan alguna condició no és correcta.
+     *
+     * @param avatarFile fitxer rebut per al procés
+     * @param obligatori valor de obligatori utilitzat pel mètode
+     */
     private void validarAvatar(MultipartFile avatarFile, boolean obligatori) {
 
         boolean avatarBuit = avatarFile == null || avatarFile.isEmpty();
@@ -277,7 +352,15 @@ public class UsuariService {
     }
 
 
-    // GUARDAR FITXER D'AVATAR A L'USUARI
+    /**
+     * GUARDAT DE DADES.
+     *
+     * Gestionat el fitxer o la dada associada al registre actual
+     * segons l'operació requerida.
+     *
+     * @param usuari valor de usuari utilitzat pel mètode
+     * @param avatarFile fitxer rebut per al procés
+     */
     private void guardarAvatar(Usuari usuari, MultipartFile avatarFile) {
         try {
             usuari.setAvatar(avatarFile.getBytes());
@@ -291,7 +374,16 @@ public class UsuariService {
     }
 
 
-    // ORDENAR USUARIS PEL CAMP SELECCIONAT
+    /**
+     * ORDENACIÓ DE DADES.
+     *
+     * Ordenada la llista rebuda segons el criteri indicat o segons
+     * l'ordre propi del servei.
+     *
+     * @param usuaris valor de usuaris utilitzat pel mètode
+     * @param ordre camp utilitzat per ordenar les dades
+     * @param direccio direcció de l'ordenació
+     */
     private void ordenarUsuaris(List<Usuari> usuaris, String ordre, String direccio) {
 
         String campOrdre = ordre != null && !ordre.isBlank() ? ordre : "nomComplet";
@@ -341,13 +433,30 @@ public class UsuariService {
     }
 
 
-    // RETORNAR TEXT SEGUR PER A L'ORDENACIÓ
+    /**
+     * NORMALITZACIÓ DEL VALOR.
+     *
+     * Executada l'operació pròpia del servei utilitzant les dades rebudes
+     * i retornant el resultat corresponent quan aplica.
+     *
+     * @param valor valor que s'ha de processar
+     * @return text obtingut pel mètode
+     */
     private String valorText(String valor) {
         return valor != null ? valor : "";
     }
 
 
-    // COMPROVAR SI UN TEXT CONTÉ UN FILTRE IGNORANT MAJÚSCULES I MINÚSCULES
+    /**
+     * COMPROVACIÓ DE CONTINGUT.
+     *
+     * Comprovada la condició indicada a partir dels valors rebuts
+     * i retornat el resultat de la verificació.
+     *
+     * @param valor valor que s'ha de processar
+     * @param filtre valor utilitzat per filtrar les dades
+     * @return cert si es compleix la condició indicada
+     */
     private boolean conteText(String valor, String filtre) {
 
         if (filtre == null || filtre.isBlank()) {
@@ -361,6 +470,17 @@ public class UsuariService {
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
 
+
+    /**
+     * OBTENCIÓ DEL MISSATGE.
+     *
+     * Obtingut el text internacionalitzat corresponent al codi rebut
+     * i als arguments indicats.
+     *
+     * @param codi codi del missatge que s'ha d'obtenir
+     * @param arguments arguments aplicats al missatge
+     * @return text obtingut pel mètode
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }
