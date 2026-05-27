@@ -13,16 +13,26 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 /**
- * CONFIGURACIÓ WEB
+ * CONFIGURACIÓ WEB.
  *
- * Permet accedir des del navegador als fitxers guardats dins la carpeta uploads del backend.
+ * Configurats els recursos accessibles des del navegador i el mecanisme
+ * de selecció d'idioma de la interfície web, mantenint la preferència
+ * escollida per l'usuari.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    // CONFIGURAR L'IDIOMA DE LA INTERFÍCIE I CONSERVAR LA SELECCIÓ EN UNA COOKIE
+
+    /**
+     * IDIOMA DE LA INTERFÍCIE.
+     *
+     * Configurat el català com a idioma predeterminat i conservada
+     * la selecció de l'usuari mitjançant una cookie segura.
+     *
+     * @return resolutor encarregat de gestionar l'idioma seleccionat
+     */
     @Bean
     public LocaleResolver localeResolver() {
 
@@ -37,7 +47,15 @@ public class WebConfig implements WebMvcConfigurer {
         return localeResolver;
     }
 
-    // PERMETRE EL CANVI D'IDIOMA MITJANÇANT EL PARÀMETRE ?lang=ca O ?lang=es
+
+    /**
+     * CANVI D'IDIOMA.
+     *
+     * Creat l'interceptor que permet modificar l'idioma de la interfície
+     * mitjançant el paràmetre rebut a la petició web.
+     *
+     * @return interceptor configurat per processar el canvi d'idioma
+     */
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
 
@@ -48,13 +66,29 @@ public class WebConfig implements WebMvcConfigurer {
         return interceptor;
     }
 
-    // REGISTRAR L'INTERCEPTOR DE CANVI D'IDIOMA A TOTES LES PETICIONS WEB
+
+    /**
+     * REGISTRE DE L'INTERCEPTOR D'IDIOMA.
+     *
+     * Registrat l'interceptor de canvi d'idioma perquè pugui actuar
+     * sobre les peticions rebudes per la interfície web.
+     *
+     * @param registry registre d'interceptors de l'aplicació web
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
     }
 
-    // MOSTRAR ELS FITXERS GUARDATS A LA CARPETA UPLOADS
+
+    /**
+     * ACCÉS ALS FITXERS PUJATS.
+     *
+     * Habilitat l'accés des del navegador als fitxers guardats
+     * dins la carpeta d'uploads del backend.
+     *
+     * @param registry registre de recursos accessibles des de la web
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")

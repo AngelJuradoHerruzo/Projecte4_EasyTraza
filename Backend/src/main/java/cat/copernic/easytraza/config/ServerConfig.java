@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * CONFIGURACIÓ DEL SERVIDOR
+ * CONFIGURACIÓ DEL SERVIDOR.
  *
- * Manté el connector HTTPS principal per a la interfície web
- * i habilita un connector HTTP addicional per a l'API mòbil.
+ * Mantingut el connector HTTPS principal per a la interfície web
+ * i habilitat un connector HTTP addicional per a l'API mòbil.
+ *
+ * @author Ángel Jurado Herruz
  */
 @Configuration
 public class ServerConfig {
@@ -19,14 +21,28 @@ public class ServerConfig {
     private static final int PORT_HTTPS_WEB = 8443;
 
 
-    // ---------------------------- CONNECTOR HTTP ADDICIONAL ----------------------------
+    /**
+     * CONNECTOR HTTP MÒBIL.
+     *
+     * Incorporat al servidor el connector HTTP addicional utilitzat
+     * per rebre les peticions procedents de l'aplicació mòbil.
+     *
+     * @return personalitzador que afegeix el connector HTTP al servidor
+     */
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> connectorHttpMobile() {
         return factory -> factory.addAdditionalConnectors(crearConnectorHttp());
     }
 
 
-    // CREA EL CONNECTOR HTTP UTILITZAT PER LES PETICIONS DE L'APP MÒBIL
+    /**
+     * CREACIÓ DEL CONNECTOR HTTP.
+     *
+     * Creat el connector HTTP destinat a l'API mòbil i configurada
+     * la redirecció corresponent cap al port HTTPS de la interfície web.
+     *
+     * @return connector HTTP configurat per a l'aplicació mòbil
+     */
     private Connector crearConnectorHttp() {
 
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
