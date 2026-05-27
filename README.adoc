@@ -135,25 +135,25 @@ L'aplicació Mobile permet a l'operari:
 
 ==== Inici de sessió
 
-image::Documentacio\captures\login_web.jpg[Pantalla d'inici de sessió de la interfície web, width=900]
+image::Documentacio/captures/login_web.jpg[Pantalla d'inici de sessió de la interfície web, width=900]
 
 ==== Gestió d'albarans de proveïdor i OCR
 
-image::Documentacio\captures\ocr_albara_proveidor.jpg[Pantalla de gestió OCR dels albarans de proveïdor, width=900]
+image::Documentacio/captures/ocr_albara_proveidor.jpg[Pantalla de gestió OCR dels albarans de proveïdor, width=900]
 
 ==== Explotació de dades
 
-image::Documentacio\captures\explotacio_dades.jpg[Pantalla del gràfic mensual de productes, width=900]
+image::Documentacio/captures/explotacio_dades.jpg[Pantalla del gràfic mensual de productes, width=900]
 
 === Aplicació Mobile
 
 ==== Identificació de l'operari
 
-image::Documentacio\captures\identificacio_mobile.jpg[Pantalla d'identificació de l'aplicació Mobile, width=350]
+image::Documentacio/captures/identificacio_mobile.jpg[Pantalla d'identificació de l'aplicació Mobile, width=350]
 
 ==== Gestió de lots
 
-image::Documentacio\captures\lots_mobile.jpg[Pantalla de gestió de lots de l'aplicació Mobile, width=350]
+image::Documentacio/captures/lots_mobile.jpg[Pantalla de gestió de lots de l'aplicació Mobile, width=350]
 
 == Estructura del repositori
 
