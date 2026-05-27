@@ -1,13 +1,13 @@
 package cat.copernic.easytraza.enums;
 
 /**
- * ENUM ROL D'USUARI
+ * ROLS D'USUARI.
  *
- * ADMIN   → Usuari administrador que accedeix des de l'aplicació web i necessita autenticació.
- * OPERARI → Usuari operari que utilitza l'aplicació mòbil Android i només necessita identificar-se.
+ * Definits els rols disponibles per diferenciar els usuaris administradors
+ * que treballen a l'aplicació web dels operaris que utilitzen l'aplicació mòbil.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 public enum RolUsuari {
-    ADMIN, OPERARI // Rol de l'usuari
+    ADMIN, OPERARI
 }

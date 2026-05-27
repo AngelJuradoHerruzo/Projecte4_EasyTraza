@@ -1,12 +1,12 @@
 package cat.copernic.easytraza.enums;
 
 /**
- * ENUM ESTAT ALBARÀ CLIENT
+ * ESTATS DE L'ALBARÀ DE CLIENT.
  *
- * PENDENT_LLIURAR → Albarà creat però encara no lliurat al client
- * LLIURAT         → Albarà lliurat al client i no modificable
+ * Definits els estats possibles d'un albarà de client, diferenciant entre
+ * els albarans pendents de lliurar i els que ja han estat lliurats al client.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 public enum EstatAlbaraClient {
     PENDENT_LLIURAR, LLIURAT
