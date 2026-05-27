@@ -1,7 +1,12 @@
 package cat.copernic.easytraza.mobile.features.lots.domain.models
 
 /**
- * Model de domini d'un lot.
+ * LOT DE MATÈRIA PRIMERA.
+ *
+ * Representades les dades de domini d'un lot que l'operari
+ * pot consultar, iniciar o finalitzar des de l'aplicació mòbil.
+ *
+ * @author Ángel Jurado Herruz
  */
 data class Lot(
     val id: Long,

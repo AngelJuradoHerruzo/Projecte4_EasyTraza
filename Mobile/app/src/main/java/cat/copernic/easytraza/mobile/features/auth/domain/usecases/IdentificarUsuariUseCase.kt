@@ -8,7 +8,13 @@ import cat.copernic.easytraza.mobile.features.auth.data.sources.remote.Identific
 import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentificat
 
 /**
- * Cas d'ús per identificar un usuari sense contrasenya.
+ * EXECUCIÓ DE LA IDENTIFICACIÓ.
+ *
+ * Enviat el correu electrònic seleccionat al backend i retornades
+ * les dades de l'usuari quan la identificació es completa correctament.
+ *
+ * @param email correu electrònic de l'usuari que s'ha d'identificar
+ * @return resultat amb l'usuari identificat o l'error produït
  */
 class IdentificarUsuariUseCase(
     private val context: Context

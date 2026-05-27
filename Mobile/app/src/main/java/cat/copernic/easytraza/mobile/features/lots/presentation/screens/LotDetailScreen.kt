@@ -57,7 +57,13 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyTextSoft
 import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 /**
- * Pantalla de detall d'un lot.
+ * FILA DE DETALL.
+ *
+ * Mostrada una dada del lot mitjançant la seva etiqueta
+ * i el valor corresponent dins de la pantalla de detall.
+ *
+ * @param label etiqueta descriptiva de la dada
+ * @param value valor que s'ha de mostrar
  */
 @Composable
 fun LotDetailScreen(
@@ -160,6 +166,7 @@ fun LotDetailScreen(
     }
 }
 
+
 /**
  * Contingut del detall d'un lot.
  */
@@ -221,6 +228,17 @@ fun LotDetailContent(
     }
 }
 
+
+/**
+ * ACCIONS DEL LOT.
+ *
+ * Mostrades les accions disponibles per al lot segons el seu estat
+ * i els avisos necessaris abans d'executar-les.
+ *
+ * @param estat estat actual del lot
+ * @param onIniciarClick acció executada per iniciar el lot
+ * @param onFinalitzarClick acció executada per finalitzar el lot
+ */
 @Composable
 private fun LotActionsCard(
     lot: Lot,
@@ -297,6 +315,15 @@ private fun LotActionsCard(
     }
 }
 
+
+/**
+ * AJUDA D'ACCIÓ DEL LOT.
+ *
+ * Mostrat el missatge orientatiu corresponent a l'estat actual
+ * del lot per facilitar l'operació de l'usuari.
+ *
+ * @param estat estat actual del lot
+ */
 @Composable
 private fun LotActionHint(estat: String) {
     val icon = when (estat) {
@@ -342,6 +369,7 @@ private fun LotActionHint(estat: String) {
         )
     }
 }
+
 
 /**
  * Fila d'informació del detall.

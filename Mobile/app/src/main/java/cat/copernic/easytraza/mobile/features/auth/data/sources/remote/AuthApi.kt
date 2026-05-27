@@ -6,7 +6,13 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 /**
- * Endpoints REST d'autenticació mòbil.
+ * IDENTIFICACIÓ D'UN USUARI.
+ *
+ * Enviada al backend la petició necessària per identificar
+ * un usuari a partir del correu electrònic seleccionat.
+ *
+ * @param request dades requerides per identificar l'usuari
+ * @return resposta HTTP amb les dades de l'usuari identificat
  */
 interface AuthApi {
 

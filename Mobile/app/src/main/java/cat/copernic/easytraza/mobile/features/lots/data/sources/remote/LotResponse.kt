@@ -1,7 +1,12 @@
 package cat.copernic.easytraza.mobile.features.lots.data.sources.remote
 
 /**
- * DTO de resposta d'un lot.
+ * RESPOSTA D'UN LOT.
+ *
+ * Representades les dades d'un lot retornades pel backend
+ * abans de transformar-les al model de domini de l'aplicació.
+ *
+ * @author Ángel Jurado Herruz
  */
 data class LotResponse(
     val id: Long,

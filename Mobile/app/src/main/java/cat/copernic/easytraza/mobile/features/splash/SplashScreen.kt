@@ -20,9 +20,12 @@ import cat.copernic.easytraza.mobile.R
 import kotlinx.coroutines.delay
 
 /**
- * Pantalla inicial de l'app.
+ * PANTALLA D'INICI.
  *
- * Mostra el logo d'EasyTraza durant uns segons abans d'entrar a l'aplicació.
+ * Mostrat el logotip d'EasyTraza durant l'arrencada
+ * abans de continuar cap al flux principal de l'aplicació.
+ *
+ * @param onSplashFinished acció executada en finalitzar la pantalla inicial
  */
 @Composable
 fun SplashScreen(
