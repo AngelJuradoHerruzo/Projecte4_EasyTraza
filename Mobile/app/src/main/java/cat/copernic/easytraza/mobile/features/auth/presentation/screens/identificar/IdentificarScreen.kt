@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import cat.copernic.easytraza.mobile.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,21 +68,21 @@ fun IdentificarScreen(
     EasyScreen {
         EasyHeader(
             title = "EasyTraza",
-            subtitle = "Identificació d'operari",
+            subtitle = stringResource(R.string.auth_subtitle),
             showConfig = true,
             onConfiguracioClick = onConfiguracioClick
         )
 
         EasyCard {
             Text(
-                text = "Selecciona usuari",
+                text = stringResource(R.string.auth_select_user),
                 style = MaterialTheme.typography.headlineSmall,
                 color = EasyBrownDark,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Tria el teu perfil per continuar.",
+                text = stringResource(R.string.auth_choose_profile),
                 style = MaterialTheme.typography.bodyMedium,
                 color = EasyTextSoft
             )
@@ -109,7 +111,7 @@ fun IdentificarScreen(
                     EasyMessageCard(text = uiState.error ?: "", isError = true)
 
                     Modifier.padding(top = 16.dp).EasyPrimaryButton(
-                        text = "Reintentar"
+                        text = stringResource(R.string.common_retry)
                     ) { viewModel.carregarUsuaris() }
                 }
             }

@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import cat.copernic.easytraza.mobile.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentificat
@@ -53,37 +55,37 @@ fun MainScreen(
     EasyScreen {
         EasyHeader(
             title = "EasyTraza",
-            subtitle = "Menú principal",
+            subtitle = stringResource(R.string.main_subtitle),
             showConfig = true,
             onConfiguracioClick = onConfiguracioClick
         )
 
         EasyCard {
             Text(
-                text = "Hola, ${usuari?.nomComplet ?: "usuari"}",
+                text = stringResource(R.string.main_hello, usuari?.nomComplet ?: stringResource(R.string.common_user)),
                 color = EasyBrownDark,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Selecciona l'apartat que vols utilitzar.",
+                text = stringResource(R.string.main_select_section),
                 color = EasyTextSoft,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
 
         MenuOptionCard(
-            title = "Gestionar lots",
-            subtitle = "Consulta, filtra, inicia i finalitza lots de proveïdor.",
+            title = stringResource(R.string.main_manage_lots),
+            subtitle = stringResource(R.string.main_manage_lots_description),
             icon = Icons.Default.Inventory,
             enabled = true,
             onClick = onLotsClick
         )
 
         MenuOptionCard(
-            title = "Processar albarà",
-            subtitle = "Processament OCR pendent per més endavant.",
+            title = stringResource(R.string.main_process_delivery_note),
+            subtitle = stringResource(R.string.main_process_delivery_note_description),
             icon = Icons.Default.Description,
             enabled = false,
             onClick = onProcessarAlbaraClick
@@ -92,7 +94,7 @@ fun MainScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Modifier.EasySecondaryButton(
-            text = "Canviar d'usuari",
+            text = stringResource(R.string.main_change_user),
             onClick = onSortirClick
         )
     }
@@ -160,7 +162,7 @@ fun MenuOptionCard(
 
                 if (!enabled) {
                     Text(
-                        text = "Properament",
+                        text = stringResource(R.string.main_coming_soon),
                         style = MaterialTheme.typography.labelMedium,
                         color = EasyBrown,
                         fontWeight = FontWeight.Bold

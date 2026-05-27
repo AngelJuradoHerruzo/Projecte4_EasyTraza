@@ -45,6 +45,14 @@ public class SecurityConfig {
             // ---------------------------- CSRF ----------------------------
             .csrf(csrf -> csrf.disable())
 
+            // ---------------------------- CANAL SEGUR WEB I CANAL HTTP MÒBIL ----------------------------
+            .portMapper(portMapper -> portMapper
+                .http(8080).mapsTo(8443)
+            )
+            .redirectToHttps(https -> https
+                .requestMatchers(request -> !request.getRequestURI().startsWith("/api/mobile/"))
+            )
+
             // ---------------------------- AUTORITZACIÓ DE RUTES ----------------------------
             .authorizeHttpRequests(auth -> auth
 

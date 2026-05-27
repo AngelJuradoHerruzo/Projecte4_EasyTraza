@@ -1,6 +1,7 @@
 package cat.copernic.easytraza.mobile.features.lots.presentation.viewmodels
 
 import android.content.Context
+import cat.copernic.easytraza.mobile.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cat.copernic.easytraza.mobile.features.lots.domain.models.Lot
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
  * ViewModel de lots.
  */
 class LotViewModel(
-    context: Context
+    private val context: Context
 ) : ViewModel() {
 
     private val lotUseCase = LotUseCase(context)
@@ -147,7 +148,7 @@ class LotViewModel(
                         carregant = false,
                         mostrarConfirmacioInici = false,
                         lotPendentConfirmacio = null,
-                        missatge = "Lot iniciat correctament."
+                        missatge = context.getString(R.string.lot_started_success)
                     )
 
                     carregarLots()
@@ -187,7 +188,7 @@ class LotViewModel(
                     _uiState.value = _uiState.value.copy(
                         lotSeleccionat = lotFinalitzat,
                         carregant = false,
-                        missatge = "Lot finalitzat correctament."
+                        missatge = context.getString(R.string.lot_finished_success)
                     )
 
                     carregarLots()

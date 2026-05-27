@@ -7,37 +7,40 @@ object IpPreferences {
 
     private const val PREFS_NAME = "easytraza_config" // Nom del fitxer de preferències on es guardarà la IP
     private const val KEY_SERVER_IP = "server_ip" // Clau amb la qual es desa la IP del servidor
-    private const val DEFAULT_SERVER_IP = "http://10.0.2.2:8080/" // Valor per defecte si encara no s'ha configurat cap IP
+    private const val DEFAULT_SERVER_IP = "10.0.2.2" // Valor per defecte si encara no s'ha configurat cap IP
+    private const val SERVER_PROTOCOL = "http"
+    private const val SERVER_PORT = "8080"
 
 
     // Guarda la IP del servidor en memòria local persistent
     fun saveIp(context: Context, ip: String) {
         val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        preferences.edit { putString(KEY_SERVER_IP, formatIp(ip)) }
+        preferences.edit { putString(KEY_SERVER_IP, formatAddress(ip)) }
     }
 
-    // Recupera la IP guardada
+    // Recupera la URL completa del servidor per utilitzar-la com a baseUrl de Retrofit
     fun getIp(context: Context): String {
+        return "$SERVER_PROTOCOL://${getAddress(context)}:$SERVER_PORT/"
+    }
+
+    // Recupera únicament l'adreça IPv4 que s'ha de mostrar al camp de configuració
+    fun getAddress(context: Context): String {
         val preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         // Si no n'hi ha cap, retorna la de per defecte
-        return preferences.getString(KEY_SERVER_IP, DEFAULT_SERVER_IP) ?: DEFAULT_SERVER_IP
+        val savedAddress = preferences.getString(KEY_SERVER_IP, DEFAULT_SERVER_IP) ?: DEFAULT_SERVER_IP
+
+        return formatAddress(savedAddress)
     }
 
-    // Dona format correcte a la IP perquè Retrofit la pugui utilitzar com a baseUrl
-    private fun formatIp(ip: String): String {
-        var url = ip.trim()
+    // Dona format correcte a l'adreça perquè l'usuari només hagi d'introduir la IPv4
+    private fun formatAddress(ip: String): String {
+        val address = ip.trim()
+            .removePrefix("https://")
+            .removePrefix("http://")
+            .substringBefore("/")
+            .substringBefore(":")
 
-        // Si l'usuari no ha escrit http:// o https://, s'afegeix automàticament
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "http://$url"
-        }
-
-        // Retrofit necessita que la URL acabi amb /
-        if (!url.endsWith("/")) {
-            url += "/"
-        }
-
-        return url
+        return address.ifBlank { DEFAULT_SERVER_IP }
     }
 }

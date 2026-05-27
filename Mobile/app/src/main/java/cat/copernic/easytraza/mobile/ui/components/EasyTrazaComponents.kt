@@ -34,6 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import cat.copernic.easytraza.mobile.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cat.copernic.easytraza.mobile.ui.theme.EasyBeige
@@ -106,7 +108,7 @@ fun EasyHeader(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Tornar",
+                        contentDescription = stringResource(R.string.common_back),
                         tint = EasyBrownDark
                     )
                 }
@@ -146,7 +148,7 @@ fun EasyHeader(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Configuració",
+                        contentDescription = stringResource(R.string.common_settings),
                         tint = EasyBrown,
                         modifier = Modifier.size(21.dp)
                     )
@@ -304,7 +306,7 @@ fun EasyConfirmDialog(
     title: String,
     text: String,
     confirmText: String,
-    dismissText: String = "Cancel·lar",
+    dismissText: String? = null,
     isDanger: Boolean = false,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -344,7 +346,7 @@ fun EasyConfirmDialog(
                 shape = EasyButtonShape,
                 border = BorderStroke(1.dp, EasyBrown)
             ) {
-                Text(dismissText, color = EasyBrown, fontWeight = FontWeight.Bold)
+                Text(dismissText ?: stringResource(R.string.common_cancel), color = EasyBrown, fontWeight = FontWeight.Bold)
             }
         },
         containerColor = EasyWhite
@@ -368,21 +370,21 @@ fun EasyStatusBadge(
             textColor = StatusEstocText
             backgroundColor = StatusEstocBackground
             borderColor = StatusEstocBorder
-            text = "EN ESTOC"
+            text = stringResource(R.string.lots_status_in_stock_upper)
         }
 
         "OBERT" -> {
             textColor = StatusObertText
             backgroundColor = StatusObertBackground
             borderColor = StatusObertBorder
-            text = "OBERT"
+            text = stringResource(R.string.lots_status_open_upper)
         }
 
         "ACABAT" -> {
             textColor = StatusAcabatText
             backgroundColor = StatusAcabatBackground
             borderColor = StatusAcabatBorder
-            text = "ACABAT"
+            text = stringResource(R.string.lots_status_finished_upper)
         }
 
         else -> {

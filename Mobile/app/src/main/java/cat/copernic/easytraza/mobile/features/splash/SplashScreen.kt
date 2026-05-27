@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cat.copernic.easytraza.mobile.R
 import kotlinx.coroutines.delay
@@ -44,7 +45,7 @@ fun SplashScreen(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.easytraza_logo),
-                contentDescription = "EasyTraza",
+                contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier.size(260.dp),
                 contentScale = ContentScale.Fit
             )
