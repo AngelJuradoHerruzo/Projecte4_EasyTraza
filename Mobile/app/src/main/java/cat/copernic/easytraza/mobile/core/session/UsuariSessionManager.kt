@@ -16,10 +16,7 @@ object UsuariSessionManager {
 
     private const val PREFS_NAME = "easytraza_session"
     private const val KEY_USUARI_ID = "usuari_id"
-    private const val KEY_USUARI_DNI = "usuari_dni"
     private const val KEY_USUARI_NOM = "usuari_nom"
-    private const val KEY_USUARI_EMAIL = "usuari_email"
-    private const val KEY_USUARI_ROL = "usuari_rol"
 
 
     /**
@@ -36,10 +33,7 @@ object UsuariSessionManager {
 
         preferences.edit {
             putLong(KEY_USUARI_ID, usuari.id)
-            putString(KEY_USUARI_DNI, usuari.dni)
             putString(KEY_USUARI_NOM, usuari.nomComplet)
-            putString(KEY_USUARI_EMAIL, usuari.email)
-            putString(KEY_USUARI_ROL, usuari.rolUsuari)
         }
     }
 
@@ -62,10 +56,7 @@ object UsuariSessionManager {
 
         return UsuariIdentificat(
             id = preferences.getLong(KEY_USUARI_ID, 0L),
-            dni = preferences.getString(KEY_USUARI_DNI, "") ?: "",
-            nomComplet = preferences.getString(KEY_USUARI_NOM, "") ?: "",
-            email = preferences.getString(KEY_USUARI_EMAIL, "") ?: "",
-            rolUsuari = preferences.getString(KEY_USUARI_ROL, "") ?: ""
+            nomComplet = preferences.getString(KEY_USUARI_NOM, "") ?: ""
         )
     }
 

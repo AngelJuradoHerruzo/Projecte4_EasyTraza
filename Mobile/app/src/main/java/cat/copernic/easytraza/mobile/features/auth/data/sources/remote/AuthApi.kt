@@ -9,7 +9,7 @@ import retrofit2.http.POST
  * IDENTIFICACIÓ D'UN USUARI.
  *
  * Enviada al backend la petició necessària per identificar
- * un usuari a partir del correu electrònic seleccionat.
+ * un usuari a partir de l'identificador seleccionat.
  *
  * @param request dades requerides per identificar l'usuari
  * @return resposta HTTP amb les dades de l'usuari identificat

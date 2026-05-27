@@ -10,10 +10,10 @@ import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentific
 /**
  * EXECUCIÓ DE LA IDENTIFICACIÓ.
  *
- * Enviat el correu electrònic seleccionat al backend i retornades
+ * Enviat l'identificador seleccionat al backend i retornades
  * les dades de l'usuari quan la identificació es completa correctament.
  *
- * @param email correu electrònic de l'usuari que s'ha d'identificar
+ * @param id identificador de l'usuari que s'ha d'identificar
  * @return resultat amb l'usuari identificat o l'error produït
  */
 class IdentificarUsuariUseCase(
@@ -46,10 +46,7 @@ class IdentificarUsuariUseCase(
                         body.map { usuari ->
                             UsuariIdentificat(
                                 id = usuari.id,
-                                dni = usuari.dni,
-                                nomComplet = usuari.nomComplet,
-                                email = usuari.email,
-                                rolUsuari = usuari.rolUsuari
+                                nomComplet = usuari.nomComplet
                             )
                         }
                     )
@@ -71,11 +68,11 @@ class IdentificarUsuariUseCase(
     /**
      * Executa la identificació de l'usuari.
      */
-    suspend fun executar(email: String): Result<UsuariIdentificat> {
+    suspend fun executar(id: Long): Result<UsuariIdentificat> {
 
         return try {
             val response = getAuthApi().identificar(
-                IdentificarRequest(email.trim().lowercase())
+                IdentificarRequest(id)
             )
 
             if (response.isSuccessful) {
@@ -85,10 +82,7 @@ class IdentificarUsuariUseCase(
                     Result.success(
                         UsuariIdentificat(
                             id = body.id,
-                            dni = body.dni,
-                            nomComplet = body.nomComplet,
-                            email = body.email,
-                            rolUsuari = body.rolUsuari
+                            nomComplet = body.nomComplet
                         )
                     )
                 }

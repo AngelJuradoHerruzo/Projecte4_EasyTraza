@@ -91,7 +91,6 @@ public class SecurityConfig {
                     "/img/**",
                     "/images/**",
                     "/fonts/**",
-                    "/uploads/**",
                     "/favicon.ico"
                 ).permitAll()
 

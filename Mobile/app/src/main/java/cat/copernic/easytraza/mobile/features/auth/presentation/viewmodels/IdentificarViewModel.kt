@@ -81,7 +81,7 @@ class IdentificarViewModel(
         )
 
         viewModelScope.launch {
-            val result = identificarUsuariUseCase.executar(usuari.email)
+            val result = identificarUsuariUseCase.executar(usuari.id)
 
             result
                 .onSuccess { usuariIdentificat ->

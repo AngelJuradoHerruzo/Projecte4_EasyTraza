@@ -42,10 +42,7 @@ public class AuthMobileRestController {
                 .stream()
                 .map(usuari -> new UsuariIdentificatResponse(
                         usuari.getId(),
-                        usuari.getDni(),
-                        usuari.getNomComplet(),
-                        usuari.getEmail(),
-                        usuari.getRolUsuari().name()
+                        usuari.getNomComplet()
                 ))
                 .toList();
 
@@ -56,8 +53,8 @@ public class AuthMobileRestController {
     /**
      * IDENTIFICACIÓ D'USUARI MÒBIL.
      *
-     * Cercat l'usuari mitjançant el correu rebut i retornades les dades
-     * necessàries quan la identificació és vàlida.
+     * Cercat l'usuari mitjançant l'identificador rebut i retornades
+     * únicament les dades necessàries quan la identificació és vàlida.
      *
      * @param request dades rebudes per identificar l'usuari
      * @return resposta amb l'usuari identificat o l'error corresponent
@@ -66,24 +63,19 @@ public class AuthMobileRestController {
     public ResponseEntity<?> identificar(@RequestBody IdentificarRequest request) {
 
         try {
-            if (request == null || request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-                throw new RuntimeException("El correu electrònic és obligatori");
+            if (request == null || request.getId() == null) {
+                throw new RuntimeException("L'identificador de l'usuari és obligatori");
             }
 
-            String email = request.getEmail().trim().toLowerCase();
+            Usuari usuari = usuariService.getUsuariById(request.getId());
 
-            Usuari usuari = usuariService.getAllUsuaris()
-                    .stream()
-                    .filter(u -> u.getEmail() != null && u.getEmail().equalsIgnoreCase(email))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("No existeix cap usuari amb aquest correu electrònic"));
+            if (usuari == null) {
+                throw new RuntimeException("No existeix cap usuari amb aquest identificador");
+            }
 
             UsuariIdentificatResponse response = new UsuariIdentificatResponse(
                     usuari.getId(),
-                    usuari.getDni(),
-                    usuari.getNomComplet(),
-                    usuari.getEmail(),
-                    usuari.getRolUsuari().name()
+                    usuari.getNomComplet()
             );
 
             return ResponseEntity.ok(response);
@@ -95,25 +87,25 @@ public class AuthMobileRestController {
 
 
     /**
-     * DTO intern per rebre el correu electrònic de l'usuari.
+     * DTO intern per rebre l'identificador de l'usuari.
      */
     public static class IdentificarRequest {
 
-        private String email;
+        private Long id;
 
         public IdentificarRequest() {
         }
 
-        public IdentificarRequest(String email) {
-            this.email = email;
+        public IdentificarRequest(Long id) {
+            this.id = id;
         }
 
-        public String getEmail() {
-            return email;
+        public Long getId() {
+            return id;
         }
 
-        public void setEmail(String email) {
-            this.email = email;
+        public void setId(Long id) {
+            this.id = id;
         }
     }
 
@@ -124,20 +116,14 @@ public class AuthMobileRestController {
     public static class UsuariIdentificatResponse {
 
         private Long id;
-        private String dni;
         private String nomComplet;
-        private String email;
-        private String rolUsuari;
 
         public UsuariIdentificatResponse() {
         }
 
-        public UsuariIdentificatResponse(Long id, String dni, String nomComplet, String email, String rolUsuari) {
+        public UsuariIdentificatResponse(Long id, String nomComplet) {
             this.id = id;
-            this.dni = dni;
             this.nomComplet = nomComplet;
-            this.email = email;
-            this.rolUsuari = rolUsuari;
         }
 
         public Long getId() {
@@ -148,14 +134,6 @@ public class AuthMobileRestController {
             this.id = id;
         }
 
-        public String getDni() {
-            return dni;
-        }
-
-        public void setDni(String dni) {
-            this.dni = dni;
-        }
-
         public String getNomComplet() {
             return nomComplet;
         }
@@ -164,20 +142,5 @@ public class AuthMobileRestController {
             this.nomComplet = nomComplet;
         }
 
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getRolUsuari() {
-            return rolUsuari;
-        }
-
-        public void setRolUsuari(String rolUsuari) {
-            this.rolUsuari = rolUsuari;
-        }
     }
 }
