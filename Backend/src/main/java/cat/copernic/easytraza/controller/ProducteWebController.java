@@ -12,6 +12,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import cat.copernic.easytraza.entities.Producte;
 import cat.copernic.easytraza.service.ProducteService;
 
+/**
+ * CONTROLADOR WEB DE PRODUCTES.
+ *
+ * Gestionades les pantalles de consulta, creació, edició i eliminació
+ * dels productes de l'aplicació web.
+ *
+ * @author Ángel Jurado Herruz
+ */
 @Controller
 @RequestMapping("/productes")
 public class ProducteWebController {
@@ -28,7 +36,16 @@ public class ProducteWebController {
     }
 
 
-    // LLISTAR PRODUCTES
+    /**
+     * LLISTAT DE PRODUCTES.
+     *
+     * Preparada la vista amb els productes filtrats segons el nom
+     * indicat per l'usuari.
+     *
+     * @param nomProducte nom del producte utilitzat com a filtre
+     * @param model model de dades de la vista
+     * @return vista del llistat de productes
+     */
     @GetMapping("/list")
     public String llistarProductes(@RequestParam(required = false) String nomProducte,
                                 Model model) {
@@ -40,7 +57,14 @@ public class ProducteWebController {
     }
 
 
-    // CREAR
+    /**
+     * FORMULARI DE CREACIÓ DE PRODUCTE.
+     *
+     * Preparat el formulari necessari per donar d'alta un producte nou.
+     *
+     * @param model model de dades de la vista
+     * @return vista del formulari de productes
+     */
     @GetMapping("/new")
     public String formCrearProducte(Model model) {
         model.addAttribute("producte", new Producte());
@@ -48,7 +72,17 @@ public class ProducteWebController {
     }
 
 
-    // GUARDAR
+    /**
+     * GUARDAT D'UN PRODUCTE.
+     *
+     * Processat el formulari de creació d'un producte i mostrats
+     * els missatges corresponents segons el resultat de l'operació.
+     *
+     * @param producte dades del producte introduïdes al formulari
+     * @param model model de dades de la vista
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/save")
     public String guardarProducte(@ModelAttribute("producte") Producte producte,
                                    Model model,
@@ -73,7 +107,16 @@ public class ProducteWebController {
     }
 
 
-    // EDITAR
+    /**
+     * FORMULARI D'EDICIÓ DE PRODUCTE.
+     *
+     * Carregat el producte seleccionat per mostrar-ne les dades
+     * al formulari d'edició.
+     *
+     * @param id identificador del producte
+     * @param model model de dades de la vista
+     * @return vista del formulari o redirecció al llistat
+     */
     @GetMapping("/edit/{id}")
     public String formEditarProducte(@PathVariable Long id, Model model) {
 
@@ -88,7 +131,18 @@ public class ProducteWebController {
     }
 
 
-    // ACTUALITZAR
+    /**
+     * ACTUALITZACIÓ D'UN PRODUCTE.
+     *
+     * Processats els canvis del producte seleccionat i gestionats
+     * els missatges derivats del resultat de l'operació.
+     *
+     * @param id identificador del producte
+     * @param producte dades actualitzades del producte
+     * @param model model de dades de la vista
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat o vista del formulari amb errors
+     */
     @PostMapping("/update/{id}")
     public String updateProducte(@PathVariable Long id,
                                   @ModelAttribute("producte") Producte producte,
@@ -124,7 +178,16 @@ public class ProducteWebController {
     }
 
 
-    // ELIMINAR
+    /**
+     * ELIMINACIÓ D'UN PRODUCTE.
+     *
+     * Sol·licitada l'eliminació del producte seleccionat i informat l'usuari
+     * del resultat de l'operació.
+     *
+     * @param id identificador del producte
+     * @param redirectAttributes atributs mostrats després de la redirecció
+     * @return redirecció al llistat de productes
+     */
     @PostMapping("/delete/{id}")
     public String deleteProducte(@PathVariable Long id,
                                   RedirectAttributes redirectAttributes) {
@@ -148,6 +211,17 @@ public class ProducteWebController {
         return "redirect:/productes/list";
     }
 
+
+    /**
+     * OBTENCIÓ D'UN MISSATGE TRADUÏT.
+     *
+     * Recuperat el text corresponent al codi indicat segons l'idioma
+     * actiu de la interfície web.
+     *
+     * @param codi codi del missatge que s'ha de recuperar
+     * @param arguments valors incorporats al missatge
+     * @return missatge traduït a l'idioma actiu
+     */
     private String missatge(String codi, Object... arguments) {
         return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
     }

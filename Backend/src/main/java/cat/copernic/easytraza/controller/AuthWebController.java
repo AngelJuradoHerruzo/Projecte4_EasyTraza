@@ -5,16 +5,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * CONTROLADOR D'AUTENTICACIÓ WEB
+ * CONTROLADOR D'AUTENTICACIÓ WEB.
  *
- * Gestiona les pantalles bàsiques d'entrada al sistema.
+ * Gestionades les pantalles bàsiques d'entrada al sistema i la redirecció
+ * inicial segons el rol de l'usuari autenticat.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @Controller
 public class AuthWebController {
 
-    // REDIRECCIÓ INICIAL SEGONS EL ROL DE L'USUARI
+
+    /**
+     * REDIRECCIÓ INICIAL.
+     *
+     * Redirigida la navegació inicial a la pantalla corresponent segons
+     * el rol de l'usuari autenticat.
+     *
+     * @param authentication autenticació activa de l'usuari
+     * @return redirecció a la pantalla inicial corresponent
+     */
     @GetMapping("/")
     public String index(Authentication authentication) {
 
@@ -26,7 +36,15 @@ public class AuthWebController {
     }
 
 
-    // FORMULARI DE LOGIN
+    /**
+     * ACCÉS AL FORMULARI DE LOGIN.
+     *
+     * Mostrada la pantalla de login quan no hi ha una sessió autenticada
+     * o redirigit l'usuari que ja ha iniciat sessió.
+     *
+     * @param authentication autenticació activa de l'usuari
+     * @return vista del login o redirecció inicial
+     */
     @GetMapping("/login")
     public String login(Authentication authentication) {
 
@@ -38,7 +56,14 @@ public class AuthWebController {
     }
 
 
-    // COMPROVAR SI L'USUARI AUTENTICAT ÉS OPERARI
+    /**
+     * COMPROVACIÓ DEL ROL OPERARI.
+     *
+     * Comprovat si l'usuari autenticat disposa del rol d'operari.
+     *
+     * @param authentication autenticació activa de l'usuari
+     * @return cert si l'usuari autenticat és operari
+     */
     private boolean esOperari(Authentication authentication) {
 
         if (authentication == null || !authentication.isAuthenticated()) {

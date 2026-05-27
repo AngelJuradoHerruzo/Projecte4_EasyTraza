@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * CONTROLADOR REST D'AUTENTICACIÓ MÒBIL
+ * CONTROLADOR REST D'AUTENTICACIÓ MÒBIL.
  *
- * Gestiona la identificació d'usuaris de l'app mòbil sense contrasenya.
+ * Gestionada la identificació d'usuaris de l'aplicació mòbil sense contrasenya
+ * i la consulta dels usuaris disponibles per iniciar la sessió.
  *
- * @author Ángel Jurado
+ * @author Ángel Jurado Herruz
  */
 @RestController
 @RequestMapping("/api/mobile/auth")
@@ -26,7 +27,14 @@ public class AuthMobileRestController {
     }
 
 
-    // LLISTAR USUARIS DISPONIBLES PER IDENTIFICAR-SE
+    /**
+     * LLISTAT D'USUARIS MÒBIL.
+     *
+     * Recuperats els usuaris disponibles i preparades les dades mínimes
+     * necessàries perquè l'aplicació mòbil permeti identificar-los.
+     *
+     * @return resposta amb la llista d'usuaris disponibles
+     */
     @GetMapping("/usuaris")
     public ResponseEntity<List<UsuariIdentificatResponse>> llistarUsuaris() {
 
@@ -45,7 +53,15 @@ public class AuthMobileRestController {
     }
 
 
-    // IDENTIFICAR USUARI SENSE CONTRASENYA
+    /**
+     * IDENTIFICACIÓ D'USUARI MÒBIL.
+     *
+     * Cercat l'usuari mitjançant el correu rebut i retornades les dades
+     * necessàries quan la identificació és vàlida.
+     *
+     * @param request dades rebudes per identificar l'usuari
+     * @return resposta amb l'usuari identificat o l'error corresponent
+     */
     @PostMapping("/identificar")
     public ResponseEntity<?> identificar(@RequestBody IdentificarRequest request) {
 
