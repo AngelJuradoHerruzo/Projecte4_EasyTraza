@@ -13,6 +13,7 @@ import cat.copernic.easytraza.mobile.features.lots.presentation.screens.LotDetai
 import cat.copernic.easytraza.mobile.features.lots.presentation.screens.LotListScreen
 import cat.copernic.easytraza.mobile.features.lots.presentation.viewmodels.LotViewModel
 import cat.copernic.easytraza.mobile.features.settings.ConfiguracioMenuScreen
+import cat.copernic.easytraza.mobile.features.settings.IdiomaConfigScreen
 import cat.copernic.easytraza.mobile.features.settings.IpConfigScreen
 import cat.copernic.easytraza.mobile.features.splash.SplashScreen
 import cat.copernic.easytraza.mobile.main.screens.MainScreen
@@ -108,12 +109,21 @@ fun AppNavigation() {
             onIpClick = {
                 screen = "configIp"
             },
+            onIdiomaClick = {
+                screen = "configIdioma"
+            },
             onTornarClick = {
                 screen = pantallaAnteriorConfiguracio
             }
         )
 
         "configIp" -> IpConfigScreen(
+            onTornarClick = {
+                screen = "configuracio"
+            }
+        )
+
+        "configIdioma" -> IdiomaConfigScreen(
             onTornarClick = {
                 screen = "configuracio"
             }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Clients - EasyTraza</title>
+    <title th:text="#{clients.llistar.titol}">Clients - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,19 +23,19 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
 
-                <h1 class="page-heading">Clients</h1>
+                <h1 class="page-heading" th:text="#{sidebar.clients}">Clients</h1>
 
                 <p class="page-description">
-                    Consulta i gestiona els clients registrats al sistema EasyTraza.
+                    <span th:text="#{clients.llistar.desc}">Consulta i gestiona els clients registrats al sistema EasyTraza.</span>
                 </p>
             </div>
 
             <div class="page-top-actions">
                 <a th:href="@{/clients/new}" class="btn btn-primary">
                     <i class="bi bi-person-plus" aria-hidden="true"></i>
-                    <span>Nou client</span>
+                    <span th:text="#{clients.llistar.nou}">Nou client</span>
                 </a>
             </div>
         </section>
@@ -59,16 +59,16 @@
 
                 <div class="clients-toolbar-info">
                     <div class="clients-title-row">
-                        <h2 class="section-title">Directori de clients</h2>
+                        <h2 class="section-title" th:text="#{clients.llistar.directori}">Directori de clients</h2>
 
                         <span class="clients-counter"
-                              th:text="|${#lists.size(clients)} clients|">
+                              th:text="${#lists.size(clients)} + ' ' + #{clients.llistar.comptador}">
                             0 clients
                         </span>
                     </div>
 
                     <p class="section-subtitle">
-                        Filtra i ordena els clients pels camps visibles del llistat.
+                        <span th:text="#{clients.llistar.sub}">Filtra i ordena els clients pels camps visibles del llistat.</span>
                     </p>
                 </div>
 
@@ -78,7 +78,7 @@
 
                     <div class="clients-filter-row">
 
-                        <label for="nomComplet" class="sr-only">Filtrar clients per nom</label>
+                        <label for="nomComplet" class="sr-only" th:text="#{clients.llistar.filtrarNom}">Filtrar clients per nom</label>
                         <div class="search-field">
                             <i class="bi bi-person" aria-hidden="true"></i>
                             <input id="nomComplet"
@@ -86,10 +86,11 @@
                                    type="text"
                                    th:value="${nomComplet}"
                                    placeholder="Nom..."
+                                   th:placeholder="#{clients.llistar.placeholderNom}"
                                    autocomplete="off">
                         </div>
 
-                        <label for="cif" class="sr-only">Filtrar clients per CIF o DNI</label>
+                        <label for="cif" class="sr-only" th:text="#{clients.llistar.filtrarCif}">Filtrar clients per CIF o DNI</label>
                         <div class="search-field search-field-small">
                             <i class="bi bi-person-vcard" aria-hidden="true"></i>
                             <input id="cif"
@@ -97,10 +98,11 @@
                                    type="text"
                                    th:value="${cif}"
                                    placeholder="CIF / DNI..."
+                                   th:placeholder="#{clients.llistar.placeholderCif}"
                                    autocomplete="off">
                         </div>
 
-                        <label for="email" class="sr-only">Filtrar clients per correu electrònic</label>
+                        <label for="email" class="sr-only" th:text="#{clients.llistar.filtrarCorreu}">Filtrar clients per correu electrònic</label>
                         <div class="search-field">
                             <i class="bi bi-envelope" aria-hidden="true"></i>
                             <input id="email"
@@ -108,10 +110,11 @@
                                    type="text"
                                    th:value="${email}"
                                    placeholder="Correu..."
+                                   th:placeholder="#{clients.llistar.placeholderCorreu}"
                                    autocomplete="off">
                         </div>
 
-                        <label for="telefon" class="sr-only">Filtrar clients per telèfon</label>
+                        <label for="telefon" class="sr-only" th:text="#{clients.llistar.filtrarTelefon}">Filtrar clients per telèfon</label>
                         <div class="search-field search-field-small">
                             <i class="bi bi-telephone" aria-hidden="true"></i>
                             <input id="telefon"
@@ -119,40 +122,41 @@
                                    type="text"
                                    th:value="${telefon}"
                                    placeholder="Telèfon..."
+                                   th:placeholder="#{clients.llistar.placeholderTelefon}"
                                    autocomplete="off">
                         </div>
 
                         <div class="order-field">
-                            <label for="ordre">Ordenar per</label>
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
 
                             <select id="ordre" name="ordre" class="form-select">
-                                <option value="nomComplet" th:selected="${ordre == 'nomComplet'}">Nom</option>
-                                <option value="cif" th:selected="${ordre == 'cif'}">CIF / DNI</option>
-                                <option value="telefon" th:selected="${ordre == 'telefon'}">Telèfon</option>
-                                <option value="email" th:selected="${ordre == 'email'}">Correu</option>
-                                <option value="adreca" th:selected="${ordre == 'adreca'}">Adreça</option>
-                                <option value="observacions" th:selected="${ordre == 'observacions'}">Observacions</option>
+                                <option value="nomComplet" th:selected="${ordre == 'nomComplet'}" th:text="#{comu.nom}">Nom</option>
+                                <option value="cif" th:selected="${ordre == 'cif'}" th:text="#{comu.cifDni}">CIF / DNI</option>
+                                <option value="telefon" th:selected="${ordre == 'telefon'}" th:text="#{comu.telefon}">Telèfon</option>
+                                <option value="email" th:selected="${ordre == 'email'}" th:text="#{comu.correuElectronic}">Correu</option>
+                                <option value="adreca" th:selected="${ordre == 'adreca'}" th:text="#{comu.adreca}">Adreça</option>
+                                <option value="observacions" th:selected="${ordre == 'observacions'}" th:text="#{comu.observacions}">Observacions</option>
                             </select>
                         </div>
 
                         <div class="order-field order-direction-field">
-                            <label for="direccio">Direcció</label>
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
 
                             <select id="direccio" name="direccio" class="form-select">
-                                <option value="asc" th:selected="${direccio == 'asc'}">Ascendent</option>
-                                <option value="desc" th:selected="${direccio == 'desc'}">Descendent</option>
+                                <option value="asc" th:selected="${direccio == 'asc'}" th:text="#{comu.ascendent}">Ascendent</option>
+                                <option value="desc" th:selected="${direccio == 'desc'}" th:text="#{comu.descendent}">Descendent</option>
                             </select>
                         </div>
 
                         <button type="submit"
                                 class="btn btn-primary btn-icon"
-                                aria-label="Aplicar filtres i ordenació de clients">
+                                aria-label="Aplicar filtres i ordenació de clients" th:attr="aria-label=#{clients.llistar.aplicarFiltres}">
                             <i class="bi bi-search" aria-hidden="true"></i>
                         </button>
 
                         <a th:href="@{/clients/list}" class="btn btn-secondary">
                             <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                            <span>Netejar</span>
+                            <span th:text="#{comu.netejar}">Netejar</span>
                         </a>
 
                     </div>
@@ -174,11 +178,11 @@
                         </div>
 
                         <div class="client-card-name-block">
-                            <p class="client-card-type">Client</p>
+                            <p class="client-card-type" th:text="#{comu.client}">Client</p>
 
                             <h3 class="client-card-title"
                                 th:text="${client.nomComplet}">
-                                Nom complet
+                                <span th:text="#{comu.nomComplet}">Nom complet</span>
                             </h3>
                         </div>
 
@@ -186,8 +190,8 @@
 
                     <!----------------------- OBSERVACIONS ----------------------->
                     <div class="client-card-observations">
-                        <p th:text="${client.observacions != null && !#strings.isEmpty(client.observacions) ? client.observacions : 'Sense observacions registrades'}">
-                            Sense observacions registrades
+                        <p th:text="${client.observacions != null && !#strings.isEmpty(client.observacions) ? client.observacions : #messages.msg('clients.llistar.senseObservacions')}">
+                            <span th:text="#{clients.llistar.senseObservacions}">Sense observacions registrades</span>
                         </p>
                     </div>
 
@@ -199,7 +203,7 @@
                                 <i class="bi bi-person-vcard" aria-hidden="true"></i>
                             </div>
                             <div class="client-data-content">
-                                <span class="client-data-label">CIF / DNI</span>
+                                <span class="client-data-label" th:text="#{comu.cifDni}">CIF / DNI</span>
                                 <span class="client-data-value" th:text="${client.cif}">CIF / DNI</span>
                             </div>
                         </div>
@@ -209,7 +213,7 @@
                                 <i class="bi bi-telephone" aria-hidden="true"></i>
                             </div>
                             <div class="client-data-content">
-                                <span class="client-data-label">Telèfon</span>
+                                <span class="client-data-label" th:text="#{comu.telefon}">Telèfon</span>
                                 <span class="client-data-value" th:text="${client.telefon}">Telèfon</span>
                             </div>
                         </div>
@@ -219,7 +223,7 @@
                                 <i class="bi bi-envelope" aria-hidden="true"></i>
                             </div>
                             <div class="client-data-content">
-                                <span class="client-data-label">Correu electrònic</span>
+                                <span class="client-data-label" th:text="#{comu.correuElectronic}">Correu electrònic</span>
                                 <span class="client-data-value" th:text="${client.email}">Correu</span>
                             </div>
                         </div>
@@ -229,7 +233,7 @@
                                 <i class="bi bi-geo-alt" aria-hidden="true"></i>
                             </div>
                             <div class="client-data-content">
-                                <span class="client-data-label">Adreça</span>
+                                <span class="client-data-label" th:text="#{comu.adreca}">Adreça</span>
                                 <span class="client-data-value" th:text="${client.adreca}">Adreça</span>
                             </div>
                         </div>
@@ -242,27 +246,27 @@
                         <a th:href="@{/clients/edit/{id}(id=${client.id})}"
                            class="card-action card-action-edit">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                            <span>Editar</span>
+                            <span th:text="#{comu.editar}">Editar</span>
                         </a>
 
                         <form th:if="${!client.teAlbarans}"
                               th:action="@{/clients/delete/{id}(id=${client.id})}"
                               method="post"
                               class="card-delete-form"
-                              onsubmit="return confirm('Segur que vols eliminar aquest client?');">
+                              th:onsubmit="|return confirm('#{clients.confirm.eliminar}');|">
 
                             <button type="submit" class="card-action card-action-delete">
                                 <i class="bi bi-trash3" aria-hidden="true"></i>
-                                <span>Eliminar</span>
+                                <span th:text="#{comu.eliminar}">Eliminar</span>
                             </button>
 
                         </form>
 
                         <span th:if="${client.teAlbarans}"
                               class="card-action card-action-disabled"
-                              title="Aquest client no es pot eliminar perquè té albarans associats">
+                              title="Aquest client no es pot eliminar perquè té albarans associats" th:title="#{clients.llistar.noEliminarAlbarans}">
                             <i class="bi bi-lock-fill" aria-hidden="true"></i>
-                            <span>En ús</span>
+                            <span th:text="#{comu.enUs}">En ús</span>
                         </span>
 
                     </footer>
@@ -276,15 +280,15 @@
                         <i class="bi bi-people" aria-hidden="true"></i>
                     </div>
 
-                    <h3>No s'han trobat clients</h3>
+                    <h3 th:text="#{clients.llistar.buit}">No s'han trobat clients</h3>
 
                     <p>
-                        No hi ha clients que coincideixin amb els filtres seleccionats.
+                        <span th:text="#{clients.llistar.buitDesc}">No hi ha clients que coincideixin amb els filtres seleccionats.</span>
                     </p>
 
                     <a th:href="@{/clients/list}" class="btn btn-secondary">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        <span>Veure tots els clients</span>
+                        <span th:text="#{clients.llistar.veureTots}">Veure tots els clients</span>
                     </a>
 
                 </div>

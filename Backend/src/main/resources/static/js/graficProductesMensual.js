@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const labelsDiesMes = JSON.parse(canvas.dataset.labels || "[]");
     const dadesVendesDiaries = JSON.parse(canvas.dataset.dades || "[]");
-    const labelSerie = canvas.dataset.serie || "Tots els productes";
+    const labelSerie = canvas.dataset.serie;
 
     new Chart(canvas, {
         type: "line",
@@ -48,10 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 tooltip: {
                     callbacks: {
                         title: function (context) {
-                            return "Dia " + context[0].label;
+                            return canvas.dataset.day + " " + context[0].label;
                         },
                         label: function (context) {
-                            return context.dataset.label + ": " + context.parsed.y + " unitats";
+                            return context.dataset.label + ": " + context.parsed.y + " " + canvas.dataset.units;
                         }
                     }
                 }
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 x: {
                     title: {
                         display: true,
-                        text: "Dia del mes"
+                        text: canvas.dataset.dayAxis
                     },
                     grid: {
                         display: true,
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: "Unitats venudes"
+                        text: canvas.dataset.unitsAxis
                     },
                     grid: {
                         color: "rgba(60, 47, 40, 0.10)"

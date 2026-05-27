@@ -2,6 +2,8 @@ package cat.copernic.easytraza.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,11 @@ public class ProveidorWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final ProveidorService proveidorService;
+    private final MessageSource messageSource;
 
-    public ProveidorWebController(ProveidorService proveidorService) {
+    public ProveidorWebController(ProveidorService proveidorService, MessageSource messageSource) {
         this.proveidorService = proveidorService;
+        this.messageSource = messageSource;
     }
 
 
@@ -66,13 +70,13 @@ public class ProveidorWebController {
             LOGGER.info("Proveïdor creat correctament.");
 
             if (popup) {
-                model.addAttribute("missatge", "Proveïdor creat correctament.");
+                model.addAttribute("missatge", missatge("proveidors.missatge.creatPopup"));
                 return "layout/tancarFinestra";
             }
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El proveïdor s'ha creat correctament."
+                missatge("proveidors.missatge.creat")
             );
 
             return "redirect:/proveidors/list";
@@ -118,20 +122,20 @@ public class ProveidorWebController {
             if (proveidorActualitzat == null) {
                 redirectAttributes.addFlashAttribute(
                     "error",
-                    "No s'ha trobat el proveïdor que vols modificar."
+                    missatge("proveidors.error.noTrobatModificar")
                 );
 
                 return "redirect:/proveidors/list";
             }
 
             if (popup) {
-                model.addAttribute("missatge", "Proveïdor actualitzat correctament.");
+                model.addAttribute("missatge", missatge("proveidors.missatge.actualitzatPopup"));
                 return "layout/tancarFinestra";
             }
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El proveïdor s'ha actualitzat correctament."
+                missatge("proveidors.missatge.actualitzat")
             );
 
             return "redirect:/proveidors/list";
@@ -157,17 +161,22 @@ public class ProveidorWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El proveïdor s'ha eliminat correctament."
+                missatge("proveidors.missatge.eliminat")
             );
         }
         catch (RuntimeException e) {
             LOGGER.warn("No s'ha pogut eliminar el proveïdor amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute(
                 "error",
-                "No es pot eliminar el proveïdor perquè està relacionat amb altres dades."
+                missatge("proveidors.error.eliminarRelacionat")
             );
         }
 
         return "redirect:/proveidors/list";
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

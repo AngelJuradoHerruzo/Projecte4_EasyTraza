@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +18,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OcrJoseNovauService implements OcrParserProveidor {
+
+    private final MessageSource messageSource;
+
+    public OcrJoseNovauService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     private static final Pattern PATRON_NUMERO_ALBARA = Pattern.compile(
             "\\b(\\d{6})\\b"
@@ -209,11 +217,11 @@ public class OcrJoseNovauService implements OcrParserProveidor {
         linia.setUnitat(detectarUnitat(materia));
 
         if ("-".equals(identificador)) {
-            linia.afegirAvis("No s'ha pogut detectar correctament el valor de la columna ARTICLE.");
+            linia.afegirAvis(missatge("ocr.avis.articleNoDetectat"));
         }
 
         if (quantitat == null || quantitat <= 0) {
-            linia.afegirAvis("No s'ha pogut detectar correctament la quantitat.");
+            linia.afegirAvis(missatge("ocr.avis.quantitatNoDetectada"));
         }
 
         return linia;
@@ -329,15 +337,20 @@ public class OcrJoseNovauService implements OcrParserProveidor {
 
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar el número d'albarà de JOSE NOVAU.");
+            resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "JOSE NOVAU"));
         }
 
         if (resultat.getDataAlbara() == null || resultat.getDataAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar la data de l'albarà de JOSE NOVAU.");
+            resultat.afegirAvis(missatge("ocr.avis.dataAlbaraNoDetectada", "JOSE NOVAU"));
         }
 
         if (resultat.getLinies() == null || resultat.getLinies().isEmpty()) {
-            resultat.afegirAvis("No s'ha pogut detectar cap línia de producte de JOSE NOVAU.");
+            resultat.afegirAvis(missatge("ocr.avis.capLiniaProducte", "JOSE NOVAU"));
         }
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +22,11 @@ public class MateriaPrimeraWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final MateriaPrimeraService materiaPrimeraService;
+    private final MessageSource messageSource;
 
-    public MateriaPrimeraWebController(MateriaPrimeraService materiaPrimeraService) {
+    public MateriaPrimeraWebController(MateriaPrimeraService materiaPrimeraService, MessageSource messageSource) {
         this.materiaPrimeraService = materiaPrimeraService;
+        this.messageSource = messageSource;
     }
 
 
@@ -70,13 +74,13 @@ public class MateriaPrimeraWebController {
             LOGGER.info("Matèria primera creada correctament.");
 
             if (popup) {
-                model.addAttribute("missatge", "Matèria primera creada correctament.");
+                model.addAttribute("missatge", missatge("materiesPrimeres.missatge.creadaPopup"));
                 return "layout/tancarFinestra";
             }
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "La matèria primera s'ha creat correctament."
+                missatge("materiesPrimeres.missatge.creada")
             );
 
             return "redirect:/materies-primeres/list";
@@ -122,20 +126,20 @@ public class MateriaPrimeraWebController {
             if (materiaActualitzada == null) {
                 redirectAttributes.addFlashAttribute(
                     "error",
-                    "No s'ha trobat la matèria primera que vols modificar."
+                    missatge("materiesPrimeres.error.noTrobadaModificar")
                 );
 
                 return "redirect:/materies-primeres/list";
             }
 
             if (popup) {
-                model.addAttribute("missatge", "Matèria primera actualitzada correctament.");
+                model.addAttribute("missatge", missatge("materiesPrimeres.missatge.actualitzadaPopup"));
                 return "layout/tancarFinestra";
             }
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "La matèria primera s'ha actualitzat correctament."
+                missatge("materiesPrimeres.missatge.actualitzada")
             );
 
             return "redirect:/materies-primeres/list";
@@ -161,7 +165,7 @@ public class MateriaPrimeraWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "La matèria primera s'ha eliminat correctament."
+                missatge("materiesPrimeres.missatge.eliminada")
             );
         }
         catch (RuntimeException e) {
@@ -171,4 +175,9 @@ public class MateriaPrimeraWebController {
 
         return "redirect:/materies-primeres/list";
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

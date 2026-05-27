@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Detall lot - EasyTraza</title>
+    <title th:text="#{lots.detall.titol}">Detall lot - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,9 +23,9 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top lot-detail-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Traçabilitat · Lots</p>
-                <h1 class="page-heading">Detall del lot</h1>
-                <p class="page-description">
+                <p class="page-eyebrow" th:text="#{lots.eyebrow}">Traçabilitat · Lots</p>
+                <h1 class="page-heading" th:text="#{lots.detall.heading}">Detall del lot</h1>
+                <p class="page-description" th:text="#{lots.detall.desc}">
                     Consulta la informació associada al lot seleccionat.
                 </p>
             </div>
@@ -33,7 +33,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/lots/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
             </div>
         </section>
@@ -48,10 +48,10 @@
                     </div>
 
                     <div>
-                        <p class="lot-summary-label">Identificador del lot</p>
+                        <p class="lot-summary-label" th:text="#{lots.detall.identificador}">Identificador del lot</p>
                         <h2 th:text="${lot.identificadorLot}">LOT-001</h2>
                         <p class="lot-summary-quantity">
-                            Quantitat:
+                            <span th:text="#{lots.detall.quantitat}">Quantitat:</span>
                             <strong th:text="${lot.quantitat != null ? lot.quantitat + ' ' + lot.unitats : '-'}">10 kg</strong>
                         </p>
                     </div>
@@ -59,45 +59,45 @@
 
                 <span class="lot-badge lot-badge-estoc"
                       th:if="${lot.estat.name() == 'EN_ESTOC'}">
-                    EN ESTOC
+                    <span th:text="#{estat.enEstoc}">EN ESTOC</span>
                 </span>
 
                 <span class="lot-badge lot-badge-obert"
                       th:if="${lot.estat.name() == 'OBERT'}">
-                    OBERT
+                    <span th:text="#{estat.obert}">OBERT</span>
                 </span>
 
                 <span class="lot-badge lot-badge-acabat"
                       th:if="${lot.estat.name() == 'ACABAT'}">
-                    ACABAT
+                    <span th:text="#{estat.acabat}">ACABAT</span>
                 </span>
             </div>
 
             <div class="lot-detail-mini-grid">
 
                 <div class="lot-mini-data">
-                    <span>Caducitat</span>
+                    <span th:text="#{lots.caducitat}">Caducitat</span>
                     <strong th:text="${lot.dataCaducitat != null ? #temporals.format(lot.dataCaducitat, 'dd/MM/yyyy') : '-'}">
                         -
                     </strong>
                 </div>
 
                 <div class="lot-mini-data">
-                    <span>Obertura</span>
+                    <span th:text="#{lots.obertura}">Obertura</span>
                     <strong th:text="${lot.dataObertura != null ? #temporals.format(lot.dataObertura, 'dd/MM/yyyy') : '-'}">
                         -
                     </strong>
                 </div>
 
                 <div class="lot-mini-data">
-                    <span>Acabament</span>
+                    <span th:text="#{lots.acabament}">Acabament</span>
                     <strong th:text="${lot.dataAcabament != null ? #temporals.format(lot.dataAcabament, 'dd/MM/yyyy') : '-'}">
                         -
                     </strong>
                 </div>
 
                 <div class="lot-mini-data">
-                    <span>Albarà</span>
+                    <span th:text="#{comu.albara}">Albarà</span>
                     <strong th:text="${lot.albaraProveidor != null ? '#' + lot.albaraProveidor.id : '-'}">
                         #1
                     </strong>
@@ -118,12 +118,12 @@
                     </div>
 
                     <div class="lot-detail-card-title">
-                        <span>Matèria primera</span>
+                        <span th:text="#{comu.materiaPrimera}">Matèria primera</span>
                         <h2 th:text="${lot.materiaPrimera != null ? lot.materiaPrimera.nomMateria : '-'}">
                             Farina blanca
                         </h2>
-                        <p th:text="${lot.materiaPrimera != null && lot.materiaPrimera.descripcio != null && !#strings.isEmpty(lot.materiaPrimera.descripcio) ? lot.materiaPrimera.descripcio : 'Sense descripció'}">
-                            Sense descripció
+                        <p th:text="${lot.materiaPrimera != null && lot.materiaPrimera.descripcio != null && !#strings.isEmpty(lot.materiaPrimera.descripcio) ? lot.materiaPrimera.descripcio : #messages.msg('comu.senseDescripcio')}">
+                            <span th:text="#{lots.senseDescripcio}">Sense descripció</span>
                         </p>
                     </div>
                 </div>
@@ -137,9 +137,9 @@
                     </div>
 
                     <div class="lot-detail-card-title">
-                        <span>Albarà de proveïdor</span>
+                        <span th:text="#{albaransProveidor.form.heading}">Albarà de proveïdor</span>
                         <h2>
-                            Albarà #
+                            <span th:text="#{comu.albaraNum}">Albarà #</span>
                             <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">1</span>
                         </h2>
                     </div>
@@ -147,14 +147,14 @@
 
                 <div class="lot-detail-data-grid">
                     <div class="lot-detail-data">
-                        <span>Data recepció</span>
+                        <span th:text="#{comu.dataRecepcio}">Data recepció</span>
                         <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.dataRecepcio != null ? #temporals.format(lot.albaraProveidor.dataRecepcio, 'dd/MM/yyyy HH:mm') : '-'}">
                             -
                         </strong>
                     </div>
 
                     <div class="lot-detail-data">
-                        <span>Lots recepcionats</span>
+                        <span th:text="#{albaransProveidor.lotsRecepcionats}">Lots recepcionats</span>
                         <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.lots != null ? #lists.size(lot.albaraProveidor.lots) : 0}">
                             0
                         </strong>
@@ -170,26 +170,26 @@
                     </div>
 
                     <div class="lot-detail-card-title">
-                        <span>Proveïdor</span>
+                        <span th:text="#{comu.proveidor}">Proveïdor</span>
                         <h2 th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null ? lot.albaraProveidor.proveidor.nomProveidor : '-'}">
-                            Proveïdor
+                            <span th:text="#{comu.proveidor}">Proveïdor</span>
                         </h2>
-                        <p th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null && lot.albaraProveidor.proveidor.descripcio != null && !#strings.isEmpty(lot.albaraProveidor.proveidor.descripcio) ? lot.albaraProveidor.proveidor.descripcio : 'Sense descripció'}">
-                            Sense descripció
+                        <p th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null && lot.albaraProveidor.proveidor.descripcio != null && !#strings.isEmpty(lot.albaraProveidor.proveidor.descripcio) ? lot.albaraProveidor.proveidor.descripcio : #messages.msg('comu.senseDescripcio')}">
+                            <span th:text="#{lots.senseDescripcio}">Sense descripció</span>
                         </p>
                     </div>
                 </div>
 
                 <div class="lot-detail-data-grid">
                     <div class="lot-detail-data">
-                        <span>CIF</span>
+                        <span th:text="#{comu.cif}">CIF</span>
                         <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null ? lot.albaraProveidor.proveidor.cif : '-'}">
                             B00000000
                         </strong>
                     </div>
 
                     <div class="lot-detail-data">
-                        <span>Adreça</span>
+                        <span th:text="#{comu.adreca}">Adreça</span>
                         <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.proveidor != null && lot.albaraProveidor.proveidor.adreca != null && !#strings.isEmpty(lot.albaraProveidor.proveidor.adreca) ? lot.albaraProveidor.proveidor.adreca : '-'}">
                             -
                         </strong>
@@ -205,7 +205,7 @@
                     </div>
 
                     <div class="lot-detail-card-title">
-                        <span>Usuari receptor</span>
+                        <span th:text="#{comu.usuariReceptor}">Usuari receptor</span>
                         <h2 th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null ? lot.albaraProveidor.usuariReceptor.nomComplet : '-'}">
                             Usuari
                         </h2>
@@ -214,14 +214,14 @@
 
                 <div class="lot-detail-data-grid">
                     <div class="lot-detail-data">
-                        <span>Rol</span>
-                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null ? lot.albaraProveidor.usuariReceptor.rolUsuari : '-'}">
+                        <span th:text="#{comu.rol}">Rol</span>
+                        <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null ? (lot.albaraProveidor.usuariReceptor.rolUsuari.name() == 'ADMIN' ? #messages.msg('sidebar.rol.admin') : #messages.msg('sidebar.rol.operari')) : '-'}">
                             OPERARI
                         </strong>
                     </div>
 
                     <div class="lot-detail-data">
-                        <span>Email</span>
+                        <span th:text="#{comu.email}">Email</span>
                         <strong th:text="${lot.albaraProveidor != null && lot.albaraProveidor.usuariReceptor != null && lot.albaraProveidor.usuariReceptor.email != null && !#strings.isEmpty(lot.albaraProveidor.usuariReceptor.email) ? lot.albaraProveidor.usuariReceptor.email : '-'}">
                             -
                         </strong>
@@ -237,8 +237,8 @@
 
             <div class="lot-related-header">
                 <div>
-                    <h2>Lots del mateix albarà</h2>
-                    <p>Altres lots recepcionats conjuntament.</p>
+                    <h2 th:text="#{lots.detall.mateixAlbara}">Lots del mateix albarà</h2>
+                    <p th:text="#{lots.detall.mateixAlbaraDesc}">Altres lots recepcionats conjuntament.</p>
                 </div>
             </div>
 
@@ -246,12 +246,12 @@
                 <table class="lots-table lots-related-table">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Lot</th>
-                        <th>Matèria primera</th>
-                        <th class="text-center">Quantitat</th>
-                        <th class="text-center">Estat</th>
-                        <th class="text-center">Acció</th>
+                        <th th:text="#{comu.id}">ID</th>
+                        <th th:text="#{comu.lot}">Lot</th>
+                        <th th:text="#{comu.materiaPrimera}">Matèria primera</th>
+                        <th class="text-center" th:text="#{comu.quantitat}">Quantitat</th>
+                        <th class="text-center" th:text="#{comu.estat}">Estat</th>
+                        <th class="text-center" th:text="#{comu.accio}">Acció</th>
                     </tr>
                     </thead>
 
@@ -269,22 +269,22 @@
                         <td class="text-center">
                             <span class="lot-badge lot-badge-estoc"
                                   th:if="${lotAlbara.estat.name() == 'EN_ESTOC'}">
-                                EN ESTOC
+                                <span th:text="#{estat.enEstoc}">EN ESTOC</span>
                             </span>
                             <span class="lot-badge lot-badge-obert"
                                   th:if="${lotAlbara.estat.name() == 'OBERT'}">
-                                OBERT
+                                <span th:text="#{estat.obert}">OBERT</span>
                             </span>
                             <span class="lot-badge lot-badge-acabat"
                                   th:if="${lotAlbara.estat.name() == 'ACABAT'}">
-                                ACABAT
+                                <span th:text="#{estat.acabat}">ACABAT</span>
                             </span>
                         </td>
                         <td class="text-center">
                             <a th:href="@{/lots/detail/{id}(id=${lotAlbara.id})}"
                                class="lot-action-btn lot-action-view">
                                 <i class="bi bi-eye" aria-hidden="true"></i>
-                                <span>Consultar</span>
+                                <span th:text="#{comu.consultar}">Consultar</span>
                             </a>
                         </td>
                     </tr>

@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +36,18 @@ public class AlbaraClientWebController {
     private final ClientService clientService;
     private final ProducteService producteService;
     private final UsuariService usuariService;
+    private final MessageSource messageSource;
 
     public AlbaraClientWebController(AlbaraClientService albaraClientService,
                                      ClientService clientService,
                                      ProducteService producteService,
-                                     UsuariService usuariService) {
+                                     UsuariService usuariService,
+                                     MessageSource messageSource) {
         this.albaraClientService = albaraClientService;
         this.clientService = clientService;
         this.producteService = producteService;
         this.usuariService = usuariService;
+        this.messageSource = messageSource;
     }
 
 
@@ -105,7 +110,7 @@ public class AlbaraClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'albarà de client s'ha creat correctament."
+                missatge("albaraClient.missatge.creat")
             );
 
             return "redirect:/albarans-client/list";
@@ -135,7 +140,7 @@ public class AlbaraClientWebController {
         if (albaraClient.getEstat() == EstatAlbaraClient.LLIURAT) {
             redirectAttributes.addFlashAttribute(
                 "error",
-                "No es pot modificar un albarà de client lliurat."
+                missatge("albaraClient.error.lliuratNoModificable")
             );
 
             return "redirect:/albarans-client/list";
@@ -160,7 +165,7 @@ public class AlbaraClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'albarà de client s'ha actualitzat correctament."
+                missatge("albaraClient.missatge.actualitzat")
             );
 
             return "redirect:/albarans-client/list";
@@ -188,7 +193,7 @@ public class AlbaraClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'albarà de client s'ha eliminat correctament."
+                missatge("albaraClient.missatge.eliminat")
             );
         }
         catch (RuntimeException e) {
@@ -210,7 +215,7 @@ public class AlbaraClientWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "L'albarà de client s'ha marcat com a lliurat."
+                missatge("albaraClient.missatge.lliurat")
             );
         }
         catch (RuntimeException e) {
@@ -261,4 +266,9 @@ public class AlbaraClientWebController {
                 ))
                 .collect(Collectors.toList());
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

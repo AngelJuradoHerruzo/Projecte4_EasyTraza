@@ -2,6 +2,8 @@ package cat.copernic.easytraza.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,11 @@ public class ProducteWebController {
 
     // ---------------------------- SERVICE I CONSTRUCTOR ----------------------------
     private final ProducteService producteService;
+    private final MessageSource messageSource;
 
-    public ProducteWebController(ProducteService producteService) {
+    public ProducteWebController(ProducteService producteService, MessageSource messageSource) {
         this.producteService = producteService;
+        this.messageSource = messageSource;
     }
 
 
@@ -55,7 +59,7 @@ public class ProducteWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El producte s'ha creat correctament."
+                missatge("productes.missatge.creat")
             );
 
             return "redirect:/productes/list";
@@ -97,7 +101,7 @@ public class ProducteWebController {
             if (producteActualitzat == null) {
                 redirectAttributes.addFlashAttribute(
                     "error",
-                    "No s'ha trobat el producte que vols modificar."
+                    missatge("productes.error.noTrobatModificar")
                 );
 
                 return "redirect:/productes/list";
@@ -105,7 +109,7 @@ public class ProducteWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El producte s'ha actualitzat correctament."
+                missatge("productes.missatge.actualitzat")
             );
 
             return "redirect:/productes/list";
@@ -130,17 +134,22 @@ public class ProducteWebController {
 
             redirectAttributes.addFlashAttribute(
                 "missatge",
-                "El producte s'ha eliminat correctament."
+                missatge("productes.missatge.eliminat")
             );
         }
         catch (RuntimeException e) {
             LOGGER.warn("No s'ha pogut eliminar el producte amb identificador {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute(
                 "error",
-                "No es pot eliminar el producte perquè està relacionat amb altres dades."
+                missatge("productes.error.eliminarRelacionat")
             );
         }
 
         return "redirect:/productes/list";
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

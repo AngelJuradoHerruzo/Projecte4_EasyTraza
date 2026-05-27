@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Matèries primeres - EasyTraza</title>
+    <title th:text="#{materies.llistat.titolPagina}">Matèries primeres - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -25,13 +25,13 @@
             <div class="page-top-left">
 
                 <!-- Secció -->
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
 
                 <!-- Títol principal -->
-                <h1 class="page-heading">Matèries primeres</h1>
+                <h1 class="page-heading" th:text="#{sidebar.materiesPrimeres}">Matèries primeres</h1>
 
                 <!-- Descripció -->
-                <p class="page-description">
+                <p class="page-description" th:text="#{materies.llistat.descripcioPagina}">
                     Consulta i gestiona les matèries primeres registrades al sistema EasyTraza.
                 </p>
             </div>
@@ -40,7 +40,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/materies-primeres/new}" class="btn btn-primary">
                     <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    <span>Nova matèria primera</span>
+                    <span th:text="#{materies.form.nova}">Nova matèria primera</span>
                 </a>
             </div>
         </section>
@@ -64,15 +64,15 @@
 
                 <div class="materials-toolbar-info">
                     <div class="materials-title-row">
-                        <h2 class="section-title">Catàleg de matèries primeres</h2>
+                        <h2 class="section-title" th:text="#{materies.llistat.titol}">Catàleg de matèries primeres</h2>
 
                         <span class="materials-counter"
-                              th:text="|${#lists.size(materiesPrimeres)} matèries|">
+                              th:text="#{materies.llistat.comptador(${#lists.size(materiesPrimeres)})}">
                             0 matèries
                         </span>
                     </div>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{materies.llistat.subtitol}">
                         Vista compacta per consultar el catàleg i identificar matèries en ús.
                     </p>
                 </div>
@@ -83,7 +83,7 @@
 
                     <div class="materials-filter-row">
 
-                        <label for="nomMateria" class="sr-only">
+                        <label for="nomMateria" class="sr-only" th:text="#{materies.llistat.filtrarNom}">
                             Filtrar matèries primeres per nom
                         </label>
 
@@ -95,16 +95,17 @@
                                    type="text"
                                    th:value="${nomMateria}"
                                    placeholder="Nom matèria..."
+                                   th:placeholder="#{materies.llistat.nom.placeholder}"
                                    autocomplete="off">
                         </div>
 
                         <div class="order-field">
-                            <label for="ordre">Ordenar per</label>
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
 
                             <select id="ordre" name="ordre" class="form-select">
                                 <option value="nomMateria"
                                         th:selected="${ordre == 'nomMateria'}">
-                                    Nom matèria
+                                    <span th:text="#{materies.llistat.nom}">Nom matèria</span>
                                 </option>
 
                                 <option value="id"
@@ -114,37 +115,38 @@
 
                                 <option value="descripcio"
                                         th:selected="${ordre == 'descripcio'}">
-                                    Descripció
+                                    <span th:text="#{comu.descripcio}">Descripció</span>
                                 </option>
                             </select>
                         </div>
 
                         <div class="order-field order-direction-field">
-                            <label for="direccio">Direcció</label>
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
 
                             <select id="direccio" name="direccio" class="form-select">
                                 <option value="asc"
                                         th:selected="${direccio == 'asc'}">
-                                    Ascendent
+                                    <span th:text="#{comu.ascendent}">Ascendent</span>
                                 </option>
 
                                 <option value="desc"
                                         th:selected="${direccio == 'desc'}">
-                                    Descendent
+                                    <span th:text="#{comu.descendent}">Descendent</span>
                                 </option>
                             </select>
                         </div>
 
                         <button type="submit"
                                 class="btn btn-primary btn-icon"
-                                aria-label="Aplicar filtres i ordenació de matèries primeres">
+                                aria-label="Aplicar filtres i ordenació de matèries primeres"
+                                th:attr="aria-label=#{materies.llistat.aplicarFiltres}">
                             <i class="bi bi-search" aria-hidden="true"></i>
                         </button>
 
                         <a th:href="@{/materies-primeres/list}"
                            class="btn btn-secondary">
                             <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                            <span>Netejar</span>
+                            <span th:text="#{comu.netejar}">Netejar</span>
                         </a>
 
                     </div>
@@ -158,10 +160,10 @@
 
                 <div th:if="${!#lists.isEmpty(materiesPrimeres)}" class="materials-list-head" aria-hidden="true">
                     <span class="materials-head-id">ID</span>
-                    <span class="materials-head-material">Matèria primera</span>
-                    <span class="materials-head-description">Descripció</span>
-                    <span class="materials-head-status">Ús</span>
-                    <span class="materials-head-actions">Accions</span>
+                    <span class="materials-head-material" th:text="#{materies.llistat.material}">Matèria primera</span>
+                    <span class="materials-head-description" th:text="#{comu.descripcio}">Descripció</span>
+                    <span class="materials-head-status" th:text="#{comu.us}">Ús</span>
+                    <span class="materials-head-actions" th:text="#{comu.accions}">Accions</span>
                 </div>
 
                 <article th:each="materiaPrimera : ${materiesPrimeres}" class="material-row">
@@ -188,7 +190,7 @@
 
                     <!----------------------- DESCRIPCIÓ ----------------------->
                     <p class="material-row-description"
-                       th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio) ? materiaPrimera.descripcio : 'Sense descripció registrada'}">
+                       th:text="${materiaPrimera.descripcio != null && !#strings.isEmpty(materiaPrimera.descripcio)} ? ${materiaPrimera.descripcio} : #{comu.senseDescripcio}">
                         Descripció matèria primera
                     </p>
 
@@ -196,15 +198,16 @@
                     <div class="material-row-status">
                         <span th:if="${materiesEnUs.contains(materiaPrimera.id)}"
                               class="material-status-badge material-status-used"
-                              title="Aquesta matèria primera està associada a lots i no es pot eliminar">
+                              title="Aquesta matèria primera està associada a lots i no es pot eliminar"
+                              th:title="#{materies.llistat.enUs.title}">
                             <i class="bi bi-link-45deg" aria-hidden="true"></i>
-                            <span>En ús</span>
+                            <span th:text="#{comu.enUs}">En ús</span>
                         </span>
 
                         <span th:unless="${materiesEnUs.contains(materiaPrimera.id)}"
                               class="material-status-badge material-status-free">
                             <i class="bi bi-check-lg" aria-hidden="true"></i>
-                            <span>Disponible</span>
+                            <span th:text="#{comu.disponible}">Disponible</span>
                         </span>
                     </div>
 
@@ -213,22 +216,23 @@
 
                         <a th:href="@{/materies-primeres/edit/{id}(id=${materiaPrimera.id})}"
                            class="row-action row-action-edit"
-                           th:aria-label="|Editar ${materiaPrimera.nomMateria}|">
+                           th:aria-label="|#{comu.editar} ${materiaPrimera.nomMateria}|">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                            <span>Editar</span>
+                            <span th:text="#{comu.editar}">Editar</span>
                         </a>
 
                         <form th:unless="${materiesEnUs.contains(materiaPrimera.id)}"
                               th:action="@{/materies-primeres/delete/{id}(id=${materiaPrimera.id})}"
                               method="post"
                               class="row-delete-form"
-                              onsubmit="return confirm('Segur que vols eliminar aquesta matèria primera?');">
+                              onsubmit="return confirm('Segur que vols eliminar aquesta matèria primera?');"
+                              th:onsubmit="'return confirm(\'' + #{materies.llistat.confirmarEliminar} + '\');'">
 
                             <button type="submit"
                                     class="row-action row-action-delete"
-                                    th:aria-label="|Eliminar ${materiaPrimera.nomMateria}|">
+                                    th:aria-label="|#{comu.eliminar} ${materiaPrimera.nomMateria}|">
                                 <i class="bi bi-trash3" aria-hidden="true"></i>
-                                <span>Eliminar</span>
+                                <span th:text="#{comu.eliminar}">Eliminar</span>
                             </button>
 
                         </form>
@@ -237,9 +241,10 @@
                                 type="button"
                                 class="row-action row-action-disabled"
                                 disabled
-                                title="No es pot eliminar perquè està associada a un o més lots">
+                                title="No es pot eliminar perquè està associada a un o més lots"
+                                th:title="#{materies.llistat.eliminarBloquejat.title}">
                             <i class="bi bi-lock" aria-hidden="true"></i>
-                            <span>En ús</span>
+                            <span th:text="#{comu.enUs}">En ús</span>
                         </button>
 
                     </footer>
@@ -253,15 +258,15 @@
                         <i class="bi bi-box-seam" aria-hidden="true"></i>
                     </div>
 
-                    <h3>No s'han trobat matèries primeres</h3>
+                    <h3 th:text="#{materies.llistat.buit.titol}">No s'han trobat matèries primeres</h3>
 
-                    <p>
+                    <p th:text="#{materies.llistat.buit.descripcio}">
                         No hi ha matèries primeres que coincideixin amb els filtres seleccionats.
                     </p>
 
                     <a th:href="@{/materies-primeres/list}" class="btn btn-secondary">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        <span>Veure totes les matèries primeres</span>
+                        <span th:text="#{materies.llistat.veureTotes}">Veure totes les matèries primeres</span>
                     </a>
 
                 </div>

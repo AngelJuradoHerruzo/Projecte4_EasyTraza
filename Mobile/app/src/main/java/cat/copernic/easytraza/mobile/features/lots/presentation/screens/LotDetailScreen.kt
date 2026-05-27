@@ -33,7 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import cat.copernic.easytraza.mobile.R
 import androidx.compose.ui.unit.dp
 import cat.copernic.easytraza.mobile.features.lots.domain.models.Lot
 import cat.copernic.easytraza.mobile.features.lots.presentation.viewmodels.LotViewModel
@@ -77,9 +79,9 @@ fun LotDetailScreen(
 
     if (mostrarConfirmacioIniciar && lotActual != null) {
         EasyConfirmDialog(
-            title = "Confirmar inici de lot",
-            text = "Vols iniciar el lot ${lotActual.identificadorLot}? El sistema comprovarà si ja existeix un altre lot obert de la mateixa matèria primera.",
-            confirmText = "Iniciar lot",
+            title = stringResource(R.string.lot_confirm_start_title),
+            text = stringResource(R.string.lot_confirm_start_text, lotActual.identificadorLot),
+            confirmText = stringResource(R.string.lot_start),
             onConfirm = {
                 mostrarConfirmacioIniciar = false
                 viewModel.iniciarLot(lotActual)
@@ -90,9 +92,9 @@ fun LotDetailScreen(
 
     if (mostrarConfirmacioFinalitzar && lotActual != null) {
         EasyConfirmDialog(
-            title = "Confirmar finalització",
-            text = "Vols finalitzar el lot ${lotActual.identificadorLot}? Aquesta acció marcarà el lot com a acabat.",
-            confirmText = "Finalitzar lot",
+            title = stringResource(R.string.lot_confirm_finish_title),
+            text = stringResource(R.string.lot_confirm_finish_text, lotActual.identificadorLot),
+            confirmText = stringResource(R.string.lot_finish),
             isDanger = true,
             onConfirm = {
                 mostrarConfirmacioFinalitzar = false
@@ -104,10 +106,10 @@ fun LotDetailScreen(
 
     if (uiState.mostrarConfirmacioInici) {
         EasyConfirmDialog(
-            title = "Lot obert existent",
+            title = stringResource(R.string.lot_existing_open_title),
             text = uiState.missatge
-                ?: "Ja hi ha un lot obert d'aquesta matèria primera. Si continues, es finalitzarà el lot anterior i s'iniciarà aquest.",
-            confirmText = "Tancar anterior i iniciar",
+                ?: stringResource(R.string.lot_existing_open_message),
+            confirmText = stringResource(R.string.lot_close_previous_start),
             onConfirm = { viewModel.confirmarIniciLot() },
             onDismiss = { viewModel.cancelLarConfirmacioInici() }
         )
@@ -115,8 +117,8 @@ fun LotDetailScreen(
 
     EasyScreen {
         EasyHeader(
-            title = "Detall del lot",
-            subtitle = "Informació i accions del lot",
+            title = stringResource(R.string.lot_detail_title),
+            subtitle = stringResource(R.string.lot_detail_subtitle),
             showBack = true,
             onBackClick = onTornarClick,
             showConfig = true,
@@ -178,7 +180,7 @@ fun LotDetailContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Inventory,
-                    contentDescription = "Lot",
+                    contentDescription = stringResource(R.string.common_lot),
                     tint = EasyBrown,
                     modifier = Modifier.size(34.dp)
                 )
@@ -201,12 +203,12 @@ fun LotDetailContent(
             }
         }
 
-        DetailRow("Matèria primera", lot.materiaPrimeraNom.ifBlank { "-" })
-        DetailRow("Quantitat", "${lot.quantitat} ${lot.unitats}")
-        DetailRow("Data caducitat", lot.dataCaducitat.ifBlank { "-" })
-        DetailRow("Data obertura", lot.dataObertura.ifBlank { "-" })
-        DetailRow("Data acabament", lot.dataAcabament.ifBlank { "-" })
-        DetailRow("Albarà proveïdor", lot.albaraProveidorId?.toString() ?: "-")
+        DetailRow(stringResource(R.string.lots_raw_material), lot.materiaPrimeraNom.ifBlank { "-" })
+        DetailRow(stringResource(R.string.lot_quantity), "${lot.quantitat} ${lot.unitats}")
+        DetailRow(stringResource(R.string.lot_expiration_date), lot.dataCaducitat.ifBlank { "-" })
+        DetailRow(stringResource(R.string.lot_opening_date), lot.dataObertura.ifBlank { "-" })
+        DetailRow(stringResource(R.string.lot_finish_date), lot.dataAcabament.ifBlank { "-" })
+        DetailRow(stringResource(R.string.lot_supplier_note), lot.albaraProveidorId?.toString() ?: "-")
     }
 
     if (lot.estat == "EN_ESTOC" || lot.estat == "OBERT") {
@@ -238,14 +240,14 @@ private fun LotActionsCard(
             verticalArrangement = Arrangement.spacedBy(13.dp)
         ) {
             Text(
-                text = "Gestió de lots",
+                text = stringResource(R.string.lot_management),
                 style = MaterialTheme.typography.titleLarge,
                 color = EasyBrownDark,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Les accions requereixen confirmació abans de canviar l'estat del lot.",
+                text = stringResource(R.string.lot_actions_help),
                 style = MaterialTheme.typography.bodyMedium,
                 color = EasyTextSoft
             )
@@ -257,7 +259,7 @@ private fun LotActionsCard(
             when (lot.estat) {
                 "EN_ESTOC" -> {
                     Modifier.EasyPrimaryButton(
-                        text = "Iniciar lot",
+                        text = stringResource(R.string.lot_start),
                         enabled = !loading,
                         onClick = onIniciarClick
                     )
@@ -265,7 +267,7 @@ private fun LotActionsCard(
 
                 "OBERT" -> {
                     Modifier.EasyDangerButton(
-                        text = "Finalitzar lot",
+                        text = stringResource(R.string.lot_finish),
                         enabled = !loading,
                         onClick = onFinalitzarClick
                     )
@@ -284,7 +286,7 @@ private fun LotActionsCard(
                     )
 
                     Text(
-                        text = "Processant acció...",
+                        text = stringResource(R.string.lot_processing),
                         color = EasyTextSoft,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold
@@ -303,9 +305,9 @@ private fun LotActionHint(estat: String) {
     }
 
     val text = when (estat) {
-        "EN_ESTOC" -> "Aquest lot està en estoc. L'única acció disponible és iniciar-lo."
-        "OBERT" -> "Aquest lot està obert. L'única acció disponible és finalitzar-lo."
-        else -> "No hi ha accions disponibles."
+        "EN_ESTOC" -> stringResource(R.string.lot_hint_in_stock)
+        "OBERT" -> stringResource(R.string.lot_hint_open)
+        else -> stringResource(R.string.lot_hint_none)
     }
 
     val tint = when (estat) {

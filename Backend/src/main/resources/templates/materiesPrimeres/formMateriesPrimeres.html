@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Formulari Matèria Primera - EasyTraza</title>
+    <title th:text="#{materies.form.titolPagina}">Formulari Matèria Primera - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,16 +23,16 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració · Matèries primeres</p>
+                <p class="page-eyebrow" th:text="#{materies.form.eyebrow}">Administració · Matèries primeres</p>
 
                 <!-- Títol dinàmic -->
                 <h1 class="page-heading"
-                    th:text="${materiaPrimera.id != null} ? 'Editar matèria primera' : 'Nova matèria primera'">
+                    th:text="${materiaPrimera.id != null} ? #{materies.form.editar} : #{materies.form.nova}">
                     Formulari matèria primera
                 </h1>
 
                 <!-- Descripció -->
-                <p class="page-description">
+                <p class="page-description" th:text="#{materies.form.descripcioPagina}">
                     Defineix el nom i la descripció que identificaran la matèria primera al catàleg.
                 </p>
             </div>
@@ -41,12 +41,12 @@
             <div class="page-top-actions">
                 <a th:if="${!popup}" th:href="@{/materies-primeres/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
 
                 <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
                     <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    <span>Tancar</span>
+                    <span th:text="#{comu.tancar}">Tancar</span>
                 </button>
             </div>
         </section>
@@ -62,9 +62,9 @@
                 </div>
 
                 <div>
-                    <h2 class="section-title">Dades de la matèria primera</h2>
+                    <h2 class="section-title" th:text="#{materies.form.dades}">Dades de la matèria primera</h2>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{materies.form.subtitol}">
                         Les matèries primeres es poden ordenar des del llistat general.
                     </p>
                 </div>
@@ -97,7 +97,7 @@
                     <!----------------------- NOM MATÈRIA PRIMERA ----------------------->
                     <div class="form-group material-form-field-full">
                         <label class="form-label" for="nomMateria">
-                            Nom de la matèria primera
+                            <span th:text="#{materies.form.nom}">Nom de la matèria primera</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -111,10 +111,12 @@
                                    required
                                    autocomplete="off"
                                    placeholder="Ex. Farina de blat"
-                                   title="Introdueix el nom de la matèria primera">
+                                   th:placeholder="#{materies.form.nom.placeholder}"
+                                   title="Introdueix el nom de la matèria primera"
+                                   th:title="#{materies.form.nom.title}">
                         </div>
 
-                        <p class="form-help">
+                        <p class="form-help" th:text="#{materies.form.nom.ajuda}">
                             Aquest nom serà visible als lots i als albarans de proveïdor.
                         </p>
                     </div>
@@ -124,7 +126,7 @@
 
                         <div class="form-label-row">
                             <label class="form-label" for="descripcio">
-                                Descripció
+                                <span th:text="#{comu.descripcio}">Descripció</span>
                             </label>
 
                             <span id="descripcioCounter" class="character-counter">
@@ -141,10 +143,12 @@
                                       maxlength="50"
                                       rows="4"
                                       placeholder="Afegeix una descripció breu de la matèria primera..."
-                                      title="La descripció pot tenir un màxim de 50 caràcters"></textarea>
+                                      th:placeholder="#{materies.form.descripcio.placeholder}"
+                                      title="La descripció pot tenir un màxim de 50 caràcters"
+                                      th:title="#{materies.form.descripcio.title}"></textarea>
                         </div>
 
-                        <p class="form-help">
+                        <p class="form-help" th:text="#{materies.form.descripcio.ajuda}">
                             Camp opcional. Màxim 50 caràcters.
                         </p>
                     </div>
@@ -156,19 +160,19 @@
 
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        <span th:text="${materiaPrimera.id != null} ? 'Guardar canvis' : 'Crear matèria primera'">
+                        <span th:text="${materiaPrimera.id != null} ? #{comu.guardarCanvis} : #{materies.form.crear}">
                             Guardar
                         </span>
                     </button>
 
                     <a th:if="${!popup}" th:href="@{/materies-primeres/list}" class="btn btn-secondary">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </a>
 
                     <button th:if="${popup}" type="button" class="btn btn-secondary" onclick="window.close();">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </button>
 
                 </div>

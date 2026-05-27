@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Proveïdors - EasyTraza</title>
+    <title th:text="#{proveidors.llistat.titolPagina}">Proveïdors - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,11 +23,11 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració</p>
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
 
-                <h1 class="page-heading">Proveïdors</h1>
+                <h1 class="page-heading" th:text="#{sidebar.proveidors}">Proveïdors</h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{proveidors.llistat.descripcioPagina}">
                     Consulta i gestiona els proveïdors de matèries primeres registrats al sistema.
                 </p>
             </div>
@@ -35,7 +35,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/proveidors/new}" class="btn btn-primary">
                     <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    <span>Nou proveïdor</span>
+                    <span th:text="#{proveidors.form.nou}">Nou proveïdor</span>
                 </a>
             </div>
         </section>
@@ -59,15 +59,15 @@
 
                 <div class="suppliers-toolbar-info">
                     <div class="suppliers-title-row">
-                        <h2 class="section-title">Llistat de proveïdors</h2>
+                        <h2 class="section-title" th:text="#{proveidors.llistat.titol}">Llistat de proveïdors</h2>
 
                         <span class="suppliers-counter"
-                              th:text="|${#lists.size(proveidors)} proveïdors|">
+                              th:text="#{proveidors.llistat.comptador(${#lists.size(proveidors)})}">
                             0 proveïdors
                         </span>
                     </div>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{proveidors.llistat.subtitol}">
                         Filtra i ordena els proveïdors pels camps visibles del llistat.
                     </p>
                 </div>
@@ -78,7 +78,7 @@
 
                     <div class="suppliers-filter-row">
 
-                        <label for="nomProveidor" class="sr-only">
+                        <label for="nomProveidor" class="sr-only" th:text="#{proveidors.llistat.filtrarNom}">
                             Filtrar proveïdors per nom
                         </label>
 
@@ -90,10 +90,11 @@
                                    type="text"
                                    th:value="${nomProveidor}"
                                    placeholder="Nom proveïdor..."
+                                   th:placeholder="#{proveidors.llistat.nom.placeholder}"
                                    autocomplete="off">
                         </div>
 
-                        <label for="cif" class="sr-only">
+                        <label for="cif" class="sr-only" th:text="#{proveidors.llistat.filtrarCif}">
                             Filtrar proveïdors per CIF o DNI
                         </label>
 
@@ -105,61 +106,63 @@
                                    type="text"
                                    th:value="${cif}"
                                    placeholder="CIF / DNI..."
+                                   th:placeholder="#{proveidors.llistat.cif.placeholder}"
                                    autocomplete="off">
                         </div>
 
                         <div class="order-field">
-                            <label for="ordre">Ordenar per</label>
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
 
                             <select id="ordre" name="ordre" class="form-select">
                                 <option value="nomProveidor"
                                         th:selected="${ordre == 'nomProveidor'}">
-                                    Nom
+                                    <span th:text="#{comu.nom}">Nom</span>
                                 </option>
 
                                 <option value="cif"
                                         th:selected="${ordre == 'cif'}">
-                                    CIF / DNI
+                                    <span th:text="#{comu.cifDni}">CIF / DNI</span>
                                 </option>
 
                                 <option value="adreca"
                                         th:selected="${ordre == 'adreca'}">
-                                    Adreça
+                                    <span th:text="#{comu.adreca}">Adreça</span>
                                 </option>
 
                                 <option value="descripcio"
                                         th:selected="${ordre == 'descripcio'}">
-                                    Descripció
+                                    <span th:text="#{comu.descripcio}">Descripció</span>
                                 </option>
                             </select>
                         </div>
 
                         <div class="order-field order-direction-field">
-                            <label for="direccio">Direcció</label>
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
 
                             <select id="direccio" name="direccio" class="form-select">
                                 <option value="asc"
                                         th:selected="${direccio == 'asc'}">
-                                    Ascendent
+                                    <span th:text="#{comu.ascendent}">Ascendent</span>
                                 </option>
 
                                 <option value="desc"
                                         th:selected="${direccio == 'desc'}">
-                                    Descendent
+                                    <span th:text="#{comu.descendent}">Descendent</span>
                                 </option>
                             </select>
                         </div>
 
                         <button type="submit"
                                 class="btn btn-primary btn-icon"
-                                aria-label="Aplicar filtres i ordenació de proveïdors">
+                                aria-label="Aplicar filtres i ordenació de proveïdors"
+                                th:attr="aria-label=#{proveidors.llistat.aplicarFiltres}">
                             <i class="bi bi-search" aria-hidden="true"></i>
                         </button>
 
                         <a th:href="@{/proveidors/list}"
                            class="btn btn-secondary">
                             <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                            <span>Netejar</span>
+                            <span th:text="#{comu.netejar}">Netejar</span>
                         </a>
 
                     </div>
@@ -182,7 +185,7 @@
 
                         <div class="supplier-card-name-block">
 
-                            <p class="supplier-card-type">Proveïdor</p>
+                            <p class="supplier-card-type" th:text="#{proveidors.llistat.tipus}">Proveïdor</p>
 
                             <h3 class="supplier-card-title"
                                 th:text="${proveidor.nomProveidor}">
@@ -197,7 +200,7 @@
                     <div class="supplier-card-description-block">
 
                         <p class="supplier-card-description"
-                           th:text="${proveidor.descripcio != null && !#strings.isEmpty(proveidor.descripcio) ? proveidor.descripcio : 'Sense descripció registrada'}">
+                           th:text="${proveidor.descripcio != null && !#strings.isEmpty(proveidor.descripcio)} ? ${proveidor.descripcio} : #{comu.senseDescripcio}">
                             Descripció proveïdor
                         </p>
 
@@ -213,7 +216,7 @@
                             </div>
 
                             <div class="supplier-data-content">
-                                <span class="supplier-data-label">CIF / DNI</span>
+                                <span class="supplier-data-label" th:text="#{comu.cifDni}">CIF / DNI</span>
 
                                 <span class="supplier-data-value"
                                       th:text="${proveidor.cif}">
@@ -230,7 +233,7 @@
                             </div>
 
                             <div class="supplier-data-content">
-                                <span class="supplier-data-label">Adreça</span>
+                                <span class="supplier-data-label" th:text="#{comu.adreca}">Adreça</span>
 
                                 <span class="supplier-data-value"
                                       th:text="${proveidor.adreca}">
@@ -248,18 +251,19 @@
                         <a th:href="@{/proveidors/edit/{id}(id=${proveidor.id})}"
                            class="card-action card-action-edit">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                            <span>Editar</span>
+                            <span th:text="#{comu.editar}">Editar</span>
                         </a>
 
                         <form th:action="@{/proveidors/delete/{id}(id=${proveidor.id})}"
                               method="post"
                               class="card-delete-form"
-                              onsubmit="return confirm('Segur que vols eliminar aquest proveïdor?');">
+                              onsubmit="return confirm('Segur que vols eliminar aquest proveïdor?');"
+                              th:onsubmit="'return confirm(\'' + #{proveidors.llistat.confirmarEliminar} + '\');'">
 
                             <button type="submit"
                                     class="card-action card-action-delete">
                                 <i class="bi bi-trash3" aria-hidden="true"></i>
-                                <span>Eliminar</span>
+                                <span th:text="#{comu.eliminar}">Eliminar</span>
                             </button>
 
                         </form>
@@ -275,15 +279,15 @@
                         <i class="bi bi-truck" aria-hidden="true"></i>
                     </div>
 
-                    <h3>No s'han trobat proveïdors</h3>
+                    <h3 th:text="#{proveidors.llistat.buit.titol}">No s'han trobat proveïdors</h3>
 
-                    <p>
+                    <p th:text="#{proveidors.llistat.buit.descripcio}">
                         No hi ha proveïdors que coincideixin amb els filtres seleccionats.
                     </p>
 
                     <a th:href="@{/proveidors/list}" class="btn btn-secondary">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                        <span>Veure tots els proveïdors</span>
+                        <span th:text="#{proveidors.llistat.veureTots}">Veure tots els proveïdors</span>
                     </a>
 
                 </div>

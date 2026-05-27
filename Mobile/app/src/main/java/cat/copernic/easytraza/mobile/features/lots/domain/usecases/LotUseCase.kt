@@ -1,6 +1,7 @@
 package cat.copernic.easytraza.mobile.features.lots.domain.usecases
 
 import android.content.Context
+import cat.copernic.easytraza.mobile.R
 import cat.copernic.easytraza.mobile.core.network.RetrofitClient
 import cat.copernic.easytraza.mobile.features.lots.data.sources.remote.LotApi
 import cat.copernic.easytraza.mobile.features.lots.data.sources.remote.LotResponse
@@ -33,11 +34,11 @@ class LotUseCase(
                 )
             }
             else {
-                Result.failure(Exception("No s'han pogut carregar els lots"))
+                Result.failure(Exception(context.getString(R.string.error_load_lots)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 
@@ -51,11 +52,11 @@ class LotUseCase(
                 Result.success(response.body()!!.toDomain())
             }
             else {
-                Result.failure(Exception("No s'ha pogut consultar el lot"))
+                Result.failure(Exception(context.getString(R.string.error_consult_lot)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 
@@ -71,17 +72,21 @@ class LotUseCase(
                 Result.success(
                     IniciarLotResult(
                         requereixConfirmacio = body.requereixConfirmacio,
-                        missatge = body.missatge,
+                        missatge = if (body.requereixConfirmacio) {
+                            context.getString(R.string.lot_existing_open_message)
+                        } else {
+                            context.getString(R.string.lot_started_success)
+                        },
                         lot = body.lot?.toDomain()
                     )
                 )
             }
             else {
-                Result.failure(Exception("No s'ha pogut iniciar el lot"))
+                Result.failure(Exception(context.getString(R.string.error_start_lot)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 
@@ -95,11 +100,11 @@ class LotUseCase(
                 Result.success(response.body()!!.lot!!.toDomain())
             }
             else {
-                Result.failure(Exception("No s'ha pogut iniciar el lot"))
+                Result.failure(Exception(context.getString(R.string.error_start_lot)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 
@@ -113,11 +118,11 @@ class LotUseCase(
                 Result.success(response.body()!!.toDomain())
             }
             else {
-                Result.failure(Exception("No s'ha pogut finalitzar el lot"))
+                Result.failure(Exception(context.getString(R.string.error_finish_lot)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 

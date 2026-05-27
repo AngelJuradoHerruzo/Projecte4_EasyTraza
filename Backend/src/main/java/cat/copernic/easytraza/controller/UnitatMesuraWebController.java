@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,15 +37,18 @@ public class UnitatMesuraWebController {
     private final ProveidorService proveidorService;
     private final MateriaPrimeraService materiaPrimeraService;
     private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
+    private final MessageSource messageSource;
 
     public UnitatMesuraWebController(UnitatMesuraService unitatMesuraService,
                                      ProveidorService proveidorService,
                                      MateriaPrimeraService materiaPrimeraService,
-                                     OcrAlbaraProveidorService ocrAlbaraProveidorService) {
+                                     OcrAlbaraProveidorService ocrAlbaraProveidorService,
+                                     MessageSource messageSource) {
         this.unitatMesuraService = unitatMesuraService;
         this.proveidorService = proveidorService;
         this.materiaPrimeraService = materiaPrimeraService;
         this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
+        this.messageSource = messageSource;
     }
 
 
@@ -75,7 +80,7 @@ public class UnitatMesuraWebController {
                 albaraProveidor.getLots().get(indexUnitatMesura).setUnitats(unitatMesura.getNom());
             }
 
-            model.addAttribute("infoUnitatMesura", "Unitat de mesura creada correctament.");
+            model.addAttribute("infoUnitatMesura", missatge("unitatsMesura.missatge.creada"));
         }
         catch (RuntimeException e) {
             LOGGER.warn("No s'ha pogut crear la unitat de mesura des de l'albarà de proveïdor: {}", e.getMessage());
@@ -128,4 +133,9 @@ public class UnitatMesuraWebController {
             model.addAttribute("ocrDocumentNomOriginal", ocrDocumentTemporalId);
         }
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +19,11 @@ public class ProducteService {
 
     // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
     private final ProducteRepository producteRepository;
+    private final MessageSource messageSource;
 
-    public ProducteService(ProducteRepository producteRepository) {
+    public ProducteService(ProducteRepository producteRepository, MessageSource messageSource) {
         this.producteRepository = producteRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -99,18 +103,18 @@ public class ProducteService {
         }
 
         if (producte.getNomProducte() == null || producte.getNomProducte().isBlank()) {
-            throw new RuntimeException("El nom del producte és obligatori.");
+            throw new RuntimeException(missatge("service.producte.nomObligatori"));
         }
 
         Optional<Producte> producteExistent = producteRepository.findByNomProducte(producte.getNomProducte());
 
         if (producteExistent.isPresent()
                 && !producteExistent.get().getId().equals(producte.getId())) {
-            throw new RuntimeException("Ja existeix un producte amb aquest nom.");
+            throw new RuntimeException(missatge("service.producte.nomDuplicat"));
         }
 
         if (producte.getDescripcio() != null && producte.getDescripcio().length() > 50) {
-            throw new RuntimeException("La descripció no pot superar els 50 caràcters.");
+            throw new RuntimeException(missatge("service.producte.descripcioMax"));
         }
     }
 
@@ -140,4 +144,9 @@ public class ProducteService {
 
         return valor.toLowerCase().contains(filtre.trim().toLowerCase());
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

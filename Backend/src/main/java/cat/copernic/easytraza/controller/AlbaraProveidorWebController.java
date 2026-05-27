@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,17 +42,20 @@ public class AlbaraProveidorWebController {
     private final MateriaPrimeraService materiaPrimeraService;
     private final UnitatMesuraService unitatMesuraService;
     private final OcrAlbaraProveidorService ocrAlbaraProveidorService;
+    private final MessageSource messageSource;
 
     public AlbaraProveidorWebController(AlbaraProveidorService albaraProveidorService,
                                         ProveidorService proveidorService,
                                         MateriaPrimeraService materiaPrimeraService,
                                         UnitatMesuraService unitatMesuraService,
-                                        OcrAlbaraProveidorService ocrAlbaraProveidorService) {
+                                        OcrAlbaraProveidorService ocrAlbaraProveidorService,
+                                        MessageSource messageSource) {
         this.albaraProveidorService = albaraProveidorService;
         this.proveidorService = proveidorService;
         this.materiaPrimeraService = materiaPrimeraService;
         this.unitatMesuraService = unitatMesuraService;
         this.ocrAlbaraProveidorService = ocrAlbaraProveidorService;
+        this.messageSource = messageSource;
     }
 
 
@@ -169,7 +174,7 @@ public class AlbaraProveidorWebController {
         }
 
         model.addAttribute("albaraProveidor", albaraProveidor);
-        model.addAttribute("info", "Llistes actualitzades. Els elements creats s'han associat si coincideixen amb les dades OCR.");
+        model.addAttribute("info", missatge("albaraProveidor.info.llistesActualitzades"));
         model.addAttribute("ocrDocumentTemporalId", ocrDocumentTemporalId);
         afegirDadesDocumentTemporal(model, ocrDocumentTemporalId);
         carregarDadesFormulari(model);
@@ -340,4 +345,9 @@ public class AlbaraProveidorWebController {
             albaraProveidor.setLots(new ArrayList<>(List.of(new LotProveidor())));
         }
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +21,14 @@ public class ClientService {
     // ---------------------------- REPOSITORIS I CONSTRUCTOR ----------------------------
     private final ClientRepository clientRepository;
     private final AlbaraClientRepository albaraClientRepository;
+    private final MessageSource messageSource;
 
     public ClientService(ClientRepository clientRepository,
-                         AlbaraClientRepository albaraClientRepository) {
+                         AlbaraClientRepository albaraClientRepository,
+                         MessageSource messageSource) {
         this.clientRepository = clientRepository;
         this.albaraClientRepository = albaraClientRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -119,7 +124,7 @@ public class ClientService {
     public void deleteClient(Long id) {
 
         if (albaraClientRepository.existsByClientId(id)) {
-            throw new RuntimeException("No es pot eliminar aquest client perquè té albarans de client associats.");
+            throw new RuntimeException(missatge("service.client.eliminarRelacionat"));
         }
 
         clientRepository.deleteById(id);
@@ -163,64 +168,64 @@ public class ClientService {
         }
 
         if (client.getCif() == null || client.getCif().isBlank()) {
-            throw new RuntimeException("El CIF o DNI és obligatori.");
+            throw new RuntimeException(missatge("service.client.cifObligatori"));
         }
 
         if (!esCifNifValid(client.getCif())) {
-            throw new RuntimeException("El CIF o DNI no és correcte.");
+            throw new RuntimeException(missatge("service.client.cifIncorrecte"));
         }
 
         Optional<Client> clientCifExistent = clientRepository.findByCif(client.getCif());
 
         if (clientCifExistent.isPresent()
                 && !clientCifExistent.get().getId().equals(client.getId())) {
-            throw new RuntimeException("Ja existeix un client amb aquest CIF o DNI.");
+            throw new RuntimeException(missatge("service.client.cifDuplicat"));
         }
 
         if (client.getNomComplet() == null || client.getNomComplet().isBlank()) {
-            throw new RuntimeException("El nom complet del client és obligatori.");
+            throw new RuntimeException(missatge("service.client.nomObligatori"));
         }
 
         if (!client.getNomComplet().matches("^[A-Za-zÀ-ÿ]+(\\s+[A-Za-zÀ-ÿ]+)+$")) {
-            throw new RuntimeException("El nom complet ha d'incloure nom i almenys un cognom.");
+            throw new RuntimeException(missatge("service.client.nomCognom"));
         }
 
         if (client.getTelefon() == null || client.getTelefon().isBlank()) {
-            throw new RuntimeException("El telèfon és obligatori.");
+            throw new RuntimeException(missatge("service.client.telefonObligatori"));
         }
 
         if (!client.getTelefon().matches("\\d{3}\\s\\d{2}\\s\\d{2}\\s\\d{2}")) {
-            throw new RuntimeException("El telèfon ha de tenir el format XXX XX XX XX.");
+            throw new RuntimeException(missatge("service.client.telefonFormat"));
         }
 
         Optional<Client> clientTelefonExistent = clientRepository.findByTelefon(client.getTelefon());
 
         if (clientTelefonExistent.isPresent()
                 && !clientTelefonExistent.get().getId().equals(client.getId())) {
-            throw new RuntimeException("Ja existeix un client amb aquest telèfon.");
+            throw new RuntimeException(missatge("service.client.telefonDuplicat"));
         }
 
         if (client.getEmail() == null || client.getEmail().isBlank()) {
-            throw new RuntimeException("El correu electrònic és obligatori.");
+            throw new RuntimeException(missatge("service.client.emailObligatori"));
         }
 
         if (!client.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new RuntimeException("El format del correu electrònic no és correcte.");
+            throw new RuntimeException(missatge("service.client.emailFormat"));
         }
 
         Optional<Client> clientEmailExistent = clientRepository.findByEmail(client.getEmail());
 
         if (clientEmailExistent.isPresent()
                 && !clientEmailExistent.get().getId().equals(client.getId())) {
-            throw new RuntimeException("Ja existeix un client amb aquest correu electrònic.");
+            throw new RuntimeException(missatge("service.client.emailDuplicat"));
         }
 
         if (client.getAdreca() == null || client.getAdreca().isBlank()) {
-            throw new RuntimeException("L'adreça és obligatòria.");
+            throw new RuntimeException(missatge("service.client.adrecaObligatoria"));
         }
 
         if (client.getObservacions() != null && client.getObservacions().length() > 50) {
-            throw new RuntimeException("Les observacions no poden superar els 50 caràcters.");
+            throw new RuntimeException(missatge("service.client.observacionsMax"));
         }
     }
 
@@ -407,4 +412,9 @@ public class ClientService {
 
         return false; // Si no compleix cap format, no és vàlid
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>Detall albarà client - EasyTraza</title>
+    <title th:text="#{albaransClient.detall.titol}">Detall albarà client - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -23,9 +23,9 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Lliuraments · Albarans client</p>
+                <p class="page-eyebrow" th:text="#{albaransClient.eyebrow}">Lliuraments · Albarans client</p>
                 <h1 class="page-heading" th:text="|Albarà #${albaraClient.id}|">Albarà #1</h1>
-                <p class="page-description">
+                <p class="page-description" th:text="#{albaransClient.detall.desc}">
                     Consulta les línies de producció, els operaris i els lots associats al lliurament.
                 </p>
             </div>
@@ -33,7 +33,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
             </div>
         </section>
@@ -48,15 +48,15 @@
                     </div>
 
                     <div>
-                        <p class="delivery-card-type">Albarà client</p>
+                        <p class="delivery-card-type" th:text="#{albaransClient.detall.tipus}">Albarà client</p>
                         <h2 class="section-title" th:text="|#${albaraClient.id}|">#1</h2>
                     </div>
                 </div>
 
                 <span class="delivery-status"
                       th:classappend="${albaraClient.estat.name() == 'PENDENT_LLIURAR'} ? ' status-pendent' : ' status-lliurat'"
-                      th:text="${albaraClient.estat.name() == 'PENDENT_LLIURAR'} ? 'Pendent' : 'Lliurat'">
-                    Estat
+                      th:text="${albaraClient.estat.name() == 'PENDENT_LLIURAR'} ? #{estat.pendentText} : #{estat.lliuratText}">
+                    <span th:text="#{comu.estat}">Estat</span>
                 </span>
             </header>
 
@@ -65,7 +65,7 @@
                 <div class="summary-item">
                     <i class="bi bi-person" aria-hidden="true"></i>
                     <div>
-                        <span class="delivery-label">Client</span>
+                        <span class="delivery-label" th:text="#{comu.client}">Client</span>
                         <strong th:text="${albaraClient.client.nomComplet}">Client</strong>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                 <div class="summary-item">
                     <i class="bi bi-calendar3" aria-hidden="true"></i>
                     <div>
-                        <span class="delivery-label">Data i hora</span>
+                        <span class="delivery-label" th:text="#{comu.dataHora}">Data i hora</span>
                         <strong th:text="${#temporals.format(albaraClient.dataAlbara, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</strong>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                 <div class="summary-item">
                     <i class="bi bi-list-check" aria-hidden="true"></i>
                     <div>
-                        <span class="delivery-label">Línies</span>
+                        <span class="delivery-label" th:text="#{comu.linies}">Línies</span>
                         <strong th:text="${#lists.size(albaraClient.liniesProduccio)}">0</strong>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                 <div class="summary-item">
                     <i class="bi bi-box-seam" aria-hidden="true"></i>
                     <div>
-                        <span class="delivery-label">Lots associats</span>
+                        <span class="delivery-label" th:text="#{comu.lotsAssociats}">Lots associats</span>
                         <strong th:text="${#lists.size(albaraClient.lotsAssociats)}">0</strong>
                     </div>
                 </div>
@@ -98,8 +98,8 @@
             <!----------------------- LÍNIES DE PRODUCCIÓ ----------------------->
             <section class="detail-block">
                 <div class="detail-block-header">
-                    <h3>Línies de producció</h3>
-                    <p>Productes lliurats i operari assignat a cada línia.</p>
+                    <h3 th:text="#{albaransClient.liniesProduccio}">Línies de producció</h3>
+                    <p th:text="#{albaransClient.detall.liniesDesc}">Productes lliurats i operari assignat a cada línia.</p>
                 </div>
 
                 <div class="production-detail-list">
@@ -107,18 +107,18 @@
                         <span class="production-detail-number" th:text="${stat.count}">1</span>
 
                         <div class="production-detail-product">
-                            <span class="delivery-label">Producte</span>
+                            <span class="delivery-label" th:text="#{comu.producte}">Producte</span>
                             <strong th:text="${linia.producte.nomProducte}">Producte</strong>
                         </div>
 
                         <div class="production-detail-operator">
-                            <span class="delivery-label">Operari</span>
+                            <span class="delivery-label" th:text="#{comu.operari}">Operari</span>
                             <strong th:text="${linia.operari != null ? linia.operari.nomComplet : '-'}">Operari</strong>
                         </div>
 
                         <div class="production-detail-quantity">
-                            <span class="delivery-label">Quantitat</span>
-                            <strong th:text="|${linia.quantitat} unitats|">1 unitats</strong>
+                            <span class="delivery-label" th:text="#{comu.quantitat}">Quantitat</span>
+                            <strong th:text="#{comu.quantitatUnitats(${linia.quantitat})}">1 unitats</strong>
                         </div>
                     </article>
                 </div>
@@ -127,8 +127,8 @@
             <!----------------------- LOTS ASSOCIATS ----------------------->
             <section class="detail-block">
                 <div class="detail-block-header">
-                    <h3>Lots oberts associats</h3>
-                    <p>Lots vinculats al lliurament per garantir la traçabilitat.</p>
+                    <h3 th:text="#{albaransClient.detall.lotsOberts}">Lots oberts associats</h3>
+                    <p th:text="#{albaransClient.detall.lotsDesc}">Lots vinculats al lliurament per garantir la traçabilitat.</p>
                 </div>
 
                 <div th:if="${albaraClient.lotsAssociats != null and !albaraClient.lotsAssociats.isEmpty()}"
@@ -138,7 +138,7 @@
                             <i class="bi bi-box-seam" aria-hidden="true"></i>
                             <strong th:text="|Lot ${lot.identificadorLot}|">Lot</strong>
                         </div>
-                        <span class="delivery-label">Matèria primera</span>
+                        <span class="delivery-label" th:text="#{comu.materiaPrimera}">Matèria primera</span>
                         <span class="associated-lot-materia" th:text="${lot.materiaPrimera.nomMateria}">Matèria primera</span>
                     </article>
                 </div>
@@ -146,7 +146,7 @@
                 <div th:if="${albaraClient.lotsAssociats == null or albaraClient.lotsAssociats.isEmpty()}"
                      class="detail-empty-state">
                     <i class="bi bi-box-seam" aria-hidden="true"></i>
-                    <span>Aquest albarà no té lots associats.</span>
+                    <span th:text="#{albaransClient.detall.senseLots}">Aquest albarà no té lots associats.</span>
                 </div>
             </section>
 
@@ -156,26 +156,26 @@
                    th:href="@{/albarans-client/edit/{id}(id=${albaraClient.id})}"
                    class="btn btn-secondary">
                     <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                    <span>Editar</span>
+                    <span th:text="#{comu.editar}">Editar</span>
                 </a>
 
                 <form th:if="${albaraClient.estat.name() == 'PENDENT_LLIURAR'}"
                       th:action="@{/albarans-client/lliurar/{id}(id=${albaraClient.id})}"
                       method="post"
-                      onsubmit="return confirm('Segur que vols marcar aquest albarà com a lliurat?');">
+                      th:onsubmit="|return confirm('#{albaransClient.confirm.lliurar}');|">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check2-circle" aria-hidden="true"></i>
-                        <span>Lliurar</span>
+                        <span th:text="#{comu.lliurar}">Lliurar</span>
                     </button>
                 </form>
 
                 <form th:if="${albaraClient.estat.name() == 'PENDENT_LLIURAR'}"
                       th:action="@{/albarans-client/delete/{id}(id=${albaraClient.id})}"
                       method="post"
-                      onsubmit="return confirm('Segur que vols eliminar aquest albarà?');">
+                      th:onsubmit="|return confirm('#{albaransClient.confirm.eliminar}');|">
                     <button type="submit" class="btn btn-delete">
                         <i class="bi bi-trash3" aria-hidden="true"></i>
-                        <span>Eliminar</span>
+                        <span th:text="#{comu.eliminar}">Eliminar</span>
                     </button>
                 </form>
             </footer>

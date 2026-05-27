@@ -1,6 +1,7 @@
 package cat.copernic.easytraza.mobile.features.auth.domain.usecases
 
 import android.content.Context
+import cat.copernic.easytraza.mobile.R
 import cat.copernic.easytraza.mobile.core.network.RetrofitClient
 import cat.copernic.easytraza.mobile.features.auth.data.sources.remote.AuthApi
 import cat.copernic.easytraza.mobile.features.auth.data.sources.remote.IdentificarRequest
@@ -48,15 +49,15 @@ class IdentificarUsuariUseCase(
                     )
                 }
                 else {
-                    Result.failure(Exception("Resposta buida del servidor"))
+                    Result.failure(Exception(context.getString(R.string.error_empty_response)))
                 }
             }
             else {
-                Result.failure(Exception("No s'han pogut carregar els usuaris"))
+                Result.failure(Exception(context.getString(R.string.error_load_users)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 
@@ -86,15 +87,15 @@ class IdentificarUsuariUseCase(
                     )
                 }
                 else {
-                    Result.failure(Exception("Resposta buida del servidor"))
+                    Result.failure(Exception(context.getString(R.string.error_empty_response)))
                 }
             }
             else {
-                Result.failure(Exception("Usuari no trobat"))
+                Result.failure(Exception(context.getString(R.string.error_user_not_found)))
             }
         }
         catch (e: Exception) {
-            Result.failure(Exception("No s'ha pogut connectar amb el servidor"))
+            Result.failure(Exception(context.getString(R.string.error_server_connection)))
         }
     }
 }

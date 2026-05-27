@@ -42,9 +42,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cat.copernic.easytraza.mobile.R
 import cat.copernic.easytraza.mobile.features.lots.domain.models.Lot
 import cat.copernic.easytraza.mobile.features.lots.presentation.viewmodels.LotViewModel
 import cat.copernic.easytraza.mobile.ui.components.EasyButtonShape
@@ -64,12 +68,12 @@ import cat.copernic.easytraza.mobile.ui.theme.EasyWhite
 
 private const val TOTS = "Tots"
 
-private enum class LotSortOption(val label: String) {
-    IDENTIFICADOR_ASC("Identificador A-Z"),
-    IDENTIFICADOR_DESC("Identificador Z-A"),
-    ESTAT("Estat"),
-    MATERIA("Matèria primera"),
-    DATA_CADUCITAT("Data caducitat")
+private enum class LotSortOption(@StringRes val labelRes: Int) {
+    IDENTIFICADOR_ASC(R.string.lots_sort_identifier_asc),
+    IDENTIFICADOR_DESC(R.string.lots_sort_identifier_desc),
+    ESTAT(R.string.lots_sort_state),
+    MATERIA(R.string.lots_sort_raw_material),
+    DATA_CADUCITAT(R.string.lots_sort_expiration)
 }
 
 /**
@@ -93,9 +97,11 @@ fun LotListScreen(
     var filtreData by remember { mutableStateOf("") }
     var ordre by remember { mutableStateOf(LotSortOption.MATERIA) }
 
+    val senseMateria = stringResource(R.string.lots_no_raw_material)
+
     val materies = remember(uiState.lots) {
         listOf(TOTS) + uiState.lots
-            .map { it.materiaPrimeraNom.ifBlank { "Sense matèria primera" } }
+            .map { it.materiaPrimeraNom.ifBlank { senseMateria } }
             .distinct()
             .sorted()
     }
@@ -108,7 +114,7 @@ fun LotListScreen(
         .filter { lot -> filtreEstat == TOTS || lot.estat == filtreEstat }
         .filter { lot ->
             filtreMateria == TOTS ||
-                    lot.materiaPrimeraNom.ifBlank { "Sense matèria primera" } == filtreMateria
+                    lot.materiaPrimeraNom.ifBlank { senseMateria } == filtreMateria
         }
         .filter { lot ->
             val data = filtreData.trim()
@@ -144,20 +150,20 @@ fun LotListScreen(
         }
 
     val lotsAgrupats = lotsFiltrats
-        .groupBy { lot -> lot.materiaPrimeraNom.ifBlank { "Sense matèria primera" } }
+        .groupBy { lot -> lot.materiaPrimeraNom.ifBlank { senseMateria } }
         .toSortedMap()
 
     EasyScreen {
         EasyHeader(
-            title = "Lots",
-            subtitle = "Consulta, filtra i ordena els lots",
+            title = stringResource(R.string.lots_title),
+            subtitle = stringResource(R.string.lots_subtitle),
             showConfig = true,
             onConfiguracioClick = onConfiguracioClick,
             actions = {
                 IconButton(onClick = { viewModel.carregarLots() }) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "Recarregar",
+                        contentDescription = stringResource(R.string.lots_reload),
                         tint = EasyBrown
                     )
                 }
@@ -204,11 +210,11 @@ fun LotListScreen(
             }
 
             uiState.lots.isEmpty() -> {
-                EmptyLotsMessage(text = "No hi ha lots disponibles.")
+                EmptyLotsMessage(text = stringResource(R.string.lots_none))
             }
 
             lotsFiltrats.isEmpty() -> {
-                EmptyLotsMessage(text = "No hi ha lots que coincideixin amb els filtres.")
+                EmptyLotsMessage(text = stringResource(R.string.lots_no_match))
             }
 
             else -> {
@@ -235,7 +241,7 @@ fun LotListScreen(
         }
 
         Modifier.EasySecondaryButton(
-            text = "Canviar d'usuari",
+            text = stringResource(R.string.main_change_user),
             onClick = onSortirClick
         )
     }
@@ -284,13 +290,13 @@ private fun LotFiltersCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.FilterList,
-                    contentDescription = "Filtres",
+                    contentDescription = stringResource(R.string.lots_filters),
                     tint = EasyBrown
                 )
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Filtres i ordenació",
+                        text = stringResource(R.string.lots_filters_and_sort),
                         color = EasyBrownDark,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
@@ -313,7 +319,7 @@ private fun LotFiltersCard(
 
                 Icon(
                     imageVector = if (plegat) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
-                    contentDescription = if (plegat) "Desplegar filtres" else "Plegar filtres",
+                    contentDescription = if (plegat) stringResource(R.string.lots_expand_filters) else stringResource(R.string.lots_collapse_filters),
                     tint = EasyBrown
                 )
             }
@@ -322,7 +328,7 @@ private fun LotFiltersCard(
                 OutlinedTextField(
                     value = filtreIdentificador,
                     onValueChange = onFiltreIdentificadorChange,
-                    label = { Text("Identificador") },
+                    label = { Text(stringResource(R.string.lots_identifier)) },
                     singleLine = true,
                     shape = EasyButtonShape,
                     modifier = Modifier.fillMaxWidth()
@@ -336,7 +342,7 @@ private fun LotFiltersCard(
                         value = estatLabel(filtreEstat),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Estat") },
+                        label = { Text(stringResource(R.string.lots_state)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = estatExpanded)
                         },
@@ -373,7 +379,7 @@ private fun LotFiltersCard(
                         value = filtreMateria,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Matèria primera") },
+                        label = { Text(stringResource(R.string.lots_raw_material)) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = materiaExpanded)
                         },
@@ -392,7 +398,7 @@ private fun LotFiltersCard(
                     ) {
                         materies.forEach { materia ->
                             DropdownMenuItem(
-                                text = { Text(materia) },
+                                text = { Text(if (materia == TOTS) stringResource(R.string.lots_all_raw_materials) else materia) },
                                 onClick = {
                                     onFiltreMateriaChange(materia)
                                     materiaExpanded = false
@@ -405,8 +411,8 @@ private fun LotFiltersCard(
                 OutlinedTextField(
                     value = filtreData,
                     onValueChange = onFiltreDataChange,
-                    label = { Text("Data") },
-                    placeholder = { Text("caducitat, obertura o acabament") },
+                    label = { Text(stringResource(R.string.lots_date)) },
+                    placeholder = { Text(stringResource(R.string.lots_date_placeholder)) },
                     singleLine = true,
                     shape = EasyButtonShape,
                     modifier = Modifier.fillMaxWidth()
@@ -417,10 +423,10 @@ private fun LotFiltersCard(
                     onExpandedChange = { ordreExpanded = !ordreExpanded }
                 ) {
                     OutlinedTextField(
-                        value = ordre.label,
+                        value = stringResource(ordre.labelRes),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Ordenar per") },
+                        label = { Text(stringResource(R.string.lots_sort_by)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Sort,
@@ -446,7 +452,7 @@ private fun LotFiltersCard(
                     ) {
                         LotSortOption.entries.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option.label) },
+                                text = { Text(stringResource(option.labelRes)) },
                                 onClick = {
                                     onOrdreChange(option)
                                     ordreExpanded = false
@@ -457,7 +463,7 @@ private fun LotFiltersCard(
                 }
 
                 Text(
-                    text = "Netejar filtres",
+                    text = stringResource(R.string.lots_clear_filters),
                     color = EasyBrown,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
@@ -507,7 +513,7 @@ fun LotMateriaGroupCard(
                     )
 
                     Text(
-                        text = "${lots.size} lots associats a aquesta matèria",
+                        text = stringResource(R.string.lots_group_count, lots.size),
                         color = EasyTextSoft,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold
@@ -516,7 +522,7 @@ fun LotMateriaGroupCard(
 
                 Icon(
                     imageVector = if (plegat) Icons.Default.ExpandMore else Icons.Default.ExpandLess,
-                    contentDescription = if (plegat) "Desplegar" else "Plegar",
+                    contentDescription = if (plegat) stringResource(R.string.lots_expand) else stringResource(R.string.lots_collapse),
                     tint = EasyBrown
                 )
             }
@@ -571,7 +577,7 @@ fun LotListItem(
         ) {
             Icon(
                 imageVector = Icons.Default.Inventory,
-                contentDescription = "Lot",
+                contentDescription = stringResource(R.string.common_lot),
                 tint = EasyBrown,
                 modifier = Modifier.size(25.dp)
             )
@@ -591,7 +597,7 @@ fun LotListItem(
             )
 
             Text(
-                text = "${lot.quantitat} ${lot.unitats} · Cad. ${lot.dataCaducitat.ifBlank { "-" }}",
+                text = "${lot.quantitat} ${lot.unitats} · ${stringResource(R.string.lots_expiration_short, lot.dataCaducitat.ifBlank { "-" })}",
                 color = EasyText,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
@@ -621,6 +627,7 @@ private fun ColumnScope.EmptyLotsMessage(text: String) {
     }
 }
 
+@Composable
 private fun resumFiltres(
     filtreIdentificador: String,
     filtreEstat: String,
@@ -637,19 +644,20 @@ private fun resumFiltres(
     ).count { it }
 
     val textFiltres = if (filtresActius == 0) {
-        "sense filtres"
+        stringResource(R.string.lots_without_filters)
     } else {
-        "$filtresActius filtre${if (filtresActius == 1) "" else "s"} actiu${if (filtresActius == 1) "" else "s"}"
+        pluralStringResource(R.plurals.lots_active_filters, filtresActius, filtresActius)
     }
 
-    return "$total lots · $textFiltres · ${ordre.label}"
+    return stringResource(R.string.lots_summary, total, textFiltres, stringResource(ordre.labelRes))
 }
 
+@Composable
 private fun estatLabel(estat: String): String = when (estat) {
-    TOTS -> "Tots els estats"
-    "EN_ESTOC" -> "En estoc"
-    "OBERT" -> "Obert"
-    "ACABAT" -> "Acabat"
+    TOTS -> stringResource(R.string.lots_all_states)
+    "EN_ESTOC" -> stringResource(R.string.lots_status_in_stock)
+    "OBERT" -> stringResource(R.string.lots_status_open)
+    "ACABAT" -> stringResource(R.string.lots_status_finished)
     else -> estat
 }
 

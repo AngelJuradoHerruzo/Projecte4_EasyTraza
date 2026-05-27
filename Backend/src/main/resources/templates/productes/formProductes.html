@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ca" xmlns:th="http://www.thymeleaf.org">
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Formulari Producte - EasyTraza</title>
+    <meta name="google" content="notranslate">
+    <title th:text="#{productes.form.titolPagina}">Formulari Producte - EasyTraza</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" th:href="@{/css/general.css}">
@@ -22,14 +23,14 @@
         <!----------------------- CAPÇALERA ----------------------->
         <section class="page-top">
             <div class="page-top-left">
-                <p class="page-eyebrow">Administració · Productes</p>
+                <p class="page-eyebrow" th:text="#{productes.form.eyebrow}">Administració · Productes</p>
 
                 <h1 class="page-heading"
-                    th:text="${producte.id != null} ? 'Editar producte' : 'Nou producte'">
+                    th:text="${producte.id != null} ? #{productes.form.editar} : #{productes.form.nou}">
                     Formulari producte
                 </h1>
 
-                <p class="page-description">
+                <p class="page-description" th:text="#{productes.form.descripcioPagina}">
                     Defineix el nom i la descripció que identificaran el producte al catàleg.
                 </p>
             </div>
@@ -37,7 +38,7 @@
             <div class="page-top-actions">
                 <a th:href="@{/productes/list}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Tornar al llistat</span>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
                 </a>
             </div>
         </section>
@@ -53,9 +54,9 @@
                 </div>
 
                 <div>
-                    <h2 class="section-title">Dades del producte</h2>
+                    <h2 class="section-title" th:text="#{productes.form.dades}">Dades del producte</h2>
 
-                    <p class="section-subtitle">
+                    <p class="section-subtitle" th:text="#{productes.form.ordre}">
                         Els productes es mostraran ordenats alfabèticament al llistat general.
                     </p>
                 </div>
@@ -86,7 +87,7 @@
                     <!----------------------- NOM PRODUCTE ----------------------->
                     <div class="form-group product-form-field-full">
                         <label class="form-label" for="nomProducte">
-                            Nom del producte
+                            <span th:text="#{productes.form.nom}">Nom del producte</span>
                             <span class="required-mark">*</span>
                         </label>
 
@@ -100,10 +101,12 @@
                                    required
                                    autocomplete="off"
                                    placeholder="Ex. Pa integral"
-                                   title="Introdueix el nom del producte">
+                                   th:placeholder="#{productes.form.nom.placeholder}"
+                                   title="Introdueix el nom del producte"
+                                   th:title="#{productes.form.nom.title}">
                         </div>
 
-                        <p class="form-help">
+                        <p class="form-help" th:text="#{productes.form.nom.ajuda}">
                             Aquest nom serà visible als albarans i als llistats de productes.
                         </p>
                     </div>
@@ -113,7 +116,7 @@
 
                         <div class="form-label-row">
                             <label class="form-label" for="descripcio">
-                                Descripció
+                                <span th:text="#{productes.form.descripcio}">Descripció</span>
                             </label>
 
                             <span id="descripcioCounter" class="character-counter">
@@ -130,10 +133,12 @@
                                       maxlength="50"
                                       rows="4"
                                       placeholder="Afegeix una descripció breu del producte..."
-                                      title="La descripció pot tenir un màxim de 50 caràcters"></textarea>
+                                      th:placeholder="#{productes.form.descripcio.placeholder}"
+                                      title="La descripció pot tenir un màxim de 50 caràcters"
+                                      th:title="#{productes.form.descripcio.title}"></textarea>
                         </div>
 
-                        <p class="form-help">
+                        <p class="form-help" th:text="#{productes.form.descripcio.ajuda}">
                             Camp opcional. Màxim 50 caràcters.
                         </p>
                     </div>
@@ -145,14 +150,14 @@
 
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        <span th:text="${producte.id != null} ? 'Guardar canvis' : 'Crear producte'">
+                        <span th:text="${producte.id != null} ? #{comu.guardarCanvis} : #{productes.form.crear}">
                             Guardar
                         </span>
                     </button>
 
                     <a th:href="@{/productes/list}" class="btn btn-secondary">
                         <i class="bi bi-x-lg" aria-hidden="true"></i>
-                        <span>Cancel·lar</span>
+                        <span th:text="#{comu.cancelar}">Cancel·lar</span>
                     </a>
 
                 </div>

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +18,11 @@ public class UnitatMesuraService {
 
     // ---------------------------- REPOSITORI I CONSTRUCTOR ----------------------------
     private final UnitatMesuraRepository unitatMesuraRepository;
+    private final MessageSource messageSource;
 
-    public UnitatMesuraService(UnitatMesuraRepository unitatMesuraRepository) {
+    public UnitatMesuraService(UnitatMesuraRepository unitatMesuraRepository, MessageSource messageSource) {
         this.unitatMesuraRepository = unitatMesuraRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -77,27 +81,25 @@ public class UnitatMesuraService {
     private void validarNomUnitatMesura(String nom) {
 
         if (nom == null || nom.isBlank()) {
-            throw new RuntimeException("La unitat de mesura és obligatòria.");
+            throw new RuntimeException(missatge("service.unitat.obligatoria"));
         }
 
         if (nom.length() > 4) {
-            throw new RuntimeException("La unitat de mesura no pot superar els 4 caràcters.");
+            throw new RuntimeException(missatge("service.unitat.longitudMax"));
         }
 
         if (!nom.matches("^[a-z0-9]+$")) {
-            throw new RuntimeException("La unitat de mesura només pot contenir lletres i números.");
+            throw new RuntimeException(missatge("service.unitat.caracters"));
         }
 
         if (unitatMesuraRepository.existsByNom(nom)) {
-            throw new RuntimeException("Aquesta unitat de mesura ja existeix.");
+            throw new RuntimeException(missatge("service.unitat.duplicada"));
         }
 
         List<String> unitatsSemblants = obtenirUnitatsSemblants(nom);
 
         if (!unitatsSemblants.isEmpty()) {
-            throw new RuntimeException("Unitat semblant: "
-                    + String.join(", ", unitatsSemblants)
-                    + ". Revisa si ja existeix.");
+            throw new RuntimeException(missatge("service.unitat.semblant", String.join(", ", unitatsSemblants)));
         }
     }
 
@@ -120,4 +122,9 @@ public class UnitatMesuraService {
 
         return unitatsSemblants;
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

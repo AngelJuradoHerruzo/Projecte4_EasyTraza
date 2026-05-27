@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +20,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OcrArtipasService implements OcrParserProveidor {
+
+    private final MessageSource messageSource;
+
+    public OcrArtipasService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     private static final Pattern PATRON_NUMERO_ALBARA = Pattern.compile(
             "\\bWH\\s*[/\\-]?\\s*[O0]UT\\s*[/\\-]?\\s*(\\d{3,12})\\b",
@@ -188,17 +196,17 @@ public class OcrArtipasService implements OcrParserProveidor {
 
         if (codiHs == null || codiHs.isBlank()) {
             resultat.setIdentificadorLot("-");
-            resultat.afegirAvis("No s'ha detectat el Codi HS. Completa el lot manualment.");
+            resultat.afegirAvis(missatge("ocr.avis.codiHsNoDetectat"));
         } else {
             resultat.setIdentificadorLot(OcrUtils.normalitzarLot(codiHs));
         }
 
         if (materia == null || materia.isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar la matèria primera.");
+            resultat.afegirAvis(missatge("ocr.avis.materiaNoDetectada"));
         }
 
         if (quantitatEntregada == null || quantitatEntregada <= 0) {
-            resultat.afegirAvis("No s'ha pogut detectar correctament la quantitat entregada.");
+            resultat.afegirAvis(missatge("ocr.avis.quantitatEntregadaNoDetectada"));
         }
 
         return resultat;
@@ -288,15 +296,20 @@ public class OcrArtipasService implements OcrParserProveidor {
 
     private void afegirAvisosGenerals(OcrAlbaraPendent resultat) {
         if (resultat.getNumeroAlbara() == null || resultat.getNumeroAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar el número d'albarà d'ARTIPAS.");
+            resultat.afegirAvis(missatge("ocr.avis.numeroAlbaraNoDetectat", "ARTIPAS"));
         }
 
         if (resultat.getDataAlbara() == null || resultat.getDataAlbara().isBlank()) {
-            resultat.afegirAvis("No s'ha pogut detectar la data de l'albarà d'ARTIPAS.");
+            resultat.afegirAvis(missatge("ocr.avis.dataAlbaraNoDetectada", "ARTIPAS"));
         }
 
         if (resultat.getLinies() == null || resultat.getLinies().isEmpty()) {
-            resultat.afegirAvis("No s'ha pogut detectar cap línia de producte d'ARTIPAS.");
+            resultat.afegirAvis(missatge("ocr.avis.capLiniaProducte", "ARTIPAS"));
         }
     }
+
+    private String missatge(String codi, Object... arguments) {
+        return messageSource.getMessage(codi, arguments, LocaleContextHolder.getLocale());
+    }
+
 }

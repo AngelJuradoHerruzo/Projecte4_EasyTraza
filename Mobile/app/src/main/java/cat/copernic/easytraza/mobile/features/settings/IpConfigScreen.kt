@@ -2,8 +2,6 @@ package cat.copernic.easytraza.mobile.features.settings
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,8 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cat.copernic.easytraza.mobile.R
 import cat.copernic.easytraza.mobile.core.config.IpPreferences
 import cat.copernic.easytraza.mobile.core.network.RetrofitClient
 import cat.copernic.easytraza.mobile.ui.components.EasyButtonShape
@@ -42,12 +42,12 @@ fun IpConfigScreen(
     onTornarClick: () -> Unit
 ) {
     val context = LocalContext.current
-    var ip by remember { mutableStateOf(IpPreferences.getIp(context)) }
+    var ip by remember { mutableStateOf(IpPreferences.getAddress(context)) }
 
     EasyScreen {
         EasyHeader(
-            title = "Servidor",
-            subtitle = "Configuració de la IP",
+            title = stringResource(R.string.server_title),
+            subtitle = stringResource(R.string.ip_subtitle),
             showBack = true,
             onBackClick = onTornarClick,
             showConfig = false
@@ -56,7 +56,7 @@ fun IpConfigScreen(
         EasyCard {
             Icon(
                 imageVector = Icons.Default.Dns,
-                contentDescription = "Servidor",
+                contentDescription = stringResource(R.string.server_title),
                 tint = EasyBrown,
                 modifier = Modifier
                     .background(EasyBeige, RoundedCornerShape(16.dp))
@@ -64,14 +64,14 @@ fun IpConfigScreen(
             )
 
             Text(
-                text = "IP del backend",
+                text = stringResource(R.string.ip_backend),
                 style = MaterialTheme.typography.titleLarge,
                 color = EasyBrownDark,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Canvia d'IP si el servidor utilitza una nova adreça.",
+                text = stringResource(R.string.ip_help),
                 style = MaterialTheme.typography.bodyMedium,
                 color = EasyTextSoft
             )
@@ -79,22 +79,22 @@ fun IpConfigScreen(
             OutlinedTextField(
                 value = ip,
                 onValueChange = { ip = it },
-                label = { Text("IP del servidor") },
+                label = { Text(stringResource(R.string.ip_label)) },
                 singleLine = true,
                 shape = EasyButtonShape,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Modifier.EasyPrimaryButton(
-                text = "Guardar"
+                text = stringResource(R.string.common_save)
             ) {
                 IpPreferences.saveIp(context, ip)
                 RetrofitClient.reset()
-                ip = IpPreferences.getIp(context)
+                ip = IpPreferences.getAddress(context)
 
                 Toast.makeText(
                     context,
-                    "IP guardada correctament",
+                    context.getString(R.string.ip_saved),
                     Toast.LENGTH_SHORT
                 ).show()
             }

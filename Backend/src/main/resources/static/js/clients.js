@@ -183,7 +183,7 @@ if (form) {
             }
 
             markInvalid(field);
-            field.setCustomValidity('Introdueix un correu electrònic vàlid, per exemple exemple@gmail.com');
+            field.setCustomValidity(form.dataset.emailInvalid);
             return false;
         }
 
