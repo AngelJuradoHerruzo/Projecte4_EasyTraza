@@ -1,0 +1,364 @@
+/*********************       .GRÀFIC MENSUAL DE PRODUCTES.       *********************/
+.monthly-chart-panel {
+    margin-top: 20px;
+}
+
+.monthly-chart-toolbar {
+    display: block;
+}
+
+.monthly-chart-toolbar-heading {
+    margin-bottom: 16px;
+}
+
+.monthly-chart-filters {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.monthly-chart-filter {
+    flex: 1;
+}
+
+.monthly-chart-filter-month {
+    min-width: 200px;
+}
+
+.monthly-chart-filter-product {
+    min-width: 220px;
+}
+
+.monthly-chart-label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.monthly-chart-field {
+    width: 100%;
+}
+
+.monthly-chart-select {
+    width: 100%;
+    border: none;
+    outline: none;
+    color: var(--text);
+    background-color: transparent;
+    font-size: 14px;
+}
+
+.monthly-chart-button {
+    height: 46px;
+    padding: 0 16px;
+    flex-shrink: 0;
+}
+
+.monthly-chart-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.monthly-chart-summary-label {
+    margin: 0 0 5px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.monthly-chart-total {
+    margin: 0;
+    color: var(--text);
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.monthly-chart-summary-selection {
+    text-align: right;
+}
+
+.monthly-chart-current-selection {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.monthly-chart-canvas-container {
+    height: 380px;
+    padding: 18px 18px 12px;
+}
+
+.monthly-chart-empty {
+    padding-top: 0;
+}
+
+
+/*********************       .RESPONSIVE GRÀFIC MENSUAL.       *********************/
+@media (max-width: 700px) {
+    .monthly-chart-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .monthly-chart-filter,
+    .monthly-chart-button {
+        width: 100%;
+    }
+
+    .monthly-chart-summary {
+        align-items: flex-start;
+        padding: 17px 18px;
+    }
+
+    .monthly-chart-summary-selection {
+        width: 100%;
+        text-align: left;
+    }
+
+    .monthly-chart-canvas-container {
+        height: 315px;
+        padding: 15px 10px 10px;
+    }
+}
+
+/*********************       .FILTRES DE TRAÇABILITAT.       *********************/
+.search-field {
+    width: 340px;
+    max-width: 100%;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background-color: var(--panel-soft);
+}
+
+.search-field i {
+    color: #9a887a;
+    font-size: 14px;
+}
+
+.search-field input {
+    width: 100%;
+    border: none;
+    outline: none;
+    color: var(--text);
+    background: transparent;
+    font-size: 14px;
+}
+
+.search-field input::placeholder {
+    color: #a19083;
+}
+
+
+/*********************       .TAULES DE TRAÇABILITAT.       *********************/
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    background-color: var(--white);
+    table-layout: fixed;
+}
+
+.data-table thead th {
+    padding: 14px 16px;
+    padding-left: 49px;
+    border-bottom: 1px solid var(--border);
+    color: #766255;
+    background-color: #f6efe7;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: left;
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+    width: 30%;
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+    width: 17%;
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+    width: 28%;
+}
+
+.data-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #f1e7dc;
+    vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+    background-color: #fffbf7;
+}
+
+.td-id {
+    color: #7f6b5e;
+    font-weight: 700;
+}
+
+.badge-role {
+    min-width: 90px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge-role.operari {
+    color: var(--green-text);
+    background-color: var(--green-soft);
+}
+
+.badge-role.admin {
+    color: #4c78a8;
+    background-color: #e7f0fb;
+}
+
+.empty-state {
+    padding: 34px 16px !important;
+}
+
+.empty-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+}
+
+.empty-box i {
+    color: #bca99a;
+    font-size: 26px;
+}
+
+
+/*********************       .LLISTAT DE LOTS DE TRAÇABILITAT.       *********************/
+.text-center {
+    text-align: center !important;
+}
+
+.lot-error {
+    margin-bottom: 18px;
+}
+
+.lots-table {
+    min-width: 1180px;
+    table-layout: fixed;
+}
+
+.lots-table thead th {
+    padding: 13px 14px !important;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.lots-table thead th.text-center {
+    text-align: center !important;
+}
+
+.lots-table tbody td {
+    padding: 13px 14px;
+    vertical-align: middle;
+}
+
+.lot-main-text {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--text);
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lot-sub-text {
+    display: block;
+    margin-top: 3px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lot-badge-acabat {
+    color: var(--edit-text);
+    background-color: var(--edit-soft);
+}
+
+.lot-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.lot-action-btn {
+    min-width: 108px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.lot-action-view {
+    color: var(--text);
+    border-color: var(--border);
+    background-color: var(--panel-soft);
+}
+
+.lot-group-table {
+    min-width: 1020px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+
+@media (max-width: 980px) {
+    .search-field {
+        width: 100%;
+    }
+}

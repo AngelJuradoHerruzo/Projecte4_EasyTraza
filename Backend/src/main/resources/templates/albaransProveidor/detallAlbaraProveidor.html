@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{albaransProveidor.detall.titol}">Detall albarà proveïdor - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/albaransProveidor.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{albaransProveidor.eyebrow}">Recepció · Albarans de proveïdor</p>
+
+                <h1 class="page-heading">
+                    <span th:text="#{comu.albaraNum}">Albarà #</span>
+                    <span th:text="${albaraProveidor.id}">1</span>
+                </h1>
+
+                <p class="page-description">
+                    <span th:text="#{albaransProveidor.detall.desc}">Consulta la informació completa de l'albarà, el document associat i els lots recepcionats.</span>
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- PANELL DE DETALL ----------------------->
+        <section class="delivery-detail-panel">
+
+            <!----------------------- PRESENTACIÓ DETALL ----------------------->
+            <div class="delivery-detail-intro">
+
+                <div class="delivery-detail-icon">
+                    <i class="bi bi-receipt" aria-hidden="true"></i>
+                </div>
+
+                <div class="delivery-detail-intro-text">
+                    <h2 class="section-title" th:text="#{albaransProveidor.detall.heading}">Detall de l'albarà</h2>
+
+                    <p class="section-subtitle">
+                        <span th:text="#{albaransProveidor.detall.sub}">Informació general de la recepció i lots vinculats.</span>
+                    </p>
+                </div>
+
+                <span class="delivery-detail-badge"
+                      th:text="|ID #${albaraProveidor.id}|">
+                    ID #1
+                </span>
+
+            </div>
+
+            <!----------------------- COS DEL DETALL ----------------------->
+            <div class="delivery-detail-body">
+
+                <!----------------------- DADES GENERALS ----------------------->
+                <section class="delivery-detail-section">
+
+                    <div class="delivery-section-heading">
+
+                        <div class="delivery-section-icon">
+                            <i class="bi bi-clipboard-data" aria-hidden="true"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="section-title" th:text="#{comu.dadesGenerals}">Dades generals</h2>
+
+                            <p class="section-subtitle" th:text="#{albaransProveidor.detall.dadesPrincipals}">
+                                Dades principals de l'albarà de proveïdor.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="delivery-detail-data-grid">
+
+                        <!----------------------- DATA RECEPCIÓ ----------------------->
+                        <div class="delivery-detail-data-card">
+
+                            <div class="delivery-detail-data-icon">
+                                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="delivery-detail-data-content">
+                                <span class="delivery-data-label" th:text="#{comu.dataRecepcio}">Data recepció</span>
+
+                                <span class="delivery-detail-data-value"
+                                      th:text="${albaraProveidor.dataRecepcio != null ? #temporals.format(albaraProveidor.dataRecepcio, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <!----------------------- NÚMERO ALBARÀ ----------------------->
+                        <div class="delivery-detail-data-card">
+
+                            <div class="delivery-detail-data-icon">
+                                <i class="bi bi-hash" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="delivery-detail-data-content">
+                                <span class="delivery-data-label" th:text="#{comu.numeroAlbara}">Número albarà</span>
+
+                                <span class="delivery-detail-data-value"
+                                      th:text="${albaraProveidor.numeroAlbara != null and !albaraProveidor.numeroAlbara.isBlank() ? albaraProveidor.numeroAlbara : '-'}">
+                                    -
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <!----------------------- PROVEÏDOR ----------------------->
+                        <div class="delivery-detail-data-card">
+
+                            <div class="delivery-detail-data-icon">
+                                <i class="bi bi-truck" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="delivery-detail-data-content">
+                                <span class="delivery-data-label" th:text="#{comu.proveidor}">Proveïdor</span>
+
+                                <span class="delivery-detail-data-value"
+                                      th:text="${albaraProveidor.proveidor != null ? albaraProveidor.proveidor.nomProveidor : '-'}">
+                                    <span th:text="#{comu.proveidor}">Proveïdor</span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <!----------------------- USUARI RECEPTOR ----------------------->
+                        <div class="delivery-detail-data-card">
+
+                            <div class="delivery-detail-data-icon">
+                                <i class="bi bi-person-check" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="delivery-detail-data-content">
+                                <span class="delivery-data-label" th:text="#{comu.usuariReceptor}">Usuari receptor</span>
+
+                                <span class="delivery-detail-data-value"
+                                      th:text="${albaraProveidor.usuariReceptor != null ? albaraProveidor.usuariReceptor.nomComplet : '-'}">
+                                    <span th:text="#{comu.usuariReceptor}">Usuari receptor</span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!----------------------- DOCUMENT DE L'ALBARÀ ----------------------->
+                <section class="delivery-detail-section">
+
+                    <div class="delivery-section-heading">
+
+                        <div class="delivery-section-icon">
+                            <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="section-title" th:text="#{albaransProveidor.detall.document}">Document de l'albarà</h2>
+
+                            <p class="section-subtitle" th:text="#{albaransProveidor.detall.fitxerAssociat}">
+                                Fitxer guardat associat a aquesta recepció.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!----------------------- DOCUMENT DISPONIBLE ----------------------->
+                    <div th:if="${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()}"
+                         class="delivery-detail-document">
+
+                        <div class="delivery-document-file">
+
+                            <div class="delivery-document-file-icon">
+                                <i class="bi bi-file-earmark-check" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="delivery-document-file-data">
+                                <span class="delivery-data-label" th:text="#{albaransProveidor.detall.fitxerAdjunt}">Fitxer adjunt</span>
+
+                                <span class="delivery-document-file-name"
+                                      th:text="${albaraProveidor.fitxers[0]}">
+                                    <span th:text="#{comu.document}">Document</span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <a th:href="@{${albaraProveidor.fitxers[0]}}"
+                           target="_blank"
+                           class="btn btn-secondary">
+                            <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                            <span th:text="#{comu.obrirFitxer}">Obrir fitxer</span>
+                        </a>
+
+                    </div>
+
+                    <!----------------------- SENSE DOCUMENT ----------------------->
+                    <div th:if="${albaraProveidor.fitxers == null or albaraProveidor.fitxers.isEmpty()}"
+                         class="delivery-detail-empty">
+
+                        <div class="delivery-detail-empty-icon">
+                            <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
+                        </div>
+
+                        <p th:text="#{albaransProveidor.detall.senseDocument}">Aquest albarà no té cap document guardat.</p>
+
+                    </div>
+
+                </section>
+
+                <!----------------------- LOTS RECEPCIONATS ----------------------->
+                <section class="delivery-detail-section">
+
+                    <div class="delivery-detail-lots-heading">
+
+                        <div class="delivery-section-heading">
+
+                            <div class="delivery-section-icon">
+                                <i class="bi bi-box-seam" aria-hidden="true"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="section-title" th:text="#{albaransProveidor.lotsRecepcionats}">Lots recepcionats</h2>
+
+                                <p class="section-subtitle" th:text="#{albaransProveidor.detall.liniesRebudes}">
+                                    Línies de matèria primera rebudes en aquest albarà.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <span class="delivery-detail-counter">
+                            <span th:text="${albaraProveidor.lots != null ? #lists.size(albaraProveidor.lots) : 0}">
+                                0
+                            </span>
+                            <span th:text="#{comu.lots}">lots</span>
+                        </span>
+
+                    </div>
+
+                    <!----------------------- LLISTAT DE LOTS ----------------------->
+                    <div th:if="${albaraProveidor.lots != null and !albaraProveidor.lots.isEmpty()}"
+                         class="delivery-detail-lots-grid">
+
+                        <article th:each="lot : ${albaraProveidor.lots}"
+                                 class="delivery-detail-lot-card">
+
+                            <header class="delivery-detail-lot-header">
+
+                                <div class="delivery-detail-lot-title">
+                                    <span class="delivery-lot-id"
+                                          th:text="|#${lot.id}|">
+                                        #1
+                                    </span>
+
+                                    <h3 th:text="${lot.identificadorLot}">
+                                        LOT-001
+                                    </h3>
+                                </div>
+
+                                <span class="lot-state-badge lot-state-stock"
+                                      th:if="${lot.estat != null and lot.estat.name() == 'EN_ESTOC'}">
+                                    <span th:text="#{estat.enEstoc}">EN ESTOC</span>
+                                </span>
+
+                                <span class="lot-state-badge lot-state-open"
+                                      th:if="${lot.estat != null and lot.estat.name() == 'OBERT'}">
+                                    <span th:text="#{estat.obert}">OBERT</span>
+                                </span>
+
+                                <span class="lot-state-badge lot-state-finished"
+                                      th:if="${lot.estat != null and lot.estat.name() == 'ACABAT'}">
+                                    <span th:text="#{estat.acabat}">ACABAT</span>
+                                </span>
+
+                            </header>
+
+                            <div class="delivery-detail-lot-data">
+
+                                <div class="delivery-detail-lot-item">
+                                    <span class="delivery-data-label" th:text="#{comu.materiaPrimera}">Matèria primera</span>
+
+                                    <span class="delivery-detail-lot-value"
+                                          th:text="${lot.materiaPrimera != null ? lot.materiaPrimera.nomMateria : '-'}">
+                                        <span th:text="#{comu.materiaPrimera}">Matèria primera</span>
+                                    </span>
+                                </div>
+
+                                <div class="delivery-detail-lot-item">
+                                    <span class="delivery-data-label" th:text="#{comu.quantitat}">Quantitat</span>
+
+                                    <span class="delivery-detail-lot-value">
+                                        <span th:text="${lot.quantitat != null ? lot.quantitat : '-'}">0</span>
+                                        <span th:text="${lot.unitats != null ? lot.unitats : ''}">kg</span>
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                    <!----------------------- ESTAT SENSE LOTS ----------------------->
+                    <div th:if="${albaraProveidor.lots == null or albaraProveidor.lots.isEmpty()}"
+                         class="delivery-detail-empty">
+
+                        <div class="delivery-detail-empty-icon">
+                            <i class="bi bi-box-seam" aria-hidden="true"></i>
+                        </div>
+
+                        <p th:text="#{albaransProveidor.detall.senseLots}">Aquest albarà no té lots recepcionats.</p>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

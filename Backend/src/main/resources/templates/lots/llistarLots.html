@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{lots.llistar.titol}">Lots - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/lots.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('lots')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{lots.tracabilitat}">Traçabilitat</p>
+                <h1 class="page-heading" th:text="#{comu.lots}">Lots</h1>
+                <p class="page-description" th:text="#{lots.llistar.desc}">
+                    Consulta els lots recepcionats agrupats per matèria primera i gestiona el seu inici i finalització.
+                </p>
+            </div>
+        </section>
+
+        <!----------------------- ERROR ----------------------->
+        <div th:if="${error}" class="alert alert-error lot-error" role="alert">
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+            <span th:text="${error}">Error</span>
+        </div>
+
+        <!----------------------- CONTENIDOR ----------------------->
+        <section class="lots-panel">
+
+            <!----------------------- TOOLBAR ----------------------->
+            <div class="lots-toolbar">
+                <div class="lots-toolbar-info">
+                    <div class="lots-title-row">
+                        <h2 class="section-title" th:text="#{lots.llistar.heading}">Llistat de lots</h2>
+
+                        <span class="lots-counter"
+                              th:text="#{comu.comptadorLots(${#lists.size(lots)})}">
+                            0 lots
+                        </span>
+                    </div>
+
+                    <p class="section-subtitle" th:text="#{lots.llistar.sub}">
+                        Filtra per matèria primera, identificador o dates del lot.
+                    </p>
+                </div>
+
+                <form th:action="@{/lots/list}"
+                      method="get"
+                      class="lots-filter">
+
+                    <label for="materiaId" class="sr-only">
+                        <span th:text="#{lots.filtrarMateria}">Filtrar per matèria primera</span>
+                    </label>
+
+                    <div class="search-field search-field-materia">
+                        <i class="bi bi-flower1" aria-hidden="true"></i>
+
+                        <select id="materiaId" name="materiaId">
+                            <option value="" th:text="#{lots.totesMateries}">Totes les matèries</option>
+                            <option th:each="materia : ${materiesPrimeres}"
+                                    th:value="${materia.id}"
+                                    th:selected="${materiaId != null && materiaId == materia.id}"
+                                    th:text="${materia.nomMateria}">
+                                <span th:text="#{comu.materia}">Matèria</span>
+                            </option>
+                        </select>
+                    </div>
+
+                    <label for="identificadorLot" class="sr-only">
+                        <span th:text="#{lots.filtrarIdentificador}">Filtrar per identificador de lot</span>
+                    </label>
+
+                    <div class="search-field search-field-lot">
+                        <i class="bi bi-upc-scan" aria-hidden="true"></i>
+
+                        <input id="identificadorLot"
+                               name="identificadorLot"
+                               type="text"
+                               th:value="${identificadorLot}"
+                               placeholder="Identificador lot..."
+                               th:placeholder="#{lots.placeholderIdentificador}">
+                    </div>
+
+                    <label for="dataCaducitat" class="sr-only" th:text="#{lots.filtrarCaducitat}">
+                        Filtrar per data de caducitat
+                    </label>
+
+                    <div class="search-field search-field-date">
+                        <i class="bi bi-calendar-event" aria-hidden="true"></i>
+
+                        <input id="dataCaducitat"
+                               name="dataCaducitat"
+                               type="date"
+                               th:value="${dataCaducitat}">
+                    </div>
+
+                    <label for="dataObertura" class="sr-only" th:text="#{lots.filtrarObertura}">
+                        Filtrar per data d'obertura
+                    </label>
+
+                    <div class="search-field search-field-date">
+                        <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+
+                        <input id="dataObertura"
+                               name="dataObertura"
+                               type="date"
+                               th:value="${dataObertura}">
+                    </div>
+
+                    <label for="dataAcabament" class="sr-only" th:text="#{lots.filtrarAcabament}">
+                        Filtrar per data d'acabament
+                    </label>
+
+                    <div class="search-field search-field-date">
+                        <i class="bi bi-calendar-check" aria-hidden="true"></i>
+
+                        <input id="dataAcabament"
+                               name="dataAcabament"
+                               type="date"
+                               th:value="${dataAcabament}">
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-icon"
+                            aria-label="Aplicar filtres de lots" th:attr="aria-label=#{lots.aplicarFiltres}">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </button>
+
+                    <a th:href="@{/lots/list}"
+                       class="btn btn-secondary"
+                       aria-label="Netejar filtres de lots" th:attr="aria-label=#{lots.netejarFiltres}">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span th:text="#{comu.netejar}">Netejar</span>
+                    </a>
+
+                </form>
+            </div>
+
+            <!----------------------- LLISTAT AGRUPAT ----------------------->
+            <div class="lots-grouped-list" id="lotsTable">
+
+                <section th:each="materia, iterStat : ${materiesPrimeres}"
+                         th:if="${!#lists.isEmpty(lots.?[materiaPrimera != null and materiaPrimera.id == #vars.materia.id])}"
+                         th:with="lotsMateria=${lots.?[materiaPrimera != null and materiaPrimera.id == #vars.materia.id]}"
+                         class="lot-group">
+
+                    <!----------------------- TÍTOL GRUP ----------------------->
+                    <div class="lot-group-header">
+                        <div class="lot-group-icon">
+                            <i class="bi bi-flower1" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="lot-group-title">
+                            <h3 th:text="${materia.nomMateria}">Harina Blanca</h3>
+                            <p th:text="${materia.descripcio != null && !#strings.isEmpty(materia.descripcio) ? materia.descripcio : #messages.msg('comu.senseDescripcio')}">
+                                <span th:text="#{comu.descripcio}">Descripció</span>
+                            </p>
+                        </div>
+
+                        <span class="lot-group-counter"
+                              th:text="#{comu.comptadorLots(${#lists.size(lotsMateria)})}">
+                            0 lots
+                        </span>
+                    </div>
+
+                    <!----------------------- TAULA GRUP ----------------------->
+                    <div class="table-container">
+                        <table class="lots-table lot-group-table">
+
+                            <colgroup>
+                                <col class="col-id">
+                                <col class="col-lot">
+                                <col class="col-quantitat">
+                                <col class="col-estat">
+                                <col class="col-data">
+                                <col class="col-data">
+                                <col class="col-data">
+                                <col class="col-accions">
+                            </colgroup>
+
+                            <thead>
+                            <tr>
+                                <th th:text="#{comu.id}">ID</th>
+                                <th th:text="#{comu.lot}">Lot</th>
+                                <th class="text-center" th:text="#{comu.quantitat}">Quantitat</th>
+                                <th class="text-center" th:text="#{comu.estat}">Estat</th>
+                                <th class="text-center" th:text="#{lots.caducitat}">Caducitat</th>
+                                <th class="text-center" th:text="#{lots.obertura}">Obertura</th>
+                                <th class="text-center" th:text="#{lots.acabament}">Acabament</th>
+                                <th class="text-center" th:text="#{comu.accions}">Accions</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="lot : ${lotsMateria}" class="lot-row">
+
+                                <td class="td-id" th:text="${lot.id}">1</td>
+
+                                <td>
+                                    <span class="lot-main-text" th:text="${lot.identificadorLot}">LOT-001</span>
+                                    <span class="lot-sub-text">
+                                        <span th:text="#{comu.albaraNum}">Albarà #</span>
+                                        <span th:text="${lot.albaraProveidor != null ? lot.albaraProveidor.id : '-'}">1</span>
+                                    </span>
+                                </td>
+
+                                <td class="text-center"
+                                    th:text="${lot.quantitat != null ? lot.quantitat + ' ' + lot.unitats : '-'}">
+                                    10 kg
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="lot-badge lot-badge-estoc"
+                                          th:if="${lot.estat.name() == 'EN_ESTOC'}">
+                                        <span th:text="#{estat.enEstoc}">EN ESTOC</span>
+                                    </span>
+
+                                    <span class="lot-badge lot-badge-obert"
+                                          th:if="${lot.estat.name() == 'OBERT'}">
+                                        <span th:text="#{estat.obert}">OBERT</span>
+                                    </span>
+
+                                    <span class="lot-badge lot-badge-acabat"
+                                          th:if="${lot.estat.name() == 'ACABAT'}">
+                                        <span th:text="#{estat.acabat}">ACABAT</span>
+                                    </span>
+                                </td>
+
+                                <td class="text-center"
+                                    th:text="${lot.dataCaducitat != null ? #temporals.format(lot.dataCaducitat, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </td>
+
+                                <td class="text-center"
+                                    th:text="${lot.dataObertura != null ? #temporals.format(lot.dataObertura, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </td>
+
+                                <td class="text-center"
+                                    th:text="${lot.dataAcabament != null ? #temporals.format(lot.dataAcabament, 'dd/MM/yyyy') : '-'}">
+                                    -
+                                </td>
+
+                                <td>
+                                    <div class="lot-actions">
+
+                                        <a th:href="@{/lots/detail/{id}(id=${lot.id})}"
+                                           class="lot-action-btn lot-action-view">
+                                            <i class="bi bi-eye" aria-hidden="true"></i>
+                                            <span th:text="#{comu.consultar}">Consultar</span>
+                                        </a>
+
+                                        <button th:if="${lot.estat.name() == 'EN_ESTOC'}"
+                                                type="button"
+                                                class="lot-action-btn lot-action-start js-open-modal"
+                                                th:attr="data-action=@{/lots/iniciar/{id}(id=${lot.id})},
+                                                         data-title=#{lots.iniciar},
+                                                         data-message=#{lots.confirm.iniciar},
+                                                         data-button=#{lots.iniciar},
+                                                         data-icon='bi-play-fill'">
+                                            <i class="bi bi-play-fill" aria-hidden="true"></i>
+                                            <span th:text="#{lots.iniciar}">Iniciar</span>
+                                        </button>
+
+                                        <button th:if="${lot.estat.name() == 'OBERT'}"
+                                                type="button"
+                                                class="lot-action-btn lot-action-finish js-open-modal"
+                                                th:attr="data-action=@{/lots/finalitzar/{id}(id=${lot.id})},
+                                                         data-title=#{lots.finalitzar},
+                                                         data-message=#{lots.confirm.finalitzar},
+                                                         data-button=#{lots.finalitzar},
+                                                         data-icon='bi-stop-fill'">
+                                            <i class="bi bi-stop-fill" aria-hidden="true"></i>
+                                            <span th:text="#{lots.finalitzar}">Finalitzar</span>
+                                        </button>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </section>
+
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(lots)}" class="lots-empty-state">
+                    <div class="lots-empty-icon">
+                        <i class="bi bi-archive" aria-hidden="true"></i>
+                    </div>
+
+                    <h3 th:text="#{lots.llistar.buit}">No s'han trobat lots</h3>
+
+                    <p th:text="#{lots.llistar.buitDesc}">
+                        No hi ha lots que coincideixin amb els filtres seleccionats.
+                    </p>
+
+                    <a th:href="@{/lots/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span th:text="#{lots.llistar.veureTots}">Veure tots els lots</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!----------------------- MODAL CONFIRMACIÓ ----------------------->
+<div id="confirmModal" class="lot-modal"
+     th:attr="data-conflict-title=#{lots.conflicte.titol},data-conflict-before=#{lots.conflicte.abans},data-conflict-after=#{lots.conflicte.despres},data-conflict-button=#{lots.conflicte.boto}">
+    <div class="lot-modal-box">
+
+        <div class="lot-modal-header">
+            <div class="lot-modal-icon">
+                <i id="modalIcon" class="bi bi-exclamation-circle" aria-hidden="true"></i>
+            </div>
+
+            <div>
+                <h2 id="modalTitle" th:text="#{lots.modal.titol}">Confirmar acció</h2>
+                <p id="modalMessage" th:text="#{lots.modal.missatge}">Segur que vols continuar?</p>
+            </div>
+        </div>
+
+        <form id="modalForm" method="post">
+            <div class="lot-modal-actions">
+                <button type="button" id="modalCancel" class="btn btn-secondary">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    <span th:text="#{comu.cancelar}">Cancel·lar</span>
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    <i id="modalSubmitIcon" class="bi bi-check-lg" aria-hidden="true"></i>
+                    <span id="modalSubmitText" th:text="#{comu.confirmar}">Confirmar</span>
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!----------------------- DADES MODAL LOT OBERT ----------------------->
+<input type="hidden"
+       id="conflictAction"
+       th:if="${confirmarIniciLot}"
+       th:value="@{/lots/iniciar-confirmat/{id}(id=${lotAIniciar.id})}">
+
+<input type="hidden"
+       id="conflictLot"
+       th:if="${confirmarIniciLot}"
+       th:value="${lotAIniciar.identificadorLot}">
+
+<script th:src="@{/js/lots.js}"></script>
+
+</body>
+</html>

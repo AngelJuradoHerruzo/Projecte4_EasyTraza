@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{albaransClient.llistar.titol}">Albarans de client - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/albaransClient.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('albaransClient')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{albaransClient.lliuraments}">Lliuraments</p>
+
+                <h1 class="page-heading" th:text="#{sidebar.albaransClient}">Albarans de client</h1>
+
+                <p class="page-description" th:text="#{albaransClient.llistar.desc}">
+                    Gestiona els lliuraments de productes i les línies de producció associades.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-client/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    <span th:text="#{albaransProveidor.llistar.nou}">Nou albarà</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!----------------------- PANELL PRINCIPAL ----------------------->
+        <section class="deliveries-panel">
+
+            <!----------------------- TOOLBAR I FILTRES ----------------------->
+            <div class="deliveries-toolbar">
+
+                <div class="deliveries-toolbar-info">
+                    <div class="deliveries-title-row">
+                        <h2 class="section-title" th:text="#{albaransProveidor.llistar.heading}">Llistat d'albarans</h2>
+
+                        <span class="deliveries-counter"
+                              th:text="|${#lists.size(albarans)} albarans|">
+                            0 albarans
+                        </span>
+                    </div>
+
+                    <p class="section-subtitle" th:text="#{albaransClient.llistar.sub}">
+                        Només els albarans pendents es poden editar, eliminar o lliurar.
+                    </p>
+                </div>
+
+                <form th:action="@{/albarans-client/list}"
+                      method="get"
+                      class="deliveries-filter">
+
+                    <div class="deliveries-filter-row">
+
+                        <label for="clientId" class="sr-only" th:text="#{albaransClient.llistar.filtrarClient}">Filtrar per client</label>
+
+                        <div class="filter-field">
+                            <i class="bi bi-person" aria-hidden="true"></i>
+
+                            <select id="clientId" name="clientId">
+                                <option value="" th:text="#{albaransClient.llistar.totsClients}">Tots els clients</option>
+                                <option th:each="client : ${clients}"
+                                        th:value="${client.id}"
+                                        th:selected="${clientId != null && clientId == client.id}"
+                                        th:text="${client.nomComplet}">
+                                    <span th:text="#{comu.client}">Client</span>
+                                </option>
+                            </select>
+                        </div>
+
+                        <label for="numeroAlbara" class="sr-only" th:text="#{albaransClient.llistar.filtrarNumero}">Filtrar per número d'albarà</label>
+
+                        <div class="search-field search-field-small">
+                            <i class="bi bi-receipt" aria-hidden="true"></i>
+
+                            <input id="numeroAlbara"
+                                   name="numeroAlbara"
+                                   type="text"
+                                   th:value="${numeroAlbara}"
+                                   placeholder="Núm. albarà..."
+                               th:placeholder="#{albaransClient.llistar.placeholderNumero}"
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="order-field">
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
+
+                            <select id="ordre" name="ordre" class="form-select">
+                                <option value="dataAlbara" th:selected="${ordre == 'dataAlbara'}" th:text="#{comu.dataHora}">Data i hora</option>
+                                <option value="id" th:selected="${ordre == 'id'}" th:text="#{comu.id}">ID</option>
+                                <option value="client" th:selected="${ordre == 'client'}" th:text="#{comu.client}">Client</option>
+                                <option value="estat" th:selected="${ordre == 'estat'}" th:text="#{comu.estat}">Estat</option>
+                                <option value="linies" th:selected="${ordre == 'linies'}" th:text="#{comu.linies}">Línies</option>
+                            </select>
+                        </div>
+
+                        <div class="order-field order-direction-field">
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
+
+                            <select id="direccio" name="direccio" class="form-select">
+                                <option value="asc" th:selected="${direccio == 'asc'}" th:text="#{comu.ascendent}">Ascendent</option>
+                                <option value="desc" th:selected="${direccio == 'desc'}" th:text="#{comu.descendent}">Descendent</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-icon"
+                                aria-label="Aplicar filtres i ordenació d'albarans de client" th:attr="aria-label=#{albaransClient.llistar.aplicarFiltres}">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+
+                        <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            <span th:text="#{comu.netejar}">Netejar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!----------------------- TARGETES D'ALBARANS ----------------------->
+            <div class="deliveries-grid">
+
+                <article th:each="albara : ${albarans}" class="delivery-card">
+
+                    <!----------------------- IDENTIFICACIÓ ----------------------->
+                    <header class="delivery-card-header">
+
+                        <div class="delivery-card-reference">
+                            <div class="delivery-card-icon">
+                                <i class="bi bi-receipt" aria-hidden="true"></i>
+                            </div>
+
+                            <div>
+                                <p class="delivery-card-type" th:text="#{albaransClient.detall.tipus}">Albarà client</p>
+
+                                <h3 class="delivery-card-title">
+                                    <span>#</span><span th:text="${albara.id}">1</span>
+                                </h3>
+                            </div>
+                        </div>
+
+                        <span class="delivery-status"
+                              th:classappend="${albara.estat.name() == 'PENDENT_LLIURAR'} ? ' status-pendent' : ' status-lliurat'"
+                              th:text="${albara.estat.name() == 'PENDENT_LLIURAR'} ? #{estat.pendentText} : #{estat.lliuratText}">
+                            <span th:text="#{comu.estat}">Estat</span>
+                        </span>
+
+                    </header>
+
+                    <!----------------------- DADES PRINCIPALS ----------------------->
+                    <div class="delivery-card-data">
+
+                        <div class="delivery-client">
+                            <span class="delivery-label" th:text="#{comu.client}">Client</span>
+                            <span class="delivery-client-name" th:text="${albara.client.nomComplet}">Client</span>
+                        </div>
+
+                        <div class="delivery-metadata">
+                            <div class="delivery-data-item">
+                                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                <div>
+                                    <span class="delivery-label" th:text="#{comu.dataHora}">Data i hora</span>
+                                    <span class="delivery-value"
+                                          th:text="${#temporals.format(albara.dataAlbara, 'dd/MM/yyyy HH:mm')}">
+                                        01/01/2026 10:00
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="delivery-data-item">
+                                <i class="bi bi-list-check" aria-hidden="true"></i>
+                                <div>
+                                    <span class="delivery-label" th:text="#{comu.linies}">Línies</span>
+                                    <span class="delivery-value"
+                                          th:text="${albara.liniesProduccio != null ? #lists.size(albara.liniesProduccio) : 0}">
+                                        0
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!----------------------- ACCIONS ----------------------->
+                    <footer class="delivery-card-actions">
+
+                        <a th:href="@{/albarans-client/detail/{id}(id=${albara.id})}"
+                           class="card-action card-action-view">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                            <span th:text="#{comu.veure}">Veure</span>
+                        </a>
+
+                        <a th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
+                           th:href="@{/albarans-client/edit/{id}(id=${albara.id})}"
+                           class="card-action card-action-edit">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                            <span th:text="#{comu.editar}">Editar</span>
+                        </a>
+
+                        <form th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
+                              th:action="@{/albarans-client/lliurar/{id}(id=${albara.id})}"
+                              method="post"
+                              class="card-action-form"
+                              th:onsubmit="|return confirm('#{albaransClient.confirm.lliurar}');|">
+                            <button type="submit" class="card-action card-action-deliver">
+                                <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                                <span th:text="#{comu.lliurar}">Lliurar</span>
+                            </button>
+                        </form>
+
+                        <form th:if="${albara.estat.name() == 'PENDENT_LLIURAR'}"
+                              th:action="@{/albarans-client/delete/{id}(id=${albara.id})}"
+                              method="post"
+                              class="card-action-form"
+                              th:onsubmit="|return confirm('#{albaransClient.confirm.eliminar}');|">
+                            <button type="submit" class="card-action card-action-delete">
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                <span th:text="#{comu.eliminar}">Eliminar</span>
+                            </button>
+                        </form>
+
+                    </footer>
+
+                </article>
+
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(albarans)}" class="deliveries-empty-state">
+                    <div class="deliveries-empty-icon">
+                        <i class="bi bi-receipt" aria-hidden="true"></i>
+                    </div>
+
+                    <h3 th:text="#{albaransClient.llistar.buit}">No s'han trobat albarans</h3>
+
+                    <p th:text="#{albaransClient.llistar.buitDesc}">No hi ha albarans de client que coincideixin amb els filtres seleccionats.</p>
+
+                    <a th:href="@{/albarans-client/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span th:text="#{albaransProveidor.llistar.veureTots}">Veure tots els albarans</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

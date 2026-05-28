@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{proveidors.llistat.titolPagina}">Proveïdors - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/proveidors.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('proveidors')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
+
+                <h1 class="page-heading" th:text="#{sidebar.proveidors}">Proveïdors</h1>
+
+                <p class="page-description" th:text="#{proveidors.llistat.descripcioPagina}">
+                    Consulta i gestiona els proveïdors de matèries primeres registrats al sistema.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/proveidors/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    <span th:text="#{proveidors.form.nou}">Nou proveïdor</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!----------------------- PANELL PRINCIPAL ----------------------->
+        <section class="suppliers-panel">
+
+            <!----------------------- TOOLBAR I FILTRES ----------------------->
+            <div class="suppliers-toolbar">
+
+                <div class="suppliers-toolbar-info">
+                    <div class="suppliers-title-row">
+                        <h2 class="section-title" th:text="#{proveidors.llistat.titol}">Llistat de proveïdors</h2>
+
+                        <span class="suppliers-counter"
+                              th:text="#{proveidors.llistat.comptador(${#lists.size(proveidors)})}">
+                            0 proveïdors
+                        </span>
+                    </div>
+
+                    <p class="section-subtitle" th:text="#{proveidors.llistat.subtitol}">
+                        Filtra i ordena els proveïdors pels camps visibles del llistat.
+                    </p>
+                </div>
+
+                <form th:action="@{/proveidors/list}"
+                      method="get"
+                      class="suppliers-filter">
+
+                    <div class="suppliers-filter-row">
+
+                        <label for="nomProveidor" class="sr-only" th:text="#{proveidors.llistat.filtrarNom}">
+                            Filtrar proveïdors per nom
+                        </label>
+
+                        <div class="search-field">
+                            <i class="bi bi-building" aria-hidden="true"></i>
+
+                            <input id="nomProveidor"
+                                   name="nomProveidor"
+                                   type="text"
+                                   th:value="${nomProveidor}"
+                                   placeholder="Nom proveïdor..."
+                                   th:placeholder="#{proveidors.llistat.nom.placeholder}"
+                                   autocomplete="off">
+                        </div>
+
+                        <label for="cif" class="sr-only" th:text="#{proveidors.llistat.filtrarCif}">
+                            Filtrar proveïdors per CIF o DNI
+                        </label>
+
+                        <div class="search-field search-field-small">
+                            <i class="bi bi-upc-scan" aria-hidden="true"></i>
+
+                            <input id="cif"
+                                   name="cif"
+                                   type="text"
+                                   th:value="${cif}"
+                                   placeholder="CIF / DNI..."
+                                   th:placeholder="#{proveidors.llistat.cif.placeholder}"
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="order-field">
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
+
+                            <select id="ordre" name="ordre" class="form-select">
+                                <option value="nomProveidor"
+                                        th:selected="${ordre == 'nomProveidor'}">
+                                    <span th:text="#{comu.nom}">Nom</span>
+                                </option>
+
+                                <option value="cif"
+                                        th:selected="${ordre == 'cif'}">
+                                    <span th:text="#{comu.cifDni}">CIF / DNI</span>
+                                </option>
+
+                                <option value="adreca"
+                                        th:selected="${ordre == 'adreca'}">
+                                    <span th:text="#{comu.adreca}">Adreça</span>
+                                </option>
+
+                                <option value="descripcio"
+                                        th:selected="${ordre == 'descripcio'}">
+                                    <span th:text="#{comu.descripcio}">Descripció</span>
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="order-field order-direction-field">
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
+
+                            <select id="direccio" name="direccio" class="form-select">
+                                <option value="asc"
+                                        th:selected="${direccio == 'asc'}">
+                                    <span th:text="#{comu.ascendent}">Ascendent</span>
+                                </option>
+
+                                <option value="desc"
+                                        th:selected="${direccio == 'desc'}">
+                                    <span th:text="#{comu.descendent}">Descendent</span>
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-icon"
+                                aria-label="Aplicar filtres i ordenació de proveïdors"
+                                th:attr="aria-label=#{proveidors.llistat.aplicarFiltres}">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+
+                        <a th:href="@{/proveidors/list}"
+                           class="btn btn-secondary">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            <span th:text="#{comu.netejar}">Netejar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!----------------------- TARGETES DE PROVEÏDORS ----------------------->
+            <div class="suppliers-grid" id="proveidorsContainer">
+
+                <article th:each="proveidor : ${proveidors}" class="supplier-card">
+
+                    <!----------------------- INFORMACIÓ PRINCIPAL ----------------------->
+                    <header class="supplier-card-main">
+
+                        <div class="supplier-card-icon">
+                            <i class="bi bi-truck" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="supplier-card-name-block">
+
+                            <p class="supplier-card-type" th:text="#{proveidors.llistat.tipus}">Proveïdor</p>
+
+                            <h3 class="supplier-card-title"
+                                th:text="${proveidor.nomProveidor}">
+                                Nom proveïdor
+                            </h3>
+
+                        </div>
+
+                    </header>
+
+                    <!----------------------- DESCRIPCIÓ ----------------------->
+                    <div class="supplier-card-description-block">
+
+                        <p class="supplier-card-description"
+                           th:text="${proveidor.descripcio != null && !#strings.isEmpty(proveidor.descripcio)} ? ${proveidor.descripcio} : #{comu.senseDescripcio}">
+                            Descripció proveïdor
+                        </p>
+
+                    </div>
+
+                    <!----------------------- DADES DEL PROVEÏDOR ----------------------->
+                    <div class="supplier-card-data">
+
+                        <div class="supplier-data-item">
+
+                            <div class="supplier-data-icon">
+                                <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="supplier-data-content">
+                                <span class="supplier-data-label" th:text="#{comu.cifDni}">CIF / DNI</span>
+
+                                <span class="supplier-data-value"
+                                      th:text="${proveidor.cif}">
+                                    CIF
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="supplier-data-item supplier-data-address">
+
+                            <div class="supplier-data-icon">
+                                <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="supplier-data-content">
+                                <span class="supplier-data-label" th:text="#{comu.adreca}">Adreça</span>
+
+                                <span class="supplier-data-value"
+                                      th:text="${proveidor.adreca}">
+                                    Adreça
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!----------------------- ACCIONS ----------------------->
+                    <footer class="supplier-card-actions">
+
+                        <a th:href="@{/proveidors/edit/{id}(id=${proveidor.id})}"
+                           class="card-action card-action-edit">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                            <span th:text="#{comu.editar}">Editar</span>
+                        </a>
+
+                        <form th:action="@{/proveidors/delete/{id}(id=${proveidor.id})}"
+                              method="post"
+                              class="card-delete-form"
+                              onsubmit="return confirm('Segur que vols eliminar aquest proveïdor?');"
+                              th:onsubmit="'return confirm(\'' + #{proveidors.llistat.confirmarEliminar} + '\');'">
+
+                            <button type="submit"
+                                    class="card-action card-action-delete">
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                <span th:text="#{comu.eliminar}">Eliminar</span>
+                            </button>
+
+                        </form>
+
+                    </footer>
+
+                </article>
+
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(proveidors)}" class="suppliers-empty-state">
+
+                    <div class="suppliers-empty-icon">
+                        <i class="bi bi-truck" aria-hidden="true"></i>
+                    </div>
+
+                    <h3 th:text="#{proveidors.llistat.buit.titol}">No s'han trobat proveïdors</h3>
+
+                    <p th:text="#{proveidors.llistat.buit.descripcio}">
+                        No hi ha proveïdors que coincideixin amb els filtres seleccionats.
+                    </p>
+
+                    <a th:href="@{/proveidors/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span th:text="#{proveidors.llistat.veureTots}">Veure tots els proveïdors</span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

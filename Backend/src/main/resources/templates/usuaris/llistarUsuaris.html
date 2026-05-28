@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{usuaris.llistat.titolPagina}">Usuaris - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/usuaris.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('usuaris')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{sidebar.administracio}">Administració</p>
+
+                <h1 class="page-heading" th:text="#{sidebar.usuaris}">Usuaris</h1>
+
+                <p class="page-description" th:text="#{usuaris.llistat.descripcioPagina}">
+                    Gestiona els administradors i operaris registrats al sistema EasyTraza.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/usuaris/new}" class="btn btn-primary">
+                    <i class="bi bi-person-plus" aria-hidden="true"></i>
+                    <span th:text="#{usuaris.form.nou}">Nou usuari</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!----------------------- PANELL PRINCIPAL ----------------------->
+        <section class="users-panel">
+
+            <!----------------------- TOOLBAR I FILTRES ----------------------->
+            <div class="users-toolbar">
+
+                <div class="users-toolbar-info">
+                    <div class="users-title-row">
+                        <h2 class="section-title" th:text="#{usuaris.llistat.titol}">Llistat d'usuaris</h2>
+
+                        <span class="users-counter"
+                              th:text="#{usuaris.llistat.comptador(${#lists.size(usuaris)})}">
+                            0 usuaris
+                        </span>
+                    </div>
+
+                    <p class="section-subtitle" th:text="#{usuaris.llistat.filtraOrdena}">
+                        Filtra i ordena els usuaris pels camps visibles del llistat.
+                    </p>
+                </div>
+
+                <form th:action="@{/usuaris/list}"
+                      method="get"
+                      class="users-filter">
+
+                    <div class="users-order-row">
+
+                        <label for="dni" class="sr-only" th:text="#{usuaris.llistat.filtrarDni}">
+                            Filtrar usuaris per DNI
+                        </label>
+
+                        <div class="search-field search-field-small">
+                            <i class="bi bi-person-vcard" aria-hidden="true"></i>
+
+                            <input id="dni"
+                                   name="dni"
+                                   type="text"
+                                   th:value="${dni}"
+                                   placeholder="DNI..."
+                                   autocomplete="off">
+                        </div>
+
+                        <label for="nomComplet" class="sr-only" th:text="#{usuaris.llistat.filtrarNom}">
+                            Filtrar usuaris per nom complet
+                        </label>
+
+                        <div class="search-field">
+                            <i class="bi bi-person" aria-hidden="true"></i>
+
+                            <input id="nomComplet"
+                                   name="nomComplet"
+                                   type="text"
+                                   th:value="${nomComplet}"
+                                   placeholder="Nom complet..."
+                                   th:placeholder="#{usuaris.llistat.nom.placeholder}"
+                                   autocomplete="off">
+                        </div>
+
+                        <label for="email" class="sr-only" th:text="#{usuaris.llistat.filtrarEmail}">
+                            Filtrar usuaris per correu electrònic
+                        </label>
+
+                        <div class="search-field">
+                            <i class="bi bi-envelope" aria-hidden="true"></i>
+
+                            <input id="email"
+                                   name="email"
+                                   type="text"
+                                   th:value="${email}"
+                                   placeholder="Correu electrònic..."
+                                   th:placeholder="#{usuaris.llistat.email.placeholder}"
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="order-field">
+                            <label for="ordre" th:text="#{comu.ordenarPer}">Ordenar per</label>
+
+                            <select id="ordre" name="ordre" class="form-select">
+                                <option value="nomComplet"
+                                        th:selected="${ordre == 'nomComplet'}"
+                                        th:text="#{usuaris.form.nomComplet}">
+                                    Nom complet
+                                </option>
+
+                                <option value="id"
+                                        th:selected="${ordre == 'id'}">
+                                    ID
+                                </option>
+
+                                <option value="dni"
+                                        th:selected="${ordre == 'dni'}">
+                                    DNI
+                                </option>
+
+                                <option value="rolUsuari"
+                                        th:selected="${ordre == 'rolUsuari'}"
+                                        th:text="#{usuaris.form.rol}">
+                                    Rol
+                                </option>
+
+                                <option value="email"
+                                        th:selected="${ordre == 'email'}"
+                                        th:text="#{usuaris.form.email}">
+                                    Correu electrònic
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="order-field order-direction-field">
+                            <label for="direccio" th:text="#{comu.direccio}">Direcció</label>
+
+                            <select id="direccio" name="direccio" class="form-select">
+                                <option value="asc"
+                                        th:selected="${direccio == 'asc'}"
+                                        th:text="#{comu.ascendent}">
+                                    Ascendent
+                                </option>
+
+                                <option value="desc"
+                                        th:selected="${direccio == 'desc'}"
+                                        th:text="#{comu.descendent}">
+                                    Descendent
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-icon"
+                                aria-label="Aplicar filtres i ordenació d'usuaris"
+                                th:attr="aria-label=#{usuaris.llistat.aplicarFiltres}">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+
+                        <a th:href="@{/usuaris/list}"
+                           class="btn btn-secondary">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            <span th:text="#{comu.netejar}">Netejar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <!----------------------- TARGETES D'USUARIS ----------------------->
+            <div class="users-grid">
+
+                <article th:each="usuari : ${usuaris}" class="user-card">
+
+                    <!----------------------- CAPÇALERA TARGETA ----------------------->
+                    <header class="user-card-header">
+
+                        <span class="user-id-badge">
+                            <i class="bi bi-hash" aria-hidden="true"></i>
+                            <span th:text="${usuari.id}">1</span>
+                        </span>
+
+                        <span class="badge-role"
+                              th:classappend="${usuari.rolUsuari.name() == 'OPERARI'} ? ' operari' : ' admin'"
+                              th:text="${usuari.rolUsuari.name() == 'ADMIN'} ? #{sidebar.rol.admin} : #{sidebar.rol.operari}">
+                            OPERARI
+                        </span>
+
+                    </header>
+
+                    <!----------------------- IDENTITAT USUARI ----------------------->
+                    <div class="user-card-body">
+
+                        <div class="user-card-identity">
+
+                            <div class="user-avatar">
+
+                                <img th:if="${usuari.avatar != null}"
+                                     th:src="@{/usuaris/avatar/{id}(id=${usuari.id})}"
+                                     th:alt="#{sidebar.avatar(${usuari.nomComplet})}">
+
+                                <i th:unless="${usuari.avatar != null}"
+                                   class="bi bi-person-fill"
+                                   aria-hidden="true"></i>
+
+                            </div>
+
+                            <div class="user-card-name-block">
+                                <h3 class="user-card-title"
+                                    th:text="${usuari.nomComplet}">
+                                    Nom complet
+                                </h3>
+
+                                <p class="user-card-dni"
+                                   th:text="${usuari.dni}">
+                                    12345678A
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="user-card-data">
+
+                            <div class="user-data-item">
+                                <span class="user-data-label" th:text="#{usuaris.form.email}">Correu electrònic</span>
+
+                                <span class="user-data-value"
+                                      th:text="${usuari.email}">
+                                    correu@exemple.com
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!----------------------- ACCIONS ----------------------->
+                    <footer class="user-card-actions">
+
+                        <a th:href="@{/usuaris/edit/{id}(id=${usuari.id})}"
+                           class="card-action card-action-edit">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                            <span th:text="#{comu.editar}">Editar</span>
+                        </a>
+
+                        <a th:href="@{/usuaris/delete/{id}(id=${usuari.id})}"
+                           class="card-action card-action-delete"
+                           onclick="return confirm('Segur que vols eliminar aquest usuari?');"
+                           th:onclick="'return confirm(\'' + #{usuaris.llistat.confirmarEliminar} + '\');'">
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                            <span th:text="#{comu.eliminar}">Eliminar</span>
+                        </a>
+
+                    </footer>
+
+                </article>
+
+                <!----------------------- ESTAT BUIT ----------------------->
+                <div th:if="${#lists.isEmpty(usuaris)}" class="users-empty-state">
+
+                    <div class="users-empty-icon">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                    </div>
+
+                    <h3 th:text="#{usuaris.llistat.buit.titol}">No s'han trobat usuaris</h3>
+
+                    <p th:text="#{usuaris.llistat.buit.descripcio}">
+                        No hi ha usuaris que coincideixin amb els filtres seleccionats.
+                    </p>
+
+                    <a th:href="@{/usuaris/list}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                        <span th:text="#{usuaris.llistat.veureTots}">Veure tots els usuaris</span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

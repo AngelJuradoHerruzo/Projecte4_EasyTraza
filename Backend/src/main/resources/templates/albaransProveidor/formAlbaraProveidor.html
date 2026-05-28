@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{albaransProveidor.form.titol}">Albarà Proveïdor - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/albaransProveidor.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('albaransProveidor')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{albaransProveidor.eyebrow}">Recepció · Albarans de proveïdor</p>
+
+                <h1 class="page-heading"
+                    th:text="${albaraProveidor != null and albaraProveidor.id != null} ? #{albaransProveidor.form.editar} : #{albaransProveidor.form.nou}">
+                    <span th:text="#{albaransProveidor.form.heading}">Albarà de proveïdor</span>
+                </h1>
+
+                <p class="page-description" th:text="#{albaransProveidor.form.desc}">
+                    Registra la recepció, revisa el document de l'albarà i gestiona els lots associats.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span th:text="#{comu.tornarLlistat}">Tornar al llistat</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- CONTENIDOR DEL FORMULARI ----------------------->
+        <section class="delivery-form-panel">
+
+            <!----------------------- PRESENTACIÓ FORMULARI ----------------------->
+            <div class="delivery-form-intro">
+
+                <div class="delivery-form-icon">
+                    <i class="bi bi-receipt" aria-hidden="true"></i>
+                </div>
+
+                <div class="delivery-form-intro-text">
+                    <h2 class="section-title" th:text="#{albaransProveidor.form.dades}">Dades de l'albarà</h2>
+
+                    <p class="section-subtitle" th:text="#{albaransProveidor.form.sub}">
+                        Introdueix les dades manualment o utilitza l'OCR per preomplir el formulari.
+                    </p>
+                </div>
+
+                <span th:if="${albaraProveidor != null and albaraProveidor.id != null}"
+                      class="delivery-edit-badge"
+                      th:text="|ID #${albaraProveidor.id}|">
+                    ID #1
+                </span>
+
+            </div>
+
+            <!----------------------- MISSATGES GENERALS ----------------------->
+            <div class="delivery-form-messages">
+
+                <div th:if="${error}" class="alert alert-error" role="alert">
+                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                    <span th:text="${error}"></span>
+                </div>
+
+                <div th:if="${info}" class="alert alert-success" role="status">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    <span th:text="${info}"></span>
+                </div>
+
+                <div th:if="${ocrResultat != null}" class="alert alert-success" role="status">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    <span th:text="#{albaransProveidor.form.ocrExecutat}">OCR executat. Revisa les dades abans de guardar.</span>
+                </div>
+
+            </div>
+
+            <!----------------------- COS DEL FORMULARI ----------------------->
+            <div class="delivery-form-body">
+
+                <!----------------------- ESCANEIG OCR ----------------------->
+                <form id="ocrAlbaraForm"
+                      class="delivery-section delivery-ocr-section"
+                      th:action="@{/albarans-proveidor/ocr}"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="delivery-section-heading">
+
+                        <div class="delivery-section-icon">
+                            <i class="bi bi-upc-scan" aria-hidden="true"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="section-title" th:text="#{albaransProveidor.form.escanejar}">Escanejar OCR</h2>
+
+                            <p class="section-subtitle" th:text="#{albaransProveidor.form.ocrAjuda}">
+                                Puja una imatge o PDF. L'OCR només emplenarà el formulari i podràs revisar-ho abans de guardar.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="ocr-upload-row">
+
+                        <div class="form-group">
+                            <label class="form-label" for="documentOcr">
+                                <span th:text="#{albaransProveidor.form.documentEscanejar}">Document per escanejar</span>
+                            </label>
+
+                            <input id="documentOcr"
+                                   type="file"
+                                   name="documentOcr"
+                                   class="form-input file-input"
+                                   accept="image/*,application/pdf"
+                                   required>
+                        </div>
+
+                        <button id="btnEscanejarOcr"
+                                type="submit"
+                                class="btn btn-primary ocr-button"
+                                th:attr="data-scanning=#{js.ocr.escanejant},data-invalid-file=#{js.ocr.fitxerInvalid}"
+                                formnovalidate>
+                            <i class="bi bi-upc-scan" aria-hidden="true"></i>
+                            <span th:text="#{albaransProveidor.form.escanejar}">Escanejar OCR</span>
+                        </button>
+
+                    </div>
+
+                    <!----------------------- AVISOS OCR ----------------------->
+                    <div th:if="${ocrResultat != null and ocrResultat.teAvisos()}"
+                         class="ocr-warnings">
+
+                        <div th:each="avis : ${ocrResultat.avisos}"
+                             class="alert alert-error"
+                             role="alert">
+                            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                            <span th:text="${avis}"></span>
+                        </div>
+
+                        <div th:if="${ocrResultat.albaraPendent != null}"
+                             th:each="avis : ${ocrResultat.albaraPendent.avisos}"
+                             class="alert alert-error"
+                             role="alert">
+                            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                            <span th:text="${avis}"></span>
+                        </div>
+
+                    </div>
+
+                </form>
+
+                <!----------------------- FORMULARI PRINCIPAL ----------------------->
+                <form id="albaraProveidorForm"
+                      class="delivery-form"
+                      th:action="${albaraProveidor.id != null} ? @{/albarans-proveidor/update/{id}(id=${albaraProveidor.id})} : @{/albarans-proveidor/save}"
+                      th:object="${albaraProveidor}"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <!-- Identificador de l'albarà quan s'està editant -->
+                    <input type="hidden" th:field="*{id}">
+
+                    <!-- Referència lleugera al document OCR temporal. No es conserva mai la imatge en base64. -->
+                    <input type="hidden"
+                           id="ocrDocumentTemporalId"
+                           name="ocrDocumentTemporalId"
+                           th:value="${ocrDocumentTemporalId != null ? ocrDocumentTemporalId : ''}">
+
+                    <!-- Fitxers ja guardats de l'albarà -->
+                    <div th:each="fitxer, stat : *{fitxers}">
+                        <input type="hidden" th:field="*{fitxers[__${stat.index}__]}">
+                    </div>
+
+                    <!----------------------- FITXER DE L'ALBARÀ ----------------------->
+                    <section class="delivery-section">
+
+                        <div class="delivery-section-heading">
+
+                            <div class="delivery-section-icon">
+                                <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="section-title" th:text="#{albaransProveidor.form.fitxerAlbara}">Fitxer de l'albarà</h2>
+
+                                <p class="section-subtitle" th:text="#{albaransProveidor.form.fitxerAjuda}">
+                                    Adjunta manualment una imatge o PDF. El fitxer definitiu es guardarà en prémer Guardar.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="document-layout">
+
+                            <!----------------------- SELECTOR DE FITXER ----------------------->
+                            <div class="document-upload-column">
+
+                                <div class="form-group">
+                                    <label class="form-label" for="imatgeAlbara">
+                                        <span th:text="#{albaransProveidor.form.fitxerManual}">Fitxer manual de l'albarà</span>
+                                    </label>
+
+                                    <input id="imatgeAlbara"
+                                           type="file"
+                                           name="imatgeAlbara"
+                                           class="form-input file-input"
+                                           accept="image/*,application/pdf">
+                                </div>
+
+                                <div class="document-help-card">
+                                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+
+                                    <p th:text="#{albaransProveidor.form.previewAjuda}">
+                                        El document OCR o el document manual seleccionat es mostrarà a la vista prèvia abans de guardar.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <!----------------------- VISTA PRÈVIA DOCUMENT ----------------------->
+                            <div class="document-preview">
+
+                                <div id="ocrPreviewEmpty"
+                                     class="document-preview-empty"
+                                     th:style="${(ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)) or (albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty())} ? 'display:none;' : 'display:flex;'">
+
+                                    <div class="document-preview-empty-icon">
+                                        <i class="bi bi-file-earmark-image" aria-hidden="true"></i>
+                                    </div>
+
+                                    <h3 th:text="#{albaransProveidor.form.capDocument}">Cap document seleccionat</h3>
+
+                                    <p th:text="#{albaransProveidor.form.previewBuit}">
+                                        La vista prèvia del document es mostrarà aquí.
+                                    </p>
+
+                                </div>
+
+                                <div id="ocrPreviewContainer"
+                                     class="document-preview-content"
+                                     th:style="${(ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)) or (albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty())} ? 'display:block;' : 'display:none;'">
+
+                                    <p id="ocrFileName"
+                                       class="document-preview-name"
+                                       th:text="${ocrDocumentNomOriginal != null and !#strings.isEmpty(ocrDocumentNomOriginal)} ? ${ocrDocumentNomOriginal} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : '')">
+                                    </p>
+
+                                    <!----------------------- PREVIEW IMATGE OCR TEMPORAL O FITXER EXISTENT ----------------------->
+                                    <img id="ocrPreviewImage"
+                                         class="document-preview-image"
+                                         th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal)} ? ${ocrDocumentUrlTemporal} : (${albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty()} ? ${albaraProveidor.fitxers[0]} : '')"
+                                         th:style="${(ocrDocumentContentType != null and #strings.startsWith(ocrDocumentContentType, 'image/')) or ((ocrDocumentUrlTemporal == null or #strings.isEmpty(ocrDocumentUrlTemporal)) and albaraProveidor.fitxers != null and !albaraProveidor.fitxers.isEmpty())} ? 'display:block;' : 'display:none;'"
+                                         alt="Vista prèvia de l'albarà" th:alt="#{albaransProveidor.form.previewImatgeAlt}">
+
+                                    <!----------------------- PREVIEW PDF OCR TEMPORAL ----------------------->
+                                    <iframe id="ocrPreviewFrame"
+                                            class="document-preview-frame"
+                                            th:src="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal) and ocrDocumentContentType == 'application/pdf'} ? ${ocrDocumentUrlTemporal} : ''"
+                                            th:style="${ocrDocumentUrlTemporal != null and !#strings.isEmpty(ocrDocumentUrlTemporal) and ocrDocumentContentType == 'application/pdf'} ? 'display:block;' : 'display:none;'"
+                                            title="Vista prèvia del PDF de l'albarà" th:title="#{albaransProveidor.form.previewPdfTitle}">
+                                    </iframe>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!----------------------- DADES GENERALS ----------------------->
+                    <section class="delivery-section">
+
+                        <div class="delivery-section-heading">
+
+                            <div class="delivery-section-icon">
+                                <i class="bi bi-clipboard-data" aria-hidden="true"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="section-title" th:text="#{comu.dadesGenerals}">Dades generals</h2>
+
+                                <p class="section-subtitle">
+                                    <span th:text="#{albaransProveidor.form.dadesSub}">Informació principal de la recepció.</span>
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="delivery-general-grid">
+
+                            <!----------------------- DATA RECEPCIÓ ----------------------->
+                            <div class="form-group">
+                                <label class="form-label" for="dataRecepcio">
+                                    <span th:text="#{comu.dataRecepcio}">Data recepció</span>
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <div class="form-input-wrapper">
+                                    <i class="bi bi-calendar3 form-input-icon" aria-hidden="true"></i>
+
+                                    <input id="dataRecepcio"
+                                           type="date"
+                                           name="dataRecepcio"
+                                           th:value="${albaraProveidor.dataRecepcio != null} ? ${#temporals.format(albaraProveidor.dataRecepcio, 'yyyy-MM-dd')} : ''"
+                                           class="form-input form-input-with-icon"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!----------------------- NÚMERO ALBARÀ ----------------------->
+                            <div class="form-group">
+                                <label class="form-label" for="numeroAlbara">
+                                    <span th:text="#{comu.numeroAlbara}">Número albarà</span>
+                                </label>
+
+                                <div class="form-input-wrapper">
+                                    <i class="bi bi-hash form-input-icon" aria-hidden="true"></i>
+
+                                    <input id="numeroAlbara"
+                                           type="text"
+                                           th:field="*{numeroAlbara}"
+                                           class="form-input form-input-with-icon"
+                                           maxlength="80"
+                                           placeholder="Automàtic si queda buit"
+                               th:placeholder="#{albaransProveidor.form.numeroPlaceholder}">
+                                </div>
+                            </div>
+
+                            <!----------------------- PROVEÏDOR ----------------------->
+                            <div class="form-group">
+                                <label class="form-label" for="proveidor">
+                                    <span th:text="#{comu.proveidor}">Proveïdor</span>
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <div class="field-with-action">
+                                    <div class="form-input-wrapper">
+                                        <i class="bi bi-truck form-input-icon" aria-hidden="true"></i>
+
+                                        <select id="proveidor"
+                                                th:field="*{proveidor.id}"
+                                                class="form-select form-select-with-icon"
+                                                required>
+                                            <option value="" th:text="#{comu.selecciona}">-- Selecciona --</option>
+
+                                            <option th:each="p : ${proveidors}"
+                                                    th:value="${p.id}"
+                                                    th:text="${p.nomProveidor}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <button type="button"
+                                            class="btn-quick-add btn-toggle-proveidor"
+                                            title="Crear proveïdor en una pestanya nova" th:title="#{albaransProveidor.form.crearProveidorTitle}"
+                                            aria-label="Crear proveïdor en una pestanya nova"
+                                            th:attr="aria-label=#{albaransProveidor.form.crearProveidorTitle},data-url=@{/proveidors/new(popup=true)}">
+                                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+
+                                <div th:if="${ocrResultat != null
+                                            and ocrResultat.albaraPendent != null
+                                            and !ocrResultat.albaraPendent.proveidorTrobat
+                                            and ocrResultat.albaraPendent.proveidorDetectat != null
+                                            and !#strings.isEmpty(ocrResultat.albaraPendent.proveidorDetectat)}"
+                                     class="alert alert-error field-alert"
+                                     role="alert">
+                                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                                    <span th:text="#{albaransProveidor.form.proveidorOcrNoTrobat}">Proveïdor detectat per OCR no trobat. OCR: </span>
+                                    <strong th:text="${ocrResultat.albaraPendent.proveidorDetectat}">ARTIPAS</strong>
+                                </div>
+                            </div>
+
+                            <!----------------------- USUARI RECEPTOR ----------------------->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span th:text="#{comu.usuariReceptor}">Usuari receptor</span>
+                                </label>
+
+                                <div class="readonly-information">
+                                    <i class="bi bi-person-check" aria-hidden="true"></i>
+
+                                    <span th:if="${albaraProveidor.usuariReceptor != null}"
+                                          th:text="${albaraProveidor.usuariReceptor.nomComplet}">
+                                        <span th:text="#{comu.usuariReceptor}">Usuari receptor</span>
+                                    </span>
+
+                                    <span th:if="${albaraProveidor.usuariReceptor == null}">
+                                        <span th:text="#{albaransProveidor.form.usuariAuto}">S'assignarà automàticament des de la sessió</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!----------------------- LOTS ----------------------->
+                    <section class="delivery-section delivery-lots-section">
+
+                        <!----------------------- CAPÇALERA LOTS ----------------------->
+                        <div class="lots-heading">
+
+                            <div class="delivery-section-heading">
+
+                                <div class="delivery-section-icon">
+                                    <i class="bi bi-box-seam" aria-hidden="true"></i>
+                                </div>
+
+                                <div>
+                                    <h2 class="section-title" th:text="#{albaransProveidor.lotsRecepcionats}">Lots recepcionats</h2>
+
+                                    <p class="section-subtitle" th:text="#{albaransProveidor.form.lotsSub}">
+                                        Cada fila correspon a un lot inclòs en aquest albarà.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="lots-heading-actions">
+
+                                <button type="submit"
+                                        class="btn btn-secondary"
+                                        th:formaction="@{/albarans-proveidor/reload-form}"
+                                        formnovalidate>
+                                    <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                                    <span th:text="#{albaransProveidor.form.actualitzar}">Actualitzar llistes</span>
+                                </button>
+
+                                <button type="button"
+                                        id="addLotBtn"
+                                        class="btn btn-primary">
+                                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                    <span th:text="#{albaransProveidor.form.afegirLot}">Afegir lot</span>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <!----------------------- CONTENIDOR DE LOTS ----------------------->
+                        <div id="lotsContainer" class="lots-container">
+
+                            <!-- Fila de lot -->
+                            <div th:each="lot, stat : *{lots}"
+                                 th:with="liniaOcr=${ocrResultat != null and ocrResultat.albaraPendent != null and ocrResultat.albaraPendent.linies != null and #lists.size(ocrResultat.albaraPendent.linies) > stat.index ? ocrResultat.albaraPendent.linies[stat.index] : null}"
+                                 class="lot-row">
+
+                                <!-- Identificador intern del lot quan s'edita -->
+                                <input type="hidden" th:field="*{lots[__${stat.index}__].id}">
+
+                                <div class="lot-row-grid">
+
+                                    <!----------------------- IDENTIFICADOR DEL LOT ----------------------->
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <span th:text="#{comu.identificadorLot}">Identificador lot</span>
+                                            <span class="required-mark">*</span>
+                                        </label>
+
+                                        <input type="text"
+                                               th:field="*{lots[__${stat.index}__].identificadorLot}"
+                                               class="form-input"
+                                               maxlength="80"
+                                               required>
+
+                                        <div th:if="${liniaOcr != null
+                                                    and liniaOcr.identificadorLot != null
+                                                    and !#strings.isEmpty(liniaOcr.identificadorLot)
+                                                    and liniaOcr.identificadorLot == '-'}"
+                                             class="alert alert-error field-alert"
+                                             role="alert">
+                                            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                                            <span th:text="#{albaransProveidor.form.lotNoDetectat}">Lot no detectat. Revisa aquesta línia.</span>
+                                        </div>
+                                    </div>
+
+                                    <!----------------------- MATÈRIA PRIMERA ----------------------->
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <span th:text="#{comu.materiaPrimera}">Matèria primera</span>
+                                            <span class="required-mark">*</span>
+                                        </label>
+
+                                        <div class="field-with-action">
+                                            <select th:field="*{lots[__${stat.index}__].materiaPrimera.id}"
+                                                    class="form-select materia-primera-select"
+                                                    th:attr="data-ocr-materia=${liniaOcr != null ? liniaOcr.materiaPrimeraDetectada : ''}"
+                                                    required>
+                                                <option value="" th:text="#{comu.selecciona}">-- Selecciona --</option>
+
+                                                <option th:each="m : ${materiesPrimeres}"
+                                                        th:value="${m.id}"
+                                                        th:text="${m.nomMateria}">
+                                                </option>
+                                            </select>
+
+                                            <button type="button"
+                                                    class="btn-quick-add btn-toggle-materia-primera"
+                                                    title="Crear matèria primera en una pestanya nova" th:title="#{albaransProveidor.form.crearMateriaTitle}"
+                                                    aria-label="Crear matèria primera en una pestanya nova"
+                                                    th:attr="aria-label=#{albaransProveidor.form.crearMateriaTitle},data-url=@{/materies-primeres/new(popup=true)}">
+                                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+
+                                        <div th:if="${liniaOcr != null
+                                                    and !liniaOcr.materiaPrimeraTrobada
+                                                    and liniaOcr.materiaPrimeraDetectada != null
+                                                    and !#strings.isEmpty(liniaOcr.materiaPrimeraDetectada)}"
+                                             class="alert alert-error field-alert ocr-materia-avis"
+                                             th:attr="data-ocr-materia=${liniaOcr.materiaPrimeraDetectada}"
+                                             role="alert">
+                                            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                                            <span th:text="#{albaransProveidor.form.materiaNoTrobada}">Matèria no trobada. OCR: </span>
+                                            <strong th:text="${liniaOcr.materiaPrimeraDetectada}">Tarrina Nata 500</strong>
+                                        </div>
+                                    </div>
+
+                                    <!----------------------- QUANTITAT ----------------------->
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <span th:text="#{comu.quantitat}">Quantitat</span>
+                                            <span class="required-mark">*</span>
+                                        </label>
+
+                                        <input type="number"
+                                               th:field="*{lots[__${stat.index}__].quantitat}"
+                                               class="form-input"
+                                               min="1"
+                                               required>
+                                    </div>
+
+                                    <!----------------------- UNITATS I ACCIONS ----------------------->
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <span th:text="#{comu.unitats}">Unitats</span>
+                                            <span class="required-mark">*</span>
+                                        </label>
+
+                                        <div class="lot-unit-actions">
+                                            <select th:field="*{lots[__${stat.index}__].unitats}"
+                                                    class="form-select"
+                                                    required>
+                                                <option value="" th:text="#{comu.selecciona}">-- Selecciona --</option>
+
+                                                <option th:each="unitat : ${unitatsMesura}"
+                                                        th:value="${unitat.nom}"
+                                                        th:text="${unitat.nom}">
+                                                </option>
+                                            </select>
+
+                                            <!----------------------- AFEGIR UNITAT ----------------------->
+                                            <button type="button"
+                                                    class="btn-quick-add btn-toggle-unitat-mesura"
+                                                    th:attr="data-lot-index=${stat.index},aria-label=#{albaransProveidor.form.afegirUnitatTitle}"
+                                                    title="Afegir unitat de mesura" th:title="#{albaransProveidor.form.afegirUnitatTitle}"
+                                                    aria-label="Afegir unitat de mesura">
+                                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                            </button>
+
+                                            <!----------------------- ELIMINAR LOT ----------------------->
+                                            <button type="button"
+                                                    class="btn-remove-lot remove-lot-btn"
+                                                    title="Eliminar lot" th:title="#{albaransProveidor.form.eliminarLot}"
+                                                    aria-label="Eliminar lot" th:attr="aria-label=#{albaransProveidor.form.eliminarLot}">
+                                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!----------------------- APARTAT DESPLEGABLE NOVA UNITAT ----------------------->
+                        <div id="unitatMesuraPanel"
+                             class="new-unit-panel"
+                             th:style="${(unitatMesuraPanelObert != null and unitatMesuraPanelObert) or errorUnitatMesura != null or infoUnitatMesura != null} ? 'display:block;' : 'display:none;'">
+
+                            <!----------------------- CAPÇALERA NOVA UNITAT ----------------------->
+                            <div class="new-unit-heading">
+
+                                <div>
+                                    <h2 class="section-title" th:text="#{albaransProveidor.form.novaUnitatMesura}">Nova unitat de mesura</h2>
+
+                                    <p class="section-subtitle" th:text="#{albaransProveidor.form.unitatSub}">
+                                        Escriu una abreviatura de màxim 4 caràcters.
+                                    </p>
+                                </div>
+
+                                <div th:if="${errorUnitatMesura != null}"
+                                     class="alert alert-error"
+                                     role="alert">
+                                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                                    <span th:text="${errorUnitatMesura}"></span>
+                                </div>
+
+                                <div th:if="${infoUnitatMesura != null}"
+                                     class="alert alert-success"
+                                     role="status">
+                                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                                    <span th:text="${infoUnitatMesura}"></span>
+                                </div>
+
+                            </div>
+
+                            <input id="indexUnitatMesura"
+                                   type="hidden"
+                                   name="indexUnitatMesura"
+                                   th:value="${unitatMesuraPanelIndex}">
+
+                            <div class="new-unit-row">
+
+                                <!----------------------- CAMP NOVA UNITAT ----------------------->
+                                <div class="form-group">
+                                    <label class="form-label" for="novaUnitatMesura">
+                                        <span th:text="#{comu.novaUnitat}">Nova unitat</span>
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <input id="novaUnitatMesura"
+                                           type="text"
+                                           name="novaUnitatMesura"
+                                           class="form-input nova-unitat-mesura-input"
+                                           th:value="${novaUnitatMesuraValor}"
+                                           maxlength="4"
+                                           title="La unitat només pot contenir lletres i números, amb un màxim de 4 caràcters" th:title="#{albaransProveidor.form.unitatTitle}"
+                                           placeholder="Ex: kg"
+                               th:placeholder="#{albaransProveidor.form.unitatPlaceholder}">
+                                </div>
+
+                                <!----------------------- BOTÓ GUARDAR UNITAT ----------------------->
+                                <button type="submit"
+                                        class="btn btn-primary"
+                                        th:formaction="@{/unitats-mesura/save-from-albara-proveidor}"
+                                        formmethod="post"
+                                        formnovalidate>
+                                    <i class="bi bi-save" aria-hidden="true"></i>
+                                    <span th:text="#{albaransProveidor.form.guardarUnitat}">Guardar unitat</span>
+                                </button>
+
+                                <!----------------------- BOTÓ CANCEL·LAR ----------------------->
+                                <button type="button"
+                                        id="cancelarUnitatMesura"
+                                        class="btn btn-secondary">
+                                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                    <span th:text="#{comu.cancelar}">Cancel·lar</span>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!----------------------- BOTONS DEL FORMULARI ----------------------->
+                    <div class="delivery-form-actions">
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg" aria-hidden="true"></i>
+                            <span th:text="${albaraProveidor.id != null} ? #{comu.guardarCanvis} : #{albaransProveidor.form.crear}">
+                                <span th:text="#{comu.guardar}">Guardar</span>
+                            </span>
+                        </button>
+
+                        <a th:href="@{/albarans-proveidor/list}" class="btn btn-secondary">
+                            <i class="bi bi-x-lg" aria-hidden="true"></i>
+                            <span th:text="#{comu.cancelar}">Cancel·lar</span>
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!----------------------- SCRIPTS ----------------------->
+<script th:src="@{/js/unitatsMesura.js}"></script>
+<script th:src="@{/js/albaransProveidor.js}"></script>
+
+</body>
+</html>

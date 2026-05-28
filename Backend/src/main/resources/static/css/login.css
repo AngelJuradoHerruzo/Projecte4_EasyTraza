@@ -1,0 +1,81 @@
+/*********************       .MISSATGE DE SORTIDA.       *********************/
+.form-success {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid #badbcc;
+    border-radius: 12px;
+    color: #198754;
+    background: #e9f7ef;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/*********************       .CONTRASENYA.       *********************/
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input {
+    padding-right: 44px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+}
+
+.toggle-password:hover {
+    color: var(--text);
+}
+
+
+/*********************       .SELECTOR D'IDIOMA DEL LOGIN.       *********************/
+.language-switch {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+}
+
+.language-link {
+    min-width: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.login-language-switch {
+    margin-top: 16px;
+    background-color: var(--accent-soft);
+}
+
+.login-language-switch .language-link {
+    color: var(--muted);
+}
+
+.login-language-switch .language-link:hover {
+    color: var(--text);
+}
+
+.login-language-switch .language-link.active {
+    color: var(--white);
+    background-color: var(--accent);
+}

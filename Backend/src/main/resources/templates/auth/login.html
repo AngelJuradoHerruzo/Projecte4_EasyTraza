@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{login.titol}">Login - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px;">
+
+    <section class="content-card" style="width:100%; max-width:460px;">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <div class="content-toolbar" style="justify-content:center; text-align:center;">
+
+            <div class="toolbar-block">
+
+                <div style="display:flex; justify-content:center; margin-bottom:16px;">
+                    <div class="sidebar-logo-box" style="width:86px; height:86px;">
+                        <img th:src="@{/img/Logo_EasyTraza.jpg}"
+                             alt="Logo EasyTraza"
+                             th:alt="#{comu.logo.alt}"
+                             class="sidebar-logo">
+                    </div>
+                </div>
+
+                <h1 class="page-heading">EasyTraza</h1>
+
+                <p class="content-subtitle" th:text="#{login.subtitol}">
+                    Inicia sessió per accedir a la gestió web.
+                </p>
+
+                <div class="language-switch login-language-switch" aria-label="Idioma">
+                    <a th:href="@{/login(lang='ca')}"
+                       class="language-link"
+                       th:classappend="${#locale.language == 'ca'} ? ' active' : ''"
+                       th:text="#{idioma.catala}">Cat</a>
+
+                    <a th:href="@{/login(lang='es')}"
+                       class="language-link"
+                       th:classappend="${#locale.language == 'es'} ? ' active' : ''"
+                       th:text="#{idioma.castella}">Es</a>
+                </div>
+            </div>
+        </div>
+
+        <!----------------------- FORMULARI ----------------------->
+        <div style="padding:24px;">
+
+            <!-- Missatge d'error del login -->
+            <div th:if="${param.error}" class="form-error" style="width:100%; max-width:none; margin-bottom:18px;">
+                <i class="bi bi-exclamation-circle"></i>
+                <span th:text="#{login.error.credencials}">Correu electrònic o contrasenya incorrectes.</span>
+            </div>
+
+            <!-- Missatge de sessió caducada -->
+            <div th:if="${param.expired}" class="form-error" style="width:100%; max-width:none; margin-bottom:18px;">
+                <i class="bi bi-exclamation-circle"></i>
+                <span th:text="#{login.error.sessioCaducada}">La sessió ha caducat. Torna a iniciar sessió.</span>
+            </div>
+
+            <!-- Missatge de logout correcte -->
+            <div th:if="${param.logout}" class="form-success" style="width:100%; margin-bottom:18px;">
+                <i class="bi bi-check-circle"></i>
+                <span th:text="#{login.logout.correcte}">Sessió tancada correctament.</span>
+            </div>
+
+            <!-- Missatge de contrasenya actualitzada -->
+            <div th:if="${param.passwordChanged}" class="form-success" style="width:100%; margin-bottom:18px;">
+                <i class="bi bi-check-circle"></i>
+                <span th:text="#{login.contrasenya.actualitzada}">Contrasenya actualitzada correctament. Ja pots iniciar sessió.</span>
+            </div>
+
+            <form th:action="@{/login}" method="post">
+
+                <!----------------------- CAMP EMAIL ----------------------->
+                <div class="form-group" style="margin-bottom:18px;">
+                    <label class="form-label" for="email" th:text="#{login.email.etiqueta}">Correu electrònic</label>
+
+                    <input id="email"
+                           name="email"
+                           type="text"
+                           class="form-input"
+                           autocomplete="username"
+                           placeholder="usuari@exemple.com"
+                           th:placeholder="#{login.email.placeholder}">
+                </div>
+
+                <!----------------------- CAMP CONTRASENYA ----------------------->
+                <div class="form-group" style="margin-bottom:22px;">
+                    <label class="form-label" for="password" th:text="#{login.contrasenya.etiqueta}">Contrasenya</label>
+
+                    <div class="password-wrapper">
+                        <input id="password"
+                               name="password"
+                               type="password"
+                               class="form-input password-input"
+                               autocomplete="current-password"
+                               placeholder="Introdueix la contrasenya"
+                               th:placeholder="#{login.contrasenya.placeholder}">
+
+                        <button type="button"
+                                id="togglePassword"
+                                class="toggle-password"
+                                aria-label="Mostrar o amagar contrasenya"
+                                th:attr="aria-label=#{login.contrasenya.mostrarAmagar}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!----------------------- BOTÓ LOGIN ----------------------->
+                <button type="submit" class="btn btn-primary" style="width:100%;">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span th:text="#{login.boto}">Iniciar sessió</span>
+                </button>
+
+                <div style="margin-top:18px; text-align:center;">
+                    <a th:href="@{/recuperar-contrasenya}"
+                       style="color:var(--accent-dark); font-size:14px; font-weight:600;"
+                       th:text="#{login.contrasenya.oblidada}">
+                        Has oblidat la contrasenya?
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+    </section>
+
+</div>
+
+<script th:src="@{/js/login.js}"></script>
+
+</body>
+</html>

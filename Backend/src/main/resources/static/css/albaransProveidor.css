@@ -1,0 +1,1443 @@
+/*********************       .FORMULARI ALBARÀ PROVEÏDOR.       *********************/
+.delivery-form-panel {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background-color: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.delivery-form-intro {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.delivery-form-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-lg);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 22px;
+}
+
+.delivery-form-intro-text {
+    flex: 1;
+    min-width: 260px;
+}
+
+.delivery-edit-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    margin-left: auto;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.delivery-form-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 24px 0;
+}
+
+.delivery-form-messages .alert {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.delivery-form-body {
+    width: 100%;
+    padding: 22px 24px 24px;
+}
+
+.delivery-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/*********************       .SECCIONS DEL FORMULARI.       *********************/
+.delivery-section {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel-soft);
+}
+
+.delivery-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.delivery-section-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 20px;
+}
+
+.delivery-section-heading .section-title {
+    font-size: 19px;
+}
+
+.delivery-section-heading .section-subtitle {
+    margin-top: 4px;
+}
+
+
+/*********************       .ESCANEIG OCR.       *********************/
+.delivery-ocr-section {
+    margin-bottom: 20px;
+}
+
+.ocr-upload-row {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) auto;
+    align-items: end;
+    gap: 12px;
+}
+
+.ocr-button {
+    min-height: 48px;
+}
+
+.ocr-warnings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.ocr-warnings .alert {
+    margin-bottom: 0;
+}
+
+
+/*********************       .FITXER I PREVISUALITZACIÓ.       *********************/
+.document-layout {
+    display: grid;
+    grid-template-columns: minmax(255px, 0.8fr) minmax(360px, 1.2fr);
+    align-items: stretch;
+    gap: 18px;
+}
+
+.document-upload-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.file-input {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.document-help-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+    color: var(--muted);
+}
+
+.document-help-card i {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--edit-text);
+    font-size: 16px;
+}
+
+.document-help-card p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.document-preview {
+    min-height: 260px;
+    overflow: hidden;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel);
+}
+
+.document-preview-empty {
+    min-height: 258px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+}
+
+.document-preview-empty-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 25px;
+}
+
+.document-preview-empty h3 {
+    margin: 2px 0 0;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.document-preview-empty p {
+    max-width: 320px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.document-preview-content {
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+}
+
+.document-preview-name {
+    margin: 0 0 12px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.document-preview-image {
+    max-width: 100%;
+    max-height: 470px;
+    margin: 0 auto;
+    border-radius: var(--radius-md);
+    object-fit: contain;
+    background-color: var(--panel);
+}
+
+.document-preview-frame {
+    width: 100%;
+    min-height: 470px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+}
+
+
+/*********************       .DADES GENERALS.       *********************/
+.delivery-general-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 18px;
+}
+
+.form-select-with-icon {
+    padding-left: 40px;
+}
+
+.field-with-action {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 46px;
+    gap: 8px;
+}
+
+.btn-quick-add {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: start;
+    border-radius: var(--radius-md);
+    color: var(--green-text);
+    background-color: var(--green-soft);
+    font-size: 15px;
+    transition: transform 0.2s ease;
+}
+
+.btn-quick-add:hover {
+    transform: translateY(-1px);
+}
+
+.btn-quick-add:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.readonly-information {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--muted);
+    background-color: var(--panel);
+    font-size: 14px;
+}
+
+.readonly-information i {
+    flex-shrink: 0;
+    color: var(--edit-text);
+}
+
+.field-alert {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 9px 11px;
+    margin: 8px 0 0;
+    font-size: 12px;
+}
+
+.field-alert strong {
+    font-weight: 700;
+}
+
+
+/*********************       .LOTS RECEPCIONATS.       *********************/
+.delivery-lots-section {
+    padding: 20px;
+}
+
+.lots-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.lots-heading .delivery-section-heading {
+    margin-bottom: 0;
+}
+
+.lots-heading-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lot-row {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel);
+}
+
+.lot-row-grid {
+    display: grid;
+    grid-template-columns: minmax(190px, 1.1fr) minmax(210px, 1.2fr) minmax(105px, 0.65fr) minmax(200px, 1fr);
+    align-items: start;
+    gap: 14px;
+}
+
+.lot-unit-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 46px 46px;
+    gap: 8px;
+}
+
+.btn-remove-lot {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    color: var(--danger-text);
+    background-color: var(--danger-soft);
+    font-size: 15px;
+    transition: transform 0.2s ease;
+}
+
+.btn-remove-lot:hover {
+    transform: translateY(-1px);
+}
+
+.btn-remove-lot:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+
+/*********************       .NOVA UNITAT DE MESURA.       *********************/
+.new-unit-panel {
+    margin-top: 18px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel);
+}
+
+.new-unit-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.new-unit-heading .alert {
+    margin-bottom: 0;
+}
+
+.new-unit-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto auto;
+    align-items: end;
+    gap: 10px;
+}
+
+
+/*********************       .ACCIONS DEL FORMULARI.       *********************/
+.delivery-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 22px;
+    margin-top: 5px;
+    border-top: 1px solid var(--border);
+}
+
+/*********************       .PANELL LLISTAT ALBARANS PROVEÏDOR.       *********************/
+.deliveries-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background-color: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.deliveries-toolbar {
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    flex-wrap: wrap;
+    padding: 20px 24px 17px;
+    border-bottom: 1px solid var(--border);
+}
+
+.deliveries-toolbar-info {
+    flex: 1;
+    min-width: 230px;
+}
+
+.deliveries-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.deliveries-filter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-field {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel-soft);
+}
+
+.search-field-supplier {
+    width: 180px;
+}
+
+.search-field-number {
+    width: 140px;
+}
+
+.search-field-lot {
+    width: 145px;
+}
+
+.search-field-receiver {
+    width: 170px;
+}
+
+.search-field i {
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.search-field input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    color: var(--text);
+    background-color: transparent;
+    font-size: 14px;
+}
+
+.search-field input::placeholder {
+    color: var(--muted);
+}
+
+.search-field:focus-within {
+    border-color: var(--accent);
+}
+
+.deliveries-filter .btn {
+    min-height: 46px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.deliveries-filter .btn-icon {
+    width: 46px;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+
+/*********************       .GRUPS DE PROVEÏDORS.       *********************/
+.deliveries-grouped-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 22px 24px 24px;
+}
+
+.delivery-group {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel-soft);
+}
+
+.delivery-group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--panel);
+}
+
+.delivery-group-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 18px;
+}
+
+.delivery-group-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.delivery-group-title p {
+    margin: 0 0 3px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.delivery-group-title h3 {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.delivery-group-counter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/*********************       .TARGETES D'ALBARANS.       *********************/
+.deliveries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+}
+
+.delivery-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.delivery-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+}
+
+.delivery-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 15px 12px;
+}
+
+.delivery-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.delivery-card-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 18px;
+}
+
+.delivery-card-title-block {
+    min-width: 0;
+}
+
+.delivery-card-type {
+    margin: 0 0 3px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.delivery-card-title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.delivery-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.delivery-card-data {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 15px;
+    border-top: 1px solid var(--border);
+    background-color: var(--panel-soft);
+}
+
+.delivery-data-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.delivery-data-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 13px;
+}
+
+.delivery-data-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.delivery-data-label {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.delivery-data-value {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.delivery-card-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 12px 15px 0;
+}
+
+.delivery-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--panel-soft);
+}
+
+.delivery-summary-item i {
+    flex-shrink: 0;
+    color: var(--edit-text);
+    font-size: 16px;
+}
+
+.delivery-summary-value {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.delivery-summary-label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.delivery-card-lots {
+    flex: 1;
+    padding: 13px 15px;
+}
+
+.delivery-lots-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.delivery-lot-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 9px;
+    border-radius: var(--radius-sm);
+    background-color: var(--panel-soft);
+}
+
+.delivery-lot-name,
+.delivery-lot-quantity {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+}
+
+.delivery-lot-name {
+    white-space: nowrap;
+}
+
+.delivery-lot-quantity {
+    white-space: nowrap;
+}
+
+.delivery-lots-empty {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.delivery-card-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    padding: 12px 15px 14px;
+    border-top: 1px solid var(--border);
+}
+
+.delivery-card-actions-locked {
+    grid-template-columns: 1fr 2fr;
+}
+
+.card-action {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    transition: background-color 0.2s ease;
+}
+
+.card-action-view {
+    color: var(--edit-text);
+    background-color: var(--edit-soft);
+}
+
+.card-action-view:hover {
+    background-color: var(--accent-soft);
+}
+
+.card-action-edit {
+    color: var(--edit-text);
+    background-color: var(--edit-soft);
+}
+
+.card-action-edit:hover {
+    background-color: var(--accent-soft);
+}
+
+.card-action-delete {
+    color: var(--danger-text);
+    background-color: var(--danger-soft);
+}
+
+.card-action-locked {
+    color: var(--muted);
+    background-color: var(--panel-soft);
+    cursor: not-allowed;
+}
+
+.card-action:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+
+/*********************       .ESTAT BUIT DEL LLISTAT.       *********************/
+.deliveries-empty-state {
+    min-height: 285px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    padding: 34px 20px;
+    border-radius: var(--radius-xl);
+    background-color: var(--panel-soft);
+    text-align: center;
+}
+
+.deliveries-empty-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    border-radius: var(--radius-lg);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 24px;
+}
+
+.deliveries-empty-state h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.deliveries-empty-state p {
+    max-width: 390px;
+    margin: 0 0 9px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+/*********************       .DETALL ALBARÀ PROVEÏDOR.       *********************/
+.delivery-detail-panel {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background-color: var(--panel);
+    box-shadow: var(--shadow);
+}
+
+.delivery-detail-intro {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.delivery-detail-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-lg);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 22px;
+}
+
+.delivery-detail-intro-text {
+    flex: 1;
+    min-width: 260px;
+}
+
+.delivery-detail-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    margin-left: auto;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.delivery-detail-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 22px 24px 24px;
+}
+
+.delivery-detail-section {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--panel-soft);
+}
+
+.delivery-detail-section .delivery-section-heading {
+    margin-bottom: 20px;
+}
+
+.delivery-detail-data-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.delivery-detail-data-card {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+}
+
+.delivery-detail-data-icon {
+    width: 39px;
+    height: 39px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 16px;
+}
+
+.delivery-detail-data-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.delivery-detail-data-value {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+/*********************       .DOCUMENT DEL DETALL.       *********************/
+.delivery-detail-document {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+}
+
+.delivery-document-file {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.delivery-document-file-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    color: var(--green-text);
+    background-color: var(--green-soft);
+    font-size: 20px;
+}
+
+.delivery-document-file-data {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.delivery-document-file-name {
+    display: block;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+/*********************       .LOTS DEL DETALL.       *********************/
+.delivery-detail-lots-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.delivery-detail-lots-heading .delivery-section-heading {
+    margin-bottom: 0;
+}
+
+.delivery-detail-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.delivery-detail-lots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 12px;
+}
+
+.delivery-detail-lot-card {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+}
+
+.delivery-detail-lot-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.delivery-detail-lot-title {
+    min-width: 0;
+}
+
+.delivery-lot-id {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.delivery-detail-lot-title h3 {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lot-state-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 6px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.lot-state-stock {
+    color: var(--green-text);
+    background-color: var(--green-soft);
+}
+
+.lot-state-open {
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+}
+
+.lot-state-finished {
+    color: var(--danger-text);
+    background-color: var(--danger-soft);
+}
+
+.delivery-detail-lot-data {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 12px;
+}
+
+.delivery-detail-lot-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.delivery-detail-lot-value {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+/*********************       .ESTATS BUITS DEL DETALL.       *********************/
+.delivery-detail-empty {
+    min-height: 145px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 22px;
+    border-radius: var(--radius-md);
+    background-color: var(--panel);
+    text-align: center;
+}
+
+.delivery-detail-empty-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    color: var(--edit-text);
+    background-color: var(--accent-soft);
+    font-size: 21px;
+}
+
+.delivery-detail-empty p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+
+/*********************       .RESPONSIVE LLISTAT I DETALL.       *********************/
+@media (max-width: 1340px) {
+    .deliveries-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .deliveries-filter {
+        justify-content: flex-start;
+    }
+
+    .delivery-detail-data-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .deliveries-grouped-list {
+        padding: 18px;
+    }
+
+    .deliveries-grid {
+        grid-template-columns: 1fr;
+        padding: 14px;
+    }
+
+    .delivery-group-header {
+        flex-wrap: wrap;
+    }
+
+    .delivery-group-counter {
+        width: fit-content;
+    }
+
+    .deliveries-filter {
+        display: grid;
+        grid-template-columns: 1fr 46px;
+    }
+
+    .search-field,
+    .search-field-supplier,
+    .search-field-number,
+    .search-field-lot,
+    .search-field-receiver {
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+
+    .deliveries-filter .btn-primary {
+        grid-column: 2;
+    }
+
+    .deliveries-filter .btn-secondary {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .delivery-detail-intro {
+        padding: 20px 18px;
+    }
+
+    .delivery-detail-badge {
+        margin-left: 0;
+    }
+
+    .delivery-detail-body {
+        padding: 18px;
+    }
+
+    .delivery-detail-section {
+        padding: 16px;
+    }
+
+    .delivery-detail-data-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .delivery-detail-document,
+    .delivery-detail-lots-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .delivery-detail-document .btn {
+        width: 100%;
+    }
+
+    .delivery-detail-lots-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/*********************       .RESPONSIVE FORMULARI ALBARÀ PROVEÏDOR.       *********************/
+@media (max-width: 1240px) {
+    .delivery-general-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lot-row-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 980px) {
+    .document-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lots-heading {
+        flex-direction: column;
+    }
+
+    .lots-heading-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 700px) {
+    .delivery-form-intro {
+        padding: 20px 18px;
+    }
+
+    .delivery-edit-badge {
+        margin-left: 0;
+    }
+
+    .delivery-form-messages {
+        padding: 18px 18px 0;
+    }
+
+    .delivery-form-body {
+        padding: 18px;
+    }
+
+    .delivery-section {
+        padding: 16px;
+    }
+
+    .delivery-section-heading {
+        align-items: flex-start;
+    }
+
+    .ocr-upload-row,
+    .delivery-general-grid,
+    .lot-row-grid,
+    .new-unit-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ocr-button,
+    .lots-heading-actions .btn,
+    .new-unit-row .btn {
+        width: 100%;
+    }
+
+    .delivery-form-actions {
+        flex-direction: column;
+    }
+
+    .delivery-form-actions .btn {
+        width: 100%;
+    }
+}

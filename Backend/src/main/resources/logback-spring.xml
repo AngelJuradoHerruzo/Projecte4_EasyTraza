@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty scope="context"
+                    name="APP_NAME"
+                    source="spring.application.name"
+                    defaultValue="easytraza"/>
+
+    <springProperty scope="context"
+                    name="LOG_PATH"
+                    source="logging.file.path"
+                    defaultValue="Backend/logs"/>
+
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{40} - %msg%n"/>
+
+    <!-- Consola: es conserva la visualització dels logs durant el desenvolupament -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Fitxer principal amb rotació per mida -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.log</file>
+        <append>true</append>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+
+        <!-- Es conserven únicament dos fitxers històrics més el fitxer actiu -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>2</maxIndex>
+        </rollingPolicy>
+
+        <!-- En arribar a 1 MB es genera el fitxer següent -->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>1MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- Logs propis d'EasyTraza -->
+    <logger name="cat.copernic.easytraza" level="INFO"/>
+
+    <!-- S'omet la informació de connexió de Hibernate i només se'n registren avisos i errors -->
+    <logger name="org.hibernate.orm.connections.pooling" level="WARN"/>
+
+    <!-- Logs generals del backend, inclosos els avisos i errors de Spring -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

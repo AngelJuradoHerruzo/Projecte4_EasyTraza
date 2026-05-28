@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{perfil.veure.titol}">El meu perfil - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet" th:href="@{/css/perfil.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{layout/sidebar :: sidebar('perfil')}"></div>
+
+    <main class="main">
+
+        <!----------------------- CAPÇALERA ----------------------->
+        <section class="page-top">
+            <div class="page-top-left">
+                <p class="page-eyebrow" th:text="#{perfil.compte}">Compte</p>
+
+                <h1 class="page-heading" th:text="#{sidebar.perfil}">El meu perfil</h1>
+
+                <p class="page-description" th:text="#{perfil.veure.desc}">
+                    Consulta les dades del teu usuari i mantén actualitzada la teva foto identificativa.
+                </p>
+            </div>
+
+            <div class="page-top-actions">
+                <a th:href="@{/perfil/edit}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                    <span th:text="#{perfil.form.heading}">Editar perfil</span>
+                </a>
+            </div>
+        </section>
+
+        <!----------------------- MISSATGES ----------------------->
+        <div th:if="${missatge}" class="alert alert-success" role="status">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${missatge}"></span>
+        </div>
+
+        <!----------------------- PANELL DEL PERFIL ----------------------->
+        <section class="profile-panel">
+
+            <!----------------------- PRESENTACIÓ DEL PERFIL ----------------------->
+            <div class="profile-intro">
+
+                <div class="profile-avatar profile-avatar-large">
+                    <img th:if="${usuari.avatar != null}"
+                         th:src="@{/perfil/avatar}"
+                         th:alt="#{sidebar.avatar(${usuari.nomComplet})}">
+
+                    <i th:unless="${usuari.avatar != null}"
+                       class="bi bi-person-fill"
+                       aria-hidden="true"></i>
+                </div>
+
+                <div class="profile-identity">
+                    <p class="profile-identity-eyebrow" th:text="#{perfil.veure.usuariAutenticat}">Usuari autenticat</p>
+
+                    <h2 th:text="${usuari.nomComplet}">
+                        Nom usuari
+                    </h2>
+
+                    <p th:text="${usuari.email}">
+                        correu@exemple.com
+                    </p>
+                </div>
+
+                <span class="profile-role-badge"
+                      th:text="${usuari.rolUsuari.name() == 'ADMIN'} ? #{sidebar.rol.admin} : #{sidebar.rol.operari}">
+                    ADMIN
+                </span>
+
+            </div>
+
+            <!----------------------- DADES PERSONALS ----------------------->
+            <div class="profile-body">
+
+                <section class="profile-section">
+
+                    <div class="profile-section-heading">
+
+                        <div class="profile-section-icon">
+                            <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="section-title" th:text="#{perfil.veure.dadesPersonals}">Dades personals</h2>
+
+                            <p class="section-subtitle" th:text="#{perfil.veure.sub}">
+                                Informació associada al teu compte.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="profile-data-grid">
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-hash" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label" th:text="#{perfil.veure.idIntern}">ID intern</span>
+                                <span class="profile-data-value" th:text="${usuari.id}">1</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label" th:text="#{comu.dni}">DNI</span>
+                                <span class="profile-data-value" th:text="${usuari.dni}">12345678A</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-person" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label" th:text="#{comu.nomComplet}">Nom complet</span>
+                                <span class="profile-data-value" th:text="${usuari.nomComplet}">Nom usuari</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-envelope" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label" th:text="#{comu.correuElectronic}">Correu electrònic</span>
+                                <span class="profile-data-value" th:text="${usuari.email}">correu@exemple.com</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label" th:text="#{comu.rol}">Rol</span>
+                                <span class="profile-data-value" th:text="${usuari.rolUsuari.name() == 'ADMIN'} ? #{sidebar.rol.admin} : #{sidebar.rol.operari}">ADMIN</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-data-card">
+                            <div class="profile-data-icon">
+                                <i class="bi bi-image" aria-hidden="true"></i>
+                            </div>
+
+                            <div class="profile-data-content">
+                                <span class="profile-data-label" th:text="#{perfil.fotoAvatarBarra}">Foto / avatar</span>
+                                <span class="profile-data-value"
+                                      th:text="${usuari.avatar != null} ? #{perfil.veure.avatarConfigurat} : #{perfil.veure.senseAvatar}">
+                                    <span th:text="#{perfil.veure.avatarConfigurat}">Avatar configurat</span>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

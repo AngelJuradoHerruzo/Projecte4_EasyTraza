@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ca" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title th:text="#{error500.titol}">Error intern - EasyTraza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/general.css}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background:#f7efe6; padding:24px;">
+
+    <section style="width:100%; max-width:520px; background:#ffffff; border:1px solid #ead8c4; border-radius:26px; padding:34px 32px; box-shadow:0 18px 40px rgba(90, 54, 28, 0.12); text-align:center;">
+
+        <div style="width:72px; height:72px; margin:0 auto 22px auto; border-radius:24px; display:flex; align-items:center; justify-content:center; background:#fff1df; color:#8B5E34; font-size:34px;">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+
+        <p class="page-eyebrow" style="margin-bottom:8px;" th:text="#{error500.codi}">
+            Error 500
+        </p>
+
+        <h1 class="page-heading" style="margin-bottom:12px;" th:text="#{error500.encapcalament}">
+            Error intern del servidor
+        </h1>
+
+        <p class="page-description" style="margin:0 auto 24px auto; max-width:390px;" th:text="#{error500.descripcio}">
+            S'ha produït un error inesperat. Torna-ho a intentar més tard o contacta amb l'administrador si el problema continua.
+        </p>
+
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+
+            <a th:href="@{/productes/list}" class="btn btn-primary">
+                <i class="bi bi-house-door"></i>
+                <span th:text="#{error.tornarInici}">Tornar a l'inici</span>
+            </a>
+
+            <a href="javascript:location.reload()" class="btn btn-secondary">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span th:text="#{error.reintentar}">Reintentar</span>
+            </a>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>
