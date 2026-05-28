@@ -18,7 +18,7 @@ import cat.copernic.easytraza.service.ProveidorService;
  * Gestionades les pantalles de consulta, creació, edició i eliminació
  * dels proveïdors de l'aplicació web.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/proveidors")

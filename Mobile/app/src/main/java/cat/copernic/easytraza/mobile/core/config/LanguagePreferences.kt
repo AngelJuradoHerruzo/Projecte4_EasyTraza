@@ -11,7 +11,7 @@ import java.util.Locale
  * Gestionada la preferència local de l'idioma de l'aplicació mòbil
  * i aplicada la configuració regional corresponent al context utilitzat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 object LanguagePreferences {
 

@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Representades les dades identificatives i de contacte d'un client
  * al qual es poden associar albarans de lliurament.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "clients")

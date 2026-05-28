@@ -13,7 +13,7 @@ import cat.copernic.easytraza.mobile.features.lots.domain.models.Lot
  * Representada la informació obtinguda en intentar iniciar un lot,
  * incloent-hi la confirmació requerida, el missatge i el lot resultant.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 class LotUseCase(
     private val context: Context

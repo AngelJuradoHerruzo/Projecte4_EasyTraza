@@ -19,7 +19,7 @@ import cat.copernic.easytraza.repository.ProducteRepository;
  * Gestionades les operacions de consulta, creació, modificació i eliminació dels productes.
  * També aplicades les validacions i ordenacions necessàries sobre les dades introduïdes.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

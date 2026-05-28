@@ -31,7 +31,7 @@ import cat.copernic.easytraza.service.UsuariService;
  * Gestionades les pantalles de consulta, creació, edició, eliminació i lliurament
  * dels albarans de client de la interfície web.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/albarans-client")

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * Agrupades funcions auxiliars utilitzades pels parsers OCR per normalitzar textos, 
  * detectar dates, convertir números i comparar valors. Aquesta classe no manté estat propi.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public final class OcrUtils {
 

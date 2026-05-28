@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Representada una quantitat de producte manufacturat dins d'un albarà
  * de client, indicant el producte i l'operari responsables.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "linies_produccio")

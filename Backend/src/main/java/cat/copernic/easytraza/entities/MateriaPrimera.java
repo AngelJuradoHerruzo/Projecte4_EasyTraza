@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Representat un producte base utilitzat en la fabricació dels productes
  * acabats gestionats per l'aplicació.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "materies_primeres")

@@ -13,7 +13,7 @@ import java.util.List;
  * Gestionada la identificació d'usuaris de l'aplicació mòbil sense contrasenya
  * i la consulta dels usuaris disponibles per iniciar la sessió.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @RestController
 @RequestMapping("/api/mobile/auth")

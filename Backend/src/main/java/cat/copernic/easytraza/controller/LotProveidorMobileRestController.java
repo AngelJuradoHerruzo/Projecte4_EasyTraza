@@ -14,7 +14,7 @@ import cat.copernic.easytraza.service.LotProveidorService;
  * Gestionada la consulta, l'inici i la finalització de lots de proveïdor
  * des de l'aplicació mòbil.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @RestController
 @RequestMapping("/api/mobile/lots")

@@ -39,7 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Gestionat el processament OCR dels documents d'albarà de proveïdor.
  * També controlats els fitxers temporals, l'extracció de text i la selecció del parser corresponent.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrAlbaraProveidorService {

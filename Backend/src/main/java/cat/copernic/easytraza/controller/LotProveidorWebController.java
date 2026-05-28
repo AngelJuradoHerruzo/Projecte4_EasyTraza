@@ -16,7 +16,7 @@ import cat.copernic.easytraza.service.LotProveidorService;
  * Gestionades les pantalles de consulta, inici i finalització dels lots
  * de proveïdor de la interfície web.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/lots")

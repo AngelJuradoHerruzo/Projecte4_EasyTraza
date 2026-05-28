@@ -8,7 +8,7 @@ import cat.copernic.easytraza.mobile.features.lots.domain.models.Lot
  * Representada la informació visible a les pantalles de lots,
  * incloent-hi el llistat, el detall, els missatges i les confirmacions.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 data class LotUiState(
     val lots: List<Lot> = emptyList(),

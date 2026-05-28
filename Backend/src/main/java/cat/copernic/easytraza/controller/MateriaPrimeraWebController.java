@@ -20,7 +20,7 @@ import cat.copernic.easytraza.service.MateriaPrimeraService;
  * Gestionades les pantalles de consulta, creació, edició i eliminació
  * de les matèries primeres de l'aplicació web.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/materies-primeres")

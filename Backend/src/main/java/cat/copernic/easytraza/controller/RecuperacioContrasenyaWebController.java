@@ -17,7 +17,7 @@ import cat.copernic.easytraza.service.RecuperacioContrasenyaService;
  * Gestionades les pantalles públiques que permeten sol·licitar
  * un enllaç temporal i establir una nova contrasenya.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 public class RecuperacioContrasenyaWebController {

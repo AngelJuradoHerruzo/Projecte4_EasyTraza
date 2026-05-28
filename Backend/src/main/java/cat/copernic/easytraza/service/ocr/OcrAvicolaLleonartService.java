@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Interpretades les dades OCR dels albarans del proveïdor Avícola Lleonart.
  * També extretes les dades principals i els avisos necessaris per revisar el resultat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrAvicolaLleonartService implements OcrParserProveidor {

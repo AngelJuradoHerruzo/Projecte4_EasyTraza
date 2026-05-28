@@ -8,7 +8,7 @@ import java.util.List;
  * Definits els proveïdors que el sistema pot reconèixer automàticament durant el procés OCR.
  * També guardades les claus utilitzades per identificar-los dins del text normalitzat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public enum OcrProveidorDetectat {
 

@@ -17,7 +17,7 @@ import cat.copernic.easytraza.service.TracabilitatService;
  * Gestionada la pantalla d'explotació de dades dels lots i la consulta
  * de la informació necessària per al seguiment de la traçabilitat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/tracabilitat")

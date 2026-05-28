@@ -22,7 +22,7 @@ import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
  * Gestionades les operacions de consulta, creació, modificació i eliminació de matèries primeres.
  * També aplicats els filtres i validacions necessaris abans de guardar-les.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

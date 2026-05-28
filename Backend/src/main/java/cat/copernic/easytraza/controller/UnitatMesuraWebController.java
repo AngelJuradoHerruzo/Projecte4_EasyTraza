@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
  * Gestionada la creació d'unitats de mesura des del formulari d'albarans
  * de proveïdor, conservant les dades temporals del procés OCR.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/unitats-mesura")

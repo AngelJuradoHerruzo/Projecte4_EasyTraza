@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Gestionat l'accés a les dades persistides de les matèries primeres
  * i la consulta necessària per localitzar-les pel seu nom.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface MateriaPrimeraRepository extends JpaRepository<MateriaPrimera, Long> {
 

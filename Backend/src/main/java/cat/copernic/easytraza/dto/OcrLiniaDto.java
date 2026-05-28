@@ -10,7 +10,7 @@ import java.util.List;
  * perquè puguin ser mostrades i revisades abans del guardat definitiu.
  * Aquest objecte no es desa a la base de dades.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public class OcrLiniaDto {
 

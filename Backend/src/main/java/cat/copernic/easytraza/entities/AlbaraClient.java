@@ -15,7 +15,7 @@ import jakarta.persistence.*;
  * Representat el lliurament d'un o més productes a un client,
  * juntament amb les línies de producció i els lots associats.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "albarans_client")

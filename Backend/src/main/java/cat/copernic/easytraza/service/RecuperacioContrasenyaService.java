@@ -32,7 +32,7 @@ import cat.copernic.easytraza.repository.UsuariRepository;
  * Gestionades les sol·licituds de recuperació, la generació de tokens
  * temporals, l'enviament del correu i l'actualització segura de la contrasenya.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

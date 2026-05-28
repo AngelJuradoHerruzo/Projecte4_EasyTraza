@@ -11,7 +11,7 @@ import jakarta.persistence.*;
  * Representat un lot de matèria primera recepcionat mitjançant un albarà
  * de proveïdor, incloent-hi el seu estat i les dates de seguiment.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "lots_proveidor")

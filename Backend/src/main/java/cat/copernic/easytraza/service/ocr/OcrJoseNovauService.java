@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Interpretades les dades OCR dels albarans del proveïdor José Novau.
  * També normalitzades les línies de producte per obtenir lots, quantitats i matèries primeres.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrJoseNovauService implements OcrParserProveidor {

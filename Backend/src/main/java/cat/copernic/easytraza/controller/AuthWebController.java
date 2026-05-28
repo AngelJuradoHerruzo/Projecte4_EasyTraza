@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Gestionades les pantalles bàsiques d'entrada al sistema i la redirecció
  * inicial segons el rol de l'usuari autenticat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 public class AuthWebController {

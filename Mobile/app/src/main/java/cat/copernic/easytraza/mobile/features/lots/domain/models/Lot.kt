@@ -6,7 +6,7 @@ package cat.copernic.easytraza.mobile.features.lots.domain.models
  * Representades les dades de domini d'un lot que l'operari
  * pot consultar, iniciar o finalitzar des de l'aplicació mòbil.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 data class Lot(
     val id: Long,

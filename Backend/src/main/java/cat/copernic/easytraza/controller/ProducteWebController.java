@@ -18,7 +18,7 @@ import cat.copernic.easytraza.service.ProducteService;
  * Gestionades les pantalles de consulta, creació, edició i eliminació
  * dels productes de l'aplicació web.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/productes")

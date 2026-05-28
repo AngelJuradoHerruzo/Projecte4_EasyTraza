@@ -10,7 +10,7 @@ import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentific
  * Gestionades les dades locals de l'usuari identificat per mantenir
  * la seva sessió disponible durant l'ús de l'aplicació mòbil.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 object UsuariSessionManager {
 

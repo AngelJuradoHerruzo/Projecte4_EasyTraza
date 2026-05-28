@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Representat un producte acabat que el negoci produeix o ven
  * i que pot incloure's als albarans dels clients.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "productes")

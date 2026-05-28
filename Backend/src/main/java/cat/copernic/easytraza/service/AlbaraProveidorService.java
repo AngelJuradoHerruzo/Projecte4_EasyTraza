@@ -45,7 +45,7 @@ import jakarta.servlet.http.HttpSession;
  * Gestionades les operacions dels albarans de proveïdor i dels lots rebuts.
  * També preparades les dades procedents del procés OCR i les validacions prèvies al guardat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

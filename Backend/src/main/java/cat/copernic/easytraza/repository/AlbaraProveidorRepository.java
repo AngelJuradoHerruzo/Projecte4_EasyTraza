@@ -10,7 +10,7 @@ import cat.copernic.easytraza.entities.AlbaraProveidor;
  * Gestionat l'accés a les dades persistides dels albarans de proveïdor
  * i les consultes necessàries per presentar les recepcions registrades.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface AlbaraProveidorRepository extends JpaRepository<AlbaraProveidor, Long> {
 

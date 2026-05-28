@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
  * Gestionades les pantalles de consulta, creació, edició i eliminació
  * dels usuaris de l'aplicació web, incloent-hi els seus avatars.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/usuaris")

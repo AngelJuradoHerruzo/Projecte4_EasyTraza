@@ -13,7 +13,7 @@ import cat.copernic.easytraza.entities.Usuari;
  * Gestionat l'accés als tokens temporals utilitzats per restablir
  * de manera segura la contrasenya dels usuaris.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface TokenRecuperacioContrasenyaRepository extends JpaRepository<TokenRecuperacioContrasenya, Long> {
 

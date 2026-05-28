@@ -9,7 +9,7 @@ import androidx.core.content.edit
  * Gestionada la persistència local de l'adreça IPv4 utilitzada per l'aplicació
  * mòbil i construïda la URL necessària per comunicar-se amb el backend.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 object IpPreferences {
 

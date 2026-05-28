@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Representades les dades d'un proveïdor de matèries primeres
  * del qual es poden registrar recepcions mitjançant albarans.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "proveidors")

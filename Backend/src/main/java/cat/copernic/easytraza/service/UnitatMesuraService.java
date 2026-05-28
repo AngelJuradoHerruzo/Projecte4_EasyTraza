@@ -17,7 +17,7 @@ import cat.copernic.easytraza.repository.UnitatMesuraRepository;
  * Gestionades les operacions de consulta, creació, modificació i eliminació de les unitats de mesura.
  * També aplicades les validacions perquè no es dupliquin valors.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

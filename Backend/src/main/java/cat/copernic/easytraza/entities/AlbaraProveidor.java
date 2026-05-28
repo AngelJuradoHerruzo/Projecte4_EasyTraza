@@ -12,7 +12,7 @@ import jakarta.persistence.*;
  * Representada la recepció de lots de matèria primera procedents
  * d'un proveïdor i els fitxers vinculats al document rebut.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "albarans_proveidor")

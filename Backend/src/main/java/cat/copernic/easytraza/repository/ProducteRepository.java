@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Gestionat l'accés a les dades persistides dels productes i la consulta
  * necessària per localitzar-los pel seu nom.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface ProducteRepository extends JpaRepository<Producte, Long> {
 

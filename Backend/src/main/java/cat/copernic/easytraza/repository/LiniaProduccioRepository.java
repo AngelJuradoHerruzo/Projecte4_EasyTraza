@@ -9,6 +9,6 @@ import cat.copernic.easytraza.entities.LiniaProduccio;
  * Gestionat l'accés a les dades persistides de les línies de producció
  * associades als albarans de client.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface LiniaProduccioRepository extends JpaRepository<LiniaProduccio, Long> {}

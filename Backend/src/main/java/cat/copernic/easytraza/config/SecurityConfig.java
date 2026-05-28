@@ -19,7 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * Definida la configuració d'autenticació, inici i tancament de sessió,
  * permisos d'accés i codificació de contrasenyes de l'aplicació.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Configuration
 public class SecurityConfig {

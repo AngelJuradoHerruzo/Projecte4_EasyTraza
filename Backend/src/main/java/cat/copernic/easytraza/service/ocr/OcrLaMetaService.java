@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Interpretades les dades OCR dels albarans del proveïdor La Meta.
  * També separades les matèries primeres, lots i quantitats detectades al document.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrLaMetaService implements OcrParserProveidor {

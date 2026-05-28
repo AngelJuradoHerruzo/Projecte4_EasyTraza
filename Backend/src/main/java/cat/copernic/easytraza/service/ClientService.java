@@ -20,7 +20,7 @@ import cat.copernic.easytraza.repository.ClientRepository;
  * Gestionades les operacions de consulta, creació, modificació i eliminació dels clients.
  * També aplicats els filtres, ordenacions i validacions pròpies de les dades de client.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

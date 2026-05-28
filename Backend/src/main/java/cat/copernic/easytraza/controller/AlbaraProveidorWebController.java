@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpSession;
  * Gestionades les pantalles i operacions dels albarans de proveïdor, incloent-hi
  * la càrrega temporal de documents reconeguts mitjançant OCR.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/albarans-proveidor")

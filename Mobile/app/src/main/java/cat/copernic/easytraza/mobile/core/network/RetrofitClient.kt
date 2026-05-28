@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  * Gestionada la instància de Retrofit utilitzada per comunicar l'aplicació
  * mòbil amb el backend segons l'adreça de servidor configurada.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 object RetrofitClient {
 

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Interpretades les dades OCR dels albarans del proveïdor Tal Com Pinta.
  * També normalitzats els lots i les línies detectades abans de presentar-les a revisió.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrTalComPintaService implements OcrParserProveidor {

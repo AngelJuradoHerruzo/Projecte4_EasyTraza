@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
  * Gestionat l'estat de les pantalles de lots i coordinades
  * les operacions de consulta, inici, confirmació i finalització.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 class LotViewModel(
     private val context: Context

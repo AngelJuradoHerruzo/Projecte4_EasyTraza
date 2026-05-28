@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Inicialitzada l'aplicació backend d'EasyTraza i el context de Spring Boot
  * necessari per executar els serveis i la interfície web del sistema.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @SpringBootApplication
 public class EasytrazaApplication {

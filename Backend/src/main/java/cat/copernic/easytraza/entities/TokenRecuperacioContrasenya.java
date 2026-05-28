@@ -10,7 +10,7 @@ import jakarta.persistence.*;
  * Representades les dades temporals necessàries per validar un enllaç
  * de recuperació de contrasenya associat a un usuari del sistema.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "tokens_recuperacio_contrasenya")

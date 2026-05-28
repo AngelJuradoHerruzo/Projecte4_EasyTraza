@@ -19,7 +19,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
  * de selecció d'idioma de la interfície web, mantenint la preferència
  * escollida per l'usuari.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

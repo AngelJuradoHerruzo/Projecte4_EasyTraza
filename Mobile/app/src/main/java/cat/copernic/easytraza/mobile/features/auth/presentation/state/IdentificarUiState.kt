@@ -8,7 +8,7 @@ import cat.copernic.easytraza.mobile.features.auth.domain.models.UsuariIdentific
  * Representada la informació visible de la pantalla d'identificació,
  * incloent-hi els usuaris disponibles, la càrrega i els possibles errors.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 data class IdentificarUiState(
     val usuaris: List<UsuariIdentificat> = emptyList(),

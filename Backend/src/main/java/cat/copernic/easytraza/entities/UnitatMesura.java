@@ -8,7 +8,7 @@ import jakarta.persistence.*;
  * Representada una unitat de mesura utilitzada en les línies
  * dels albarans i desada de forma normalitzada.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "unitats_mesura")

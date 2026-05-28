@@ -9,7 +9,7 @@ import jakarta.persistence.*;
  * Representades les dades dels usuaris del sistema, diferenciant
  * els administradors de l'aplicació web i els operaris del client mòbil.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Entity
 @Table(name = "usuaris")

@@ -14,7 +14,7 @@ import cat.copernic.easytraza.repository.LiniaProduccioRepository;
  *
  * Gestionades les consultes bàsiques de les línies de producció registrades als albarans de client.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

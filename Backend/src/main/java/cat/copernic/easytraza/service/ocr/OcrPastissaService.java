@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Interpretades les dades OCR dels albarans del proveïdor Pastissa.
  * També aplicades lectures alternatives quan el format del document dificulta la detecció principal.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrPastissaService implements OcrParserProveidor {

@@ -11,7 +11,7 @@ import cat.copernic.easytraza.entities.Client;
  * Gestionat l'accés a les dades persistides dels clients i les consultes
  * necessàries per localitzar-los segons les seves dades identificatives.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface ClientRepository extends JpaRepository<Client, Long> {
 

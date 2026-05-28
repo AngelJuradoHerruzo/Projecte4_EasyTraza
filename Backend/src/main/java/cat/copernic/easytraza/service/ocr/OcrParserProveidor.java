@@ -8,7 +8,7 @@ import cat.copernic.easytraza.dto.OcrAlbaraPendent;
  * Definides les operacions comunes que han d'implementar els parsers OCR específics de cada proveïdor.
  * Així el procés general pot obtenir el proveïdor suportat i interpretar el text reconegut.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface OcrParserProveidor {
 

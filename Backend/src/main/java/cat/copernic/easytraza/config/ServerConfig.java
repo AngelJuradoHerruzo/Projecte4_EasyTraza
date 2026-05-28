@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * Mantingut el connector HTTPS principal per a la interfície web
  * i habilitat un connector HTTP addicional per a l'API mòbil.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Configuration
 public class ServerConfig {

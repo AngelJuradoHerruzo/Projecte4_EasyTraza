@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * Interpretades les dades OCR dels albarans del proveïdor Artipas.
  * També extretes les línies de lots, quantitats i matèries primeres detectades.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class OcrArtipasService implements OcrParserProveidor {

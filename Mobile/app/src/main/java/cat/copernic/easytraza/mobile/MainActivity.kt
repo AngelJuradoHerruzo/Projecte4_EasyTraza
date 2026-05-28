@@ -15,7 +15,7 @@ import cat.copernic.easytraza.mobile.ui.theme.MobileTheme
  * Inicialitzada l'aplicació mòbil, aplicada la configuració d'idioma
  * escollida i carregat el contingut Compose amb la navegació principal.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 class MainActivity : ComponentActivity() {
 

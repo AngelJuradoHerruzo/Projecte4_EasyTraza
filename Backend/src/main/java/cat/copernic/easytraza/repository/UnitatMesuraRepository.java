@@ -11,7 +11,7 @@ import cat.copernic.easytraza.entities.UnitatMesura;
  * Gestionat l'accés a les dades persistides de les unitats de mesura
  * i les consultes necessàries per cercar-les i presentar-les ordenades.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface UnitatMesuraRepository extends JpaRepository<UnitatMesura, Long> {
 

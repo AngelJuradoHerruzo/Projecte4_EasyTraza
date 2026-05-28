@@ -11,7 +11,7 @@ import retrofit2.http.Path
  * Definits els endpoints REST utilitzats per consultar els lots
  * i executar-ne les operacions d'inici i finalització.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 interface LotApi {
 

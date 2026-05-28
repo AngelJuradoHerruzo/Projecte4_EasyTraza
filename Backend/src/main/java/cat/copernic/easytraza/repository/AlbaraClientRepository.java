@@ -10,7 +10,7 @@ import cat.copernic.easytraza.entities.AlbaraClient;
  * Gestionat l'accés a les dades persistides dels albarans de client
  * i les consultes necessàries per ordenar-los o validar-ne les relacions.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface AlbaraClientRepository extends JpaRepository<AlbaraClient, Long> {
 

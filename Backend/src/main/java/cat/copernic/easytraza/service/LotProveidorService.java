@@ -22,7 +22,7 @@ import cat.copernic.easytraza.repository.MateriaPrimeraRepository;
  * Gestionades les operacions de consulta, inici i finalització dels lots de proveïdor.
  * També controlades les validacions d'estat i de matèria primera associada.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

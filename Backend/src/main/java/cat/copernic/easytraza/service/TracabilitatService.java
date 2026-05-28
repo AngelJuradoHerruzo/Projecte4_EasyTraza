@@ -36,7 +36,7 @@ import cat.copernic.easytraza.repository.ProveidorRepository;
  * Gestionades les consultes necessàries per obtenir informació de producció i seguiment associada als lots.
  * També preparades les dades utilitzades en l'explotació i consulta de la traçabilitat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Gestionades les pantalles mostrades quan es produeixen errors d'accés,
  * de recurs no trobat o errors interns del servidor.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 public class ErrorWebController {

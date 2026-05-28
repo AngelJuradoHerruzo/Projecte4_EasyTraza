@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Gestionat l'accés a les dades persistides dels usuaris i les consultes
  * necessàries per localitzar-los durant l'autenticació o la gestió de perfils.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface UsuariRepository extends JpaRepository<Usuari, Long> {
 

@@ -6,7 +6,7 @@ package cat.copernic.easytraza.mobile.features.lots.data.sources.remote
  * Representat el resultat retornat pel backend en iniciar un lot,
  * indicant si cal confirmar l'operació i el lot afectat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 data class ConfirmarIniciLotResponse(
     val requereixConfirmacio: Boolean,

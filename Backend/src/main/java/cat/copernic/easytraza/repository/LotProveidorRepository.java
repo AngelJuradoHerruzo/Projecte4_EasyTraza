@@ -14,7 +14,7 @@ import cat.copernic.easytraza.enums.EstatLot;
  * Gestionat l'accés a les dades persistides dels lots de proveïdor
  * i les consultes necessàries per controlar-ne l'estat i la matèria primera.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface LotProveidorRepository extends JpaRepository<LotProveidor, Long> {
 

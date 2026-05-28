@@ -26,7 +26,7 @@ import cat.copernic.easytraza.repository.UsuariRepository;
  * Gestionades les operacions de consulta, creació, modificació i eliminació dels usuaris.
  * També controlades les validacions de dades i la gestió de l'avatar associat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

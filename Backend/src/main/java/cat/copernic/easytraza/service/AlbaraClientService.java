@@ -28,7 +28,7 @@ import cat.copernic.easytraza.repository.UsuariRepository;
  * Gestionades les operacions de consulta, creació, modificació, lliurament i eliminació dels albarans de client.
  * També aplicades les validacions necessàries sobre les línies de producció associades.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 @Transactional

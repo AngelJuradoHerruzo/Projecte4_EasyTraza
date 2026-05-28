@@ -11,7 +11,7 @@ import java.util.List;
  * incloent-hi el document temporal, els textos reconeguts i els avisos generats.
  * Aquest objecte no implica el guardat de cap dada de negoci.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public class OcrResultatAlbaraProveidorDto {
 

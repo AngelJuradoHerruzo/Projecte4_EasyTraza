@@ -10,7 +10,7 @@ import cat.copernic.easytraza.entities.Proveidor;
  * Gestionat l'accés a les dades persistides dels proveïdors i la consulta
  * necessària per localitzar-los mitjançant el seu CIF.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 public interface ProveidorRepository extends JpaRepository<Proveidor, Long> {
 

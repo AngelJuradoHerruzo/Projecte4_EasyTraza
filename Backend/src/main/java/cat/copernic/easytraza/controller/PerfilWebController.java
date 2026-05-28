@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpSession;
  * Gestionada la visualització i modificació del perfil de l'usuari autenticat,
  * incloent-hi la consulta del seu avatar.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Controller
 @RequestMapping("/perfil")

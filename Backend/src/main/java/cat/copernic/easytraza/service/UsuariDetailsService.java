@@ -17,7 +17,7 @@ import java.util.List;
  * Carregades les dades dels usuaris necessàries per a l'autenticació amb Spring Security.
  * També adaptat el rol propi de l'aplicació al format utilitzat pel sistema de seguretat.
  *
- * @author Ángel Jurado Herruz
+ * @author Ángel Jurado Herruzo
  */
 @Service
 public class UsuariDetailsService implements UserDetailsService {
