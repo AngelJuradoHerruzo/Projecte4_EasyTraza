@@ -183,21 +183,6 @@ public class AlbaraProveidorService {
      * @param id identificador utilitzat en l'operació
      * @return resultat obtingut pel mètode
      */
-    public AlbaraProveidor getAlbaraProveidorById(Long id) {
-        Optional<AlbaraProveidor> albaraProveidor = albaraProveidorRepository.findById(id);
-        return albaraProveidor.orElse(null);
-    }
-
-
-    /**
-     * OBTENCIÓ DE DADES.
-     *
-     * Obtinguda la informació sol·licitada a partir de les dades disponibles
-     * o dels paràmetres rebuts pel mètode.
-     *
-     * @param id identificador utilitzat en l'operació
-     * @return resultat obtingut pel mètode
-     */
     public AlbaraProveidor getAlbaraProveidorDetallById(Long id) {
 
         Optional<AlbaraProveidor> albaraProveidorOpt = albaraProveidorRepository.findById(id);
@@ -243,14 +228,6 @@ public class AlbaraProveidorService {
     }
 
 
-    // CREAR ALBARÀ DE PROVEÏDOR SENSE DOCUMENT OCR TEMPORAL
-    public AlbaraProveidor createAlbaraProveidor(AlbaraProveidor albaraProveidor,
-                                                 MultipartFile imatgeAlbara,
-                                                 HttpSession session) {
-        return createAlbaraProveidor(albaraProveidor, imatgeAlbara, null, session);
-    }
-
-
     // ACTUALITZAR ALBARÀ DE PROVEÏDOR
     public AlbaraProveidor updateAlbaraProveidor(Long id,
                                                  AlbaraProveidor albaraProveidor,
@@ -278,15 +255,6 @@ public class AlbaraProveidorService {
         guardarFitxerAlbara(albaraActual, imatgeAlbara, ocrDocumentTemporalId);
 
         return albaraProveidorRepository.save(albaraActual);
-    }
-
-
-    // ACTUALITZAR ALBARÀ DE PROVEÏDOR SENSE DOCUMENT OCR TEMPORAL
-    public AlbaraProveidor updateAlbaraProveidor(Long id,
-                                                 AlbaraProveidor albaraProveidor,
-                                                 MultipartFile imatgeAlbara,
-                                                 HttpSession session) {
-        return updateAlbaraProveidor(id, albaraProveidor, imatgeAlbara, null, session);
     }
 
 

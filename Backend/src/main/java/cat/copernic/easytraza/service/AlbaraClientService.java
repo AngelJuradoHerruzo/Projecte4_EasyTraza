@@ -51,19 +51,6 @@ public class AlbaraClientService {
     }
 
 
-    /**
-     * OBTENCIÓ DEL LLISTAT.
-     *
-     * Obtingut el conjunt de dades sol·licitat pel servei, aplicant
-     * els filtres o l'ordenació corresponents quan és necessari.
-     *
-     * @return llista de resultats obtinguda
-     */
-    public List<AlbaraClient> getAllAlbaransClient() {
-        return albaraClientRepository.findAllByOrderByDataAlbaraDescIdDesc();
-    }
-
-
     // PREPARAR LLISTAT WEB D'ALBARANS DE CLIENT AMB FILTRES I ORDENACIÓ OPCIONALS
     public List<AlbaraClient> getAlbaransClientLlistat(Long clientId,
                                                         String numeroAlbara,

@@ -2,7 +2,6 @@ package cat.copernic.easytraza.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -37,13 +36,6 @@ public class UnitatMesuraService {
     // OBTENIR TOTES LES UNITATS DE MESURA ORDENADES
     public List<UnitatMesura> getAllUnitatsMesura() {
         return unitatMesuraRepository.findAllByOrderByNomAsc();
-    }
-
-
-    // OBTENIR UNITAT DE MESURA PER ID
-    public UnitatMesura getUnitatMesuraById(Long id) {
-        Optional<UnitatMesura> unitatMesura = unitatMesuraRepository.findById(id);
-        return unitatMesura.orElse(null);
     }
 
 

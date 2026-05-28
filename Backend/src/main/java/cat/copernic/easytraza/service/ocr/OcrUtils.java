@@ -305,30 +305,6 @@ public final class OcrUtils {
 
 
     /**
-     * CONVERSIÓ DE DADES.
-     *
-     * Convertit el valor rebut al format necessari per poder-lo utilitzar
-     * dins del procés del servei.
-     *
-     * @param valor valor que s'ha de processar
-     * @return valor numèric obtingut
-     */
-    public static Double convertirQuantitatOcr(String valor) {
-        if (valor == null || valor.isBlank()) {
-            return null;
-        }
-
-        String net = valor.trim();
-
-        if (!net.contains(",") && !net.contains(".") && net.matches("\\d{3,4}")) {
-            return convertirNumero(net.substring(0, net.length() - 2) + "." + net.substring(net.length() - 2));
-        }
-
-        return convertirNumero(net);
-    }
-
-
-    /**
      * NORMALITZACIÓ DE DADES.
      *
      * Preparat el valor rebut perquè pugui ser comparat, mostrat
