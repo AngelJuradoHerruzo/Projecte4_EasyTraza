@@ -198,6 +198,7 @@ Abans d'utilitzar les funcionalitats connectades amb el backend, cal configurar 
 La memòria completa del projecte es troba dins de la carpeta `Documentacio`:
 
 * link:Documentacio/memoria_final.adoc[Memòria Final del Projecte EasyTraza]
+* link:Documentacio/memoria_fase_disseny.adoc[Memòria de la Fase de Disseny]
 
 La documentació inclou:
 
