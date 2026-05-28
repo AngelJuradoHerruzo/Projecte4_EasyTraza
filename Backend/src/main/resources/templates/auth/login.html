@@ -72,6 +72,12 @@
                 <span th:text="#{login.logout.correcte}">Sessió tancada correctament.</span>
             </div>
 
+            <!-- Missatge de contrasenya actualitzada -->
+            <div th:if="${param.passwordChanged}" class="form-success" style="width:100%; margin-bottom:18px;">
+                <i class="bi bi-check-circle"></i>
+                <span th:text="#{login.contrasenya.actualitzada}">Contrasenya actualitzada correctament. Ja pots iniciar sessió.</span>
+            </div>
+
             <form th:action="@{/login}" method="post">
 
                 <!----------------------- CAMP EMAIL ----------------------->
@@ -115,6 +121,14 @@
                     <i class="bi bi-box-arrow-in-right"></i>
                     <span th:text="#{login.boto}">Iniciar sessió</span>
                 </button>
+
+                <div style="margin-top:18px; text-align:center;">
+                    <a th:href="@{/recuperar-contrasenya}"
+                       style="color:var(--accent-dark); font-size:14px; font-weight:600;"
+                       th:text="#{login.contrasenya.oblidada}">
+                        Has oblidat la contrasenya?
+                    </a>
+                </div>
 
             </form>
         </div>

@@ -18,5 +18,15 @@
     "name": "ocr.documents.final-path",
     "type": "java.lang.String",
     "description": "A description for 'ocr.documents.final-path'"
+  },
+  {
+    "name": "app.recuperacio.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'app.recuperacio.base-url'"
+  },
+  {
+    "name": "app.recuperacio.token-duracio-minuts",
+    "type": "java.lang.String",
+    "description": "A description for 'app.recuperacio.token-duracio-minuts'"
   }
 ]}
