@@ -77,6 +77,8 @@ public class SecurityConfig {
                 // Rutes públiques
                 .requestMatchers(
                     "/login",
+                    "/recuperar-contrasenya",
+                    "/restablir-contrasenya",
                     "/error",
                     "/error/**",
                     "/api/mobile/auth/identificar",
